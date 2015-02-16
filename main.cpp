@@ -19,10 +19,10 @@ public:
 
     sleeper(rep global, rep local) :
             night(global), nap(local), cur_nap(local) {
-        reset();
+        start();
     }
 
-    void reset() {
+    void start() {
         bedtime = std::chrono::system_clock::now();
     }
 
