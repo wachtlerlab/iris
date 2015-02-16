@@ -40,7 +40,7 @@ public:
         if (sleep_longer) {
             cur_nap *= 2;
         } else {
-            cur_nap = nap;
+            reset_local();
         }
 
         auto the_nap = std::min(cur_nap, night - t_elapsed);
@@ -49,6 +49,10 @@ public:
         std::this_thread::sleep_for(timeout);
 
         return true;
+    }
+
+    void reset_local() {
+        cur_nap = nap;
     }
 
 private:
