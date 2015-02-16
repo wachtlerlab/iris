@@ -51,6 +51,15 @@ public:
         return true;
     }
 
+    bool maybe_sleep(bool should_sleep) {
+        if (should_sleep) {
+            return sleep(true);
+        }
+
+        reset_local();
+        return true;
+    }
+
     void reset_local() {
         cur_nap = nap;
     }
