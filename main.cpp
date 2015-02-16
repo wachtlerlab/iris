@@ -320,30 +320,25 @@ public:
     cfg config() {
         std::string resp = io.send_and_recv_line("D120");
         status res = parse_status(resp);
+        if (res != 0) {
+            return cfg();
+        }
+        //qqqqq,pp,bw,bb,ee,ii,nrp,frp,lrp CRLF
+        int qq, pp, bb, ee, ii, nrp, frp, lrp;
+        float bw;
 
-        if (res == 0 && resp.size() > 2) {
-            const size_t size = resp.size();
+        cfg hwcfg;
 
-            resp[size - 2] = '\0';
-            //qqqqq,pp,bw,bb,ee,ii,nrp,frp,lrp CRLF
-            int qq, pp, bb, ee, ii, nrp, frp, lrp;
-            float bw;
+        int ret = std::sscanf(resp.data(), "%d,%hu,%f,%hu,%hu,%hu,%d,%d,%d",
+                              &qq, &hwcfg.n_points, &hwcfg.bandwidth,
+                              &hwcfg.wl_start, &hwcfg.wl_stop, &hwcfg.wl_inc,
+                              &nrp, &frp, &lrp);
 
-            cfg hwcfg;
-
-            int ret = std::sscanf(resp.data(), "%d,%hu,%f,%hu,%hu,%hu,%d,%d,%d",
-                                  &qq, &hwcfg.n_points, &hwcfg.bandwidth,
-                                  &hwcfg.wl_start, &hwcfg.wl_stop, &hwcfg.wl_inc,
-                                  &nrp, &frp, &lrp);
-
-            if (ret != 9) {
-                throw std::runtime_error("Could not parse config line");
-            }
-
-            return hwcfg;
+        if (ret != 9) {
+            throw std::runtime_error("Could not parse config line");
         }
 
-        return cfg();
+        return hwcfg;
     }
 
     void measure() {
