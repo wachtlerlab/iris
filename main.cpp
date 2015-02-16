@@ -190,7 +190,7 @@ public:
         return buf;
     }
 
-    std::vector<char> recv_line(sleeper::rep read_timeout = 5000) {
+    std::string recv_line(sleeper::rep read_timeout = 5000) {
         sleeper timeout(read_timeout, 1);
 
         std::vector<char> buf;
@@ -203,15 +203,17 @@ public:
                 throw std::runtime_error("r failed");
             }
 
-            buf.push_back(ch);
+            if (nread > 0 && ch != '\r' && ch != '\n') {
+                buf.push_back(ch);
+            }
 
-            if (!timeout.sleep(nread == 0)) {
+            if (!timeout.maybe_sleep(nread == 0)) {
                 throw std::runtime_error("w failed: timeout");
             }
 
         } while (ch != '\n');
 
-        return buf;
+        return std::string(buf.data(), buf.size());
     };
 
     void eatup() {
@@ -230,7 +232,7 @@ public:
         return recv_data(to_read, t_read);
     }
 
-    std::vector<char> send_and_recv_line(const std::string &cmd, sleeper::rep t_pause = 200) {
+    std::string send_and_recv_line(const std::string &cmd, sleeper::rep t_pause = 200) {
         send_data(cmd);
         wait(t_pause);
         return recv_line();
@@ -277,8 +279,11 @@ public:
     }
 
     bool start() {
-        io.send_and_recv("PHOTO", 12, 1000);
-        return true;
+        std::vector<char> resp = io.send_and_recv("PHOTO", 12, 1000);
+        std::string line(resp.data(), resp.size());
+        std::cerr << "[" << line << "]" << std::endl;
+
+        return !line.compare(1, 11, "REMOTE MODE");
     }
 
     void stop() {
@@ -287,33 +292,33 @@ public:
     }
 
     std::string serial_number() {
-        std::vector<char> resp = io.send_and_recv_line("D110");
+        std::string resp = io.send_and_recv_line("D110");
         status res = parse_status(resp);
 
-        return std::string(resp.data());
+        return resp;
     }
 
     std::string model_number() {
-        std::vector<char> resp = io.send_and_recv_line("D111");
+        std::string resp = io.send_and_recv_line("D111");
         status res = parse_status(resp);
 
-        return std::string(resp.data());
+        return resp;
     }
 
     void units(bool metric) {
         std::string cmd = metric ? "SU1" : "SU0";
-        std::vector<char> resp = io.send_and_recv_line(cmd);
+        std::string resp = io.send_and_recv_line(cmd);
         status res = parse_status(resp);
 
     }
 
     status istatus() {
-        std::vector<char> resp = io.send_and_recv_line("I");
+        std::string resp = io.send_and_recv_line("I");
         return parse_status(resp);
     }
 
     cfg config() {
-        std::vector<char> resp = io.send_and_recv_line("D120");
+        std::string resp = io.send_and_recv_line("D120");
         status res = parse_status(resp);
 
         if (res == 0 && resp.size() > 2) {
@@ -343,21 +348,15 @@ public:
 
     void measure() {
         io.send_data("M5");
-        io.wait(1000);
+        //io.wait(1000);
 
-        std::vector<char> header = io.recv_line(30000);
-        status res = parse_status(header);
+        std::string header = io.recv_line(50000);
+        //status res = parse_status(header);
+        std::cout << header << std::endl;
 
         //qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
         for(uint32_t i = 0; i < 101; i++) {
-            std::vector<char> line = io.recv_line();
-
-            if (line.empty()) {
-                break;
-            }
-
-            line.back() = '\0';
-
+            std::string line = io.recv_line();
             char *s_end = nullptr;
             unsigned long lambda = std::strtoul(line.data(), &s_end, 10);
             double ri = std::strtod(line.data() + 5, &s_end);
@@ -366,19 +365,17 @@ public:
 
     }
 
-    status parse_status(std::vector<char> resp) {
+    status parse_status(std::string resp) {
         char *s_end;
 
-        if (resp.size() < 6) {
+        if (resp.size() < 5) {
             throw std::invalid_argument("Cannot parse status code (< 5)");
         }
 
         const size_t size = resp.size();
-        resp[size - 2] = '\0';
-        std::cerr << "[D] L: [" << resp.data() << "] (" << resp.size() << ")" << std::endl;
-
-        resp[4] = '\0';
         unsigned long code = strtoul(resp.data(), &s_end, 10);
+        std::cerr << "[D] L: [" << resp.data() << "] (" << resp.size() << ") -> " << code << std::endl;
+
         return code;
     }
 
@@ -393,23 +390,32 @@ int main(int argc, char **argv) {
 
     device::pr655 meter = device::pr655::open(argv[1]);
 
-    meter.start();
+    try {
+        bool could_start = meter.start();
+        if (! could_start) {
+            std::cerr << "Could not start remote mode" << std::endl;
 
-    std::string res = meter.serial_number();
-    std::cerr << res << std::endl;
+        }
 
-    res = meter.model_number();
-    std::cerr << res << std::endl;
+        std::string res = meter.serial_number();
+        std::cerr << res << std::endl;
 
-    meter.units(true);
+        res = meter.model_number();
+        std::cerr << res << std::endl;
 
-    std::cout << meter.istatus() << std::endl;
+        meter.units(true);
 
-    device::pr655::cfg config = meter.config();
+        std::cout << meter.istatus() << std::endl;
 
-    std::cout << config.wl_start << " " << config.wl_stop << " " << config.wl_inc << std::endl;
+        meter.measure();
 
-    meter.measure();
+        device::pr655::cfg config = meter.config();
+        std::cout << config.wl_start << " " << config.wl_stop << " " << config.wl_inc << std::endl;
+
+        std::cout << meter.istatus() << std::endl;
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
 
     meter.stop();
 
