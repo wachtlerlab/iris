@@ -296,14 +296,19 @@ public:
 
     }
 
-    status parse_status(std::vector<char> data) {
+    status parse_status(std::vector<char> resp) {
         char *s_end;
 
-        if (data.size() < 4) {
-            std::invalid_argument("Cannot parse status code (< 4)");
+        if (resp.size() < 5) {
+            throw std::invalid_argument("Cannot parse status code (< 5)");
         }
 
-        unsigned long code = strtoul(data.data(), &s_end, 10);
+        const size_t size = resp.size();
+        resp[size - 2] = '\0';
+        std::cerr << "[D] L: [" << resp.data() << "] (" << resp.size() << ")" << std::endl;
+
+        resp[4] = '\0';
+        unsigned long code = strtoul(resp.data(), &s_end, 10);
         return code;
     }
 
