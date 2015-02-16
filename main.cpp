@@ -2,6 +2,7 @@
 #include <sstream>
 #include <chrono>
 #include <thread>
+#include <vector>
 
 #include <fcntl.h>
 #include <termios.h>
@@ -153,16 +154,15 @@ public:
         }
     };
 
-    std::string recv_data(size_t to_read, sleeper::rep read_timeout = 5000) {
-        char buf[to_read + 1];
-        std::fill_n(buf, to_read + 1, 0);
+    std::vector<char> recv_data(size_t to_read, sleeper::rep read_timeout = 5000) {
+        std::vector<char> buf(to_read + 1, 0);
 
         size_t pos = 0;
 
         sleeper timeout(read_timeout, 1);
 
         while (pos < to_read) {
-            ssize_t nread = read(fd, buf + pos, to_read - pos);
+            ssize_t nread = read(fd, buf.data() + pos, to_read - pos);
             if (nread < 0) {
                 throw std::runtime_error("r failed");
             }
@@ -174,7 +174,7 @@ public:
             }
         }
 
-        return std::string(buf);
+        return buf;
     }
 
     void eatup() {
@@ -184,10 +184,10 @@ public:
         }
     }
 
-    std::string send_and_recv(const std::string &cmd,
-                              size_t             to_read,
-                              sleeper::rep       t_rest = 200,
-                              sleeper::rep       t_read = 5000) {
+    std::vector<char> send_and_recv(const std::string &cmd,
+                                    size_t             to_read,
+                                    sleeper::rep       t_rest = 200,
+                                    sleeper::rep       t_read = 5000) {
         send_data(cmd);
         wait(t_rest);
         return recv_data(to_read, t_read);
@@ -220,9 +220,6 @@ public:
     static pr655 open(const std::string &path) {
         serial s = serial::open(path);
         pr655 meter(s);
-
-
-
         return meter;
     }
 
@@ -237,44 +234,46 @@ public:
     }
 
     std::string serial_number() {
-        return io.send_and_recv("D110", 16);
+        std::vector<char> resp = io.send_and_recv("D110", 16);
+        return std::string(resp.data());
     }
 
     std::string model_number() {
-        return io.send_and_recv("D111", 14);
+        std::vector<char> resp = io.send_and_recv("D111", 14);
+        return std::string(resp.data());
     }
 
     void units(bool metric) {
         std::string cmd = metric ? "SU1" : "SU0";
-        std::string l = io.send_and_recv(cmd, 7);
+        std::vector<char> resp = io.send_and_recv(cmd, 7);
     }
 
     void measure() {
         io.send_data("M5");
         io.wait(1000);
 
-        std::string header = io.recv_data(39, 30000);
-        std::cout << header << std::endl;
+        std::vector<char> header = io.recv_data(39, 30000);
+        std::cout << header.data() << std::endl;
 
         //qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
         for(uint32_t i = 0; i < 101; i++) {
-            std::string line = io.recv_data(16);
+            std::vector<char> line = io.recv_data(16);
             char *s_end = nullptr;
-            unsigned long lambda = std::strtoul(line.c_str(), &s_end, 10);
-            double ri = std::strtod(line.c_str() + 5, &s_end);
+            unsigned long lambda = std::strtoul(line.data(), &s_end, 10);
+            double ri = std::strtod(line.data() + 5, &s_end);
             std::cout << lambda << " | " << ri << std::endl;
         }
 
     }
 
-    status parse_status(const std::string &data) {
+    status parse_status(std::vector<char> data) {
         char *s_end;
 
         if (data.size() < 4) {
             std::invalid_argument("Cannot parse status code (< 4)");
         }
 
-        unsigned long code = strtoul(data.c_str(), &s_end, 10);
+        unsigned long code = strtoul(data.data(), &s_end, 10);
         return code;
     }
 
