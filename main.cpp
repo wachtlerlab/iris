@@ -264,30 +264,48 @@ public:
     }
 
     std::string serial_number() {
-        std::vector<char> resp = io.send_and_recv("D110", 16);
+        std::vector<char> resp = io.send_and_recv_line("D110");
+        status res = parse_status(resp);
+
         return std::string(resp.data());
     }
 
     std::string model_number() {
-        std::vector<char> resp = io.send_and_recv("D111", 14);
+        std::vector<char> resp = io.send_and_recv_line("D111");
+        status res = parse_status(resp);
+
         return std::string(resp.data());
     }
 
     void units(bool metric) {
         std::string cmd = metric ? "SU1" : "SU0";
-        std::vector<char> resp = io.send_and_recv(cmd, 7);
+        std::vector<char> resp = io.send_and_recv_line(cmd);
+        status res = parse_status(resp);
+
+    }
+
+    status istatus() {
+        std::vector<char> resp = io.send_and_recv_line("I");
+        return parse_status(resp);
     }
 
     void measure() {
         io.send_data("M5");
         io.wait(1000);
 
-        std::vector<char> header = io.recv_data(39, 30000);
-        std::cout << header.data() << std::endl;
+        std::vector<char> header = io.recv_line(30000);
+        status res = parse_status(header);
 
         //qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
         for(uint32_t i = 0; i < 101; i++) {
-            std::vector<char> line = io.recv_data(16);
+            std::vector<char> line = io.recv_line();
+
+            if (line.empty()) {
+                break;
+            }
+
+            line.back() = '\0';
+
             char *s_end = nullptr;
             unsigned long lambda = std::strtoul(line.data(), &s_end, 10);
             double ri = std::strtod(line.data() + 5, &s_end);
