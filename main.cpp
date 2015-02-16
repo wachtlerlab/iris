@@ -177,6 +177,30 @@ public:
         return buf;
     }
 
+    std::vector<char> recv_line(sleeper::rep read_timeout = 5000) {
+        sleeper timeout(read_timeout, 1);
+
+        std::vector<char> buf;
+
+        char ch = '\0';
+
+        do {
+            ssize_t nread = read(fd, &ch, 1);
+            if (nread < 0) {
+                throw std::runtime_error("r failed");
+            }
+
+            buf.push_back(ch);
+
+            if (!timeout.sleep(nread == 0)) {
+                throw std::runtime_error("w failed: timeout");
+            }
+
+        } while (ch != '\n');
+
+        return buf;
+    };
+
     void eatup() {
         char buff[255];
         while((read(fd, buff, sizeof(buff))) > 0) {
