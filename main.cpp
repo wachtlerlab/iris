@@ -177,6 +177,18 @@ public:
         return std::string(buf);
     }
 
+    std::string send_and_recv(const std::string &cmd,
+                              size_t             to_read,
+                              sleeper::rep       t_rest = 200,
+                              sleeper::rep       t_read = 5000) {
+        send_data(cmd);
+
+        std::chrono::milliseconds dura(t_rest);
+        std::this_thread::sleep_for(dura);
+
+        return readline(to_read, t_read);
+    }
+
     ~serial() {
         close(fd);
     }
@@ -206,13 +218,7 @@ public:
     }
 
     bool start() {
-        io.send_data("PHOTO");
-
-        std::chrono::milliseconds dura(1000);
-        std::this_thread::sleep_for(dura);
-
-        std::string l = io.readline(12);
-
+        io.send_and_recv("PHOTO", 12, 1000);
         return true;
     }
 
@@ -221,44 +227,25 @@ public:
     }
 
     std::string serial_number() {
-        io.send_data("D110");
-        std::chrono::milliseconds dura(200);
-        std::this_thread::sleep_for(dura);
-
-        std::string l = io.readline(16);
-        return l;
+        return io.send_and_recv("D110", 16);
     }
 
     std::string model_number() {
-
-        io.send_data("D111");
-        std::chrono::milliseconds dura(200);
-        std::this_thread::sleep_for(dura);
-        std::string l = io.readline(14);
-        return l;
-    }
-
-    std::string software_version() {
-        io.send_data("D114");
-        std::chrono::milliseconds dura(200);
-        std::this_thread::sleep_for(dura);
-        std::string l = io.readline(13);
-        return l;
+        return io.send_and_recv("D111", 14);
     }
 
     void units(bool metric) {
-        if (metric) {
-            io.send_data("SU1");
-        } else {
-            io.send_data("SU0");
-        }
-        std::string l = io.readline(7);
+        std::string cmd = metric ? "SU1" : "SU0";
+        std::string l = io.send_and_recv(cmd, 7);
     }
 
     void measure() {
         io.send_data("M5");
 
-        std::string header = io.readline(39);
+        std::chrono::milliseconds dura(1000);
+        std::this_thread::sleep_for(dura);
+
+        std::string header = io.readline(39, 30000);
         std::cout << header << std::endl;
 
         //qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
