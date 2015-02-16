@@ -123,16 +123,20 @@ public:
         const size_t size = str.size();
         size_t pos = 0;
 
+        //lets say we sleep 10ms per char
+        sleeper timeout(static_cast<sleeper::rep>(size) * 10, 1);
+
         while (pos < size) {
 
             ssize_t n = write(fd, data + pos, 1);
             if (n < 0) {
-                std::cerr << "w failed" << std::endl;
+                throw std::runtime_error("w failed: io error");
             }
 
             pos += static_cast<size_t>(n);
-            std::chrono::milliseconds dura(1);
-            std::this_thread::sleep_for(dura);
+            if (!timeout.sleep(n == 0)) {
+                throw std::runtime_error("w failed: timeout");
+            }
         }
 
         char cr[1] = {'\r'};
@@ -142,16 +146,20 @@ public:
             if (n == 1) {
                 break;
             }
+
+            if (!timeout.sleep(n == 0)) {
+                throw std::runtime_error("w failed: timeout");
+            }
         }
     };
 
-    std::string readline(size_t to_read) {
+    std::string readline(size_t to_read, sleeper::rep read_timeout = 5000) {
         char buf[to_read + 1];
         std::fill_n(buf, to_read + 1, 0);
 
         size_t pos = 0;
 
-        auto t_start = std::chrono::system_clock::now();
+        sleeper timeout(read_timeout, 1);
 
         while (pos < to_read) {
             ssize_t nread = read(fd, buf + pos, to_read - pos);
@@ -161,16 +169,9 @@ public:
 
             pos += static_cast<size_t>(nread);
 
-            std::chrono::milliseconds dura(1);
-            std::this_thread::sleep_for(dura);
-
-            auto now = std::chrono::system_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - t_start);
-            if (elapsed.count() > 10) {
-                std::cerr << "TIMEOUT: " << buf << std::endl;
-                return "";
+            if (!timeout.sleep(nread == 0)) {
+                throw std::runtime_error("w failed: timeout");
             }
-
         }
 
         return std::string(buf);
