@@ -11,6 +11,53 @@
 
 namespace device {
 
+class sleeper {
+public:
+    typedef std::chrono::milliseconds dur_t;
+    typedef dur_t::rep rep;
+
+    sleeper(rep global, rep local) :
+            night(global), nap(local), cur_nap(local) {
+        reset();
+    }
+
+    void reset() {
+        bedtime = std::chrono::system_clock::now();
+    }
+
+    bool sleep(bool sleep_longer) {
+
+        auto now = std::chrono::system_clock::now();
+        auto elapsed = std::chrono::duration_cast<dur_t>(now - bedtime); //in rep, i.e. ms
+
+        const rep t_elapsed = elapsed.count();
+
+        if (t_elapsed > night) {
+            return false;
+        }
+
+        if (sleep_longer) {
+            cur_nap *= 2;
+        } else {
+            cur_nap = nap;
+        }
+
+        auto the_nap = std::min(cur_nap, night - t_elapsed);
+
+        dur_t timeout(the_nap);
+        std::this_thread::sleep_for(timeout);
+
+        return true;
+    }
+
+private:
+    rep night;   // max sleeping until we can do, i.e. timeout
+    rep nap;     // the starting consecutive amount of sleeping
+    rep cur_nap; // the amount of consecutive sleeping we will do
+
+    std::chrono::system_clock::time_point bedtime; // when the night started
+};
+
 
 class serial {
 
