@@ -180,8 +180,7 @@ public:
     void eatup() {
         char buff[255];
         while((read(fd, buff, sizeof(buff))) > 0) {
-            std::chrono::milliseconds dura(10);
-            std::this_thread::sleep_for(dura);
+            wait(10);
         }
     }
 
@@ -190,10 +189,7 @@ public:
                               sleeper::rep       t_rest = 200,
                               sleeper::rep       t_read = 5000) {
         send_data(cmd);
-
-        std::chrono::milliseconds dura(t_rest);
-        std::this_thread::sleep_for(dura);
-
+        wait(t_rest);
         return recv_data(to_read, t_read);
     }
 
@@ -203,6 +199,11 @@ public:
 
     explicit operator bool() const {
         return fd > 0;
+    }
+
+    void wait(sleeper::rep time_to_wait) {
+        std::chrono::milliseconds dura(time_to_wait);
+        std::this_thread::sleep_for(dura);
     }
 
 private:
@@ -250,9 +251,7 @@ public:
 
     void measure() {
         io.send_data("M5");
-
-        std::chrono::milliseconds dura(1000);
-        std::this_thread::sleep_for(dura);
+        io.wait(1000);
 
         std::string header = io.recv_data(39, 30000);
         std::cout << header << std::endl;
