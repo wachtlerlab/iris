@@ -177,6 +177,14 @@ public:
         return std::string(buf);
     }
 
+    void eatup() {
+        char buff[255];
+        while((read(fd, buff, sizeof(buff))) > 0) {
+            std::chrono::milliseconds dura(10);
+            std::this_thread::sleep_for(dura);
+        }
+    }
+
     std::string send_and_recv(const std::string &cmd,
                               size_t             to_read,
                               sleeper::rep       t_rest = 200,
@@ -224,6 +232,7 @@ public:
 
     void stop() {
         io.send_data("Q");
+        io.eatup();
     }
 
     std::string serial_number() {
