@@ -217,6 +217,12 @@ public:
         return recv_data(to_read, t_read);
     }
 
+    std::vector<char> send_and_recv_line(const std::string &cmd, sleeper::rep t_pause = 200) {
+        send_data(cmd);
+        wait(t_pause);
+        return recv_line();
+    }
+
     ~serial() {
         close(fd);
     }
