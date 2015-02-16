@@ -265,7 +265,7 @@ private:
 
 class pr655 {
 public:
-    typedef unsigned long status;
+    typedef int status;
 
     struct cfg {
         unsigned short n_points;
@@ -332,17 +332,17 @@ public:
             return cfg();
         }
         //qqqqq,pp,bw,bb,ee,ii,nrp,frp,lrp CRLF
-        int qq, pp, bb, ee, ii, nrp, frp, lrp;
+        int pp, bb, ee, ii, nrp, frp, lrp;
         float bw;
 
         cfg hwcfg;
 
-        int ret = std::sscanf(resp.data(), "%d,%hu,%f,%hu,%hu,%hu,%d,%d,%d",
-                              &qq, &hwcfg.n_points, &hwcfg.bandwidth,
+        int ret = std::sscanf(resp.c_str(), "%hu,%f,%hu,%hu,%hu,%d,%d,%d",
+                              &hwcfg.n_points, &hwcfg.bandwidth,
                               &hwcfg.wl_start, &hwcfg.wl_stop, &hwcfg.wl_inc,
                               &nrp, &frp, &lrp);
 
-        if (ret != 9) {
+        if (ret != 8) {
             throw std::runtime_error("Could not parse config line");
         }
 
@@ -377,19 +377,21 @@ public:
         return data;
     }
 
-    status parse_status(std::string resp) {
-        char *s_end;
+    status parse_status(std::string &resp) {
 
         if (resp.size() < 5) {
             throw std::invalid_argument("Cannot parse status code (< 5)");
         }
 
-        const size_t size = resp.size();
-        unsigned long code = strtoul(resp.data(), &s_end, 10);
+        int code = std::stoi(resp);
         std::cerr << "[D] L: [" << resp.data() << "] (" << resp.size() << ") -> " << code << std::endl;
+
+        size_t to_erase = resp.size() > 5 && resp[5] == ',' ? 6 : 5;
+        resp.erase(0, to_erase);
 
         return code;
     }
+
 
 private:
     serial io;
@@ -406,7 +408,6 @@ int main(int argc, char **argv) {
         bool could_start = meter.start();
         if (! could_start) {
             std::cerr << "Could not start remote mode" << std::endl;
-
         }
 
         std::string res = meter.serial_number();
