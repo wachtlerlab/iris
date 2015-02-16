@@ -153,7 +153,7 @@ public:
         }
     };
 
-    std::string readline(size_t to_read, sleeper::rep read_timeout = 5000) {
+    std::string recv_data(size_t to_read, sleeper::rep read_timeout = 5000) {
         char buf[to_read + 1];
         std::fill_n(buf, to_read + 1, 0);
 
@@ -194,7 +194,7 @@ public:
         std::chrono::milliseconds dura(t_rest);
         std::this_thread::sleep_for(dura);
 
-        return readline(to_read, t_read);
+        return recv_data(to_read, t_read);
     }
 
     ~serial() {
@@ -254,13 +254,12 @@ public:
         std::chrono::milliseconds dura(1000);
         std::this_thread::sleep_for(dura);
 
-        std::string header = io.readline(39, 30000);
+        std::string header = io.recv_data(39, 30000);
         std::cout << header << std::endl;
 
         //qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
         for(uint32_t i = 0; i < 101; i++) {
-            std::string line = io.readline(16);
-
+            std::string line = io.recv_data(16);
             char *s_end = nullptr;
             unsigned long lambda = std::strtoul(line.c_str(), &s_end, 10);
             double ri = std::strtod(line.c_str() + 5, &s_end);
