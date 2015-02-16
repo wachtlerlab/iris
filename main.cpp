@@ -10,6 +10,14 @@
 
 #include <stdexcept>
 
+struct spectral_data {
+
+    bool is_valid;
+
+    std::vector<uint16_t> points;
+    std::vector<float>    data;
+};
+
 namespace device {
 
 class sleeper {
@@ -341,23 +349,32 @@ public:
         return hwcfg;
     }
 
-    void measure() {
+    spectral_data measure() {
         io.send_data("M5");
-        //io.wait(1000);
 
         std::string header = io.recv_line(50000);
-        //status res = parse_status(header);
-        std::cout << header << std::endl;
+        status res = parse_status(header);
 
-        //qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
+        spectral_data data;
+        data.is_valid = res == 0;
+
+        // |qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
+        // |wl,spectral data CRLF
+
         for(uint32_t i = 0; i < 101; i++) {
             std::string line = io.recv_line();
-            char *s_end = nullptr;
-            unsigned long lambda = std::strtoul(line.data(), &s_end, 10);
-            double ri = std::strtod(line.data() + 5, &s_end);
+
+            unsigned short lambda;
+            float ri;
+            std::sscanf(line.c_str(), "%hu,%f", &lambda, &ri);
+
+            data.points.push_back(lambda);
+            data.data.push_back(ri);
+
             std::cout << lambda << " | " << ri << std::endl;
         }
 
+        return data;
     }
 
     status parse_status(std::string resp) {
