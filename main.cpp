@@ -241,10 +241,20 @@ private:
 };
 
 class pr655 {
-
+public:
     typedef unsigned long status;
 
-public:
+    struct cfg {
+        unsigned short n_points;
+
+        unsigned short wl_start;
+        unsigned short wl_stop;
+        unsigned short wl_inc;
+
+        float bandwidth;
+
+    };
+
     pr655(const serial &port) : io(port) {}
 
     static pr655 open(const std::string &path) {
@@ -289,6 +299,35 @@ public:
         return parse_status(resp);
     }
 
+    cfg config() {
+        std::vector<char> resp = io.send_and_recv_line("D120");
+        status res = parse_status(resp);
+
+        if (res == 0 && resp.size() > 2) {
+            const size_t size = resp.size();
+
+            resp[size - 2] = '\0';
+            //qqqqq,pp,bw,bb,ee,ii,nrp,frp,lrp CRLF
+            int qq, pp, bb, ee, ii, nrp, frp, lrp;
+            float bw;
+
+            cfg hwcfg;
+
+            int ret = std::sscanf(resp.data(), "%d,%hu,%f,%hu,%hu,%hu,%d,%d,%d",
+                                  &qq, &hwcfg.n_points, &hwcfg.bandwidth,
+                                  &hwcfg.wl_start, &hwcfg.wl_stop, &hwcfg.wl_inc,
+                                  &nrp, &frp, &lrp);
+
+            if (ret != 9) {
+                throw std::runtime_error("Could not parse config line");
+            }
+
+            return hwcfg;
+        }
+
+        return cfg();
+    }
+
     void measure() {
         io.send_data("M5");
         io.wait(1000);
@@ -317,7 +356,7 @@ public:
     status parse_status(std::vector<char> resp) {
         char *s_end;
 
-        if (resp.size() < 5) {
+        if (resp.size() < 6) {
             throw std::invalid_argument("Cannot parse status code (< 5)");
         }
 
@@ -350,6 +389,12 @@ int main(int argc, char **argv) {
     std::cerr << res << std::endl;
 
     meter.units(true);
+
+    std::cout << meter.istatus() << std::endl;
+
+    device::pr655::cfg config = meter.config();
+
+    std::cout << config.wl_start << " " << config.wl_stop << " " << config.wl_inc << std::endl;
 
     meter.measure();
 
