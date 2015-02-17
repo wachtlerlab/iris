@@ -309,8 +309,12 @@ public:
     }
 
     void stop() {
-        io.send_data("Q");
-        io.eatup();
+        try {
+            io.send_data("Q");
+            io.eatup();
+        } catch (...) {
+
+        }
     }
 
     std::string serial_number() {
