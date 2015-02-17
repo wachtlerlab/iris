@@ -333,7 +333,7 @@ public:
     }
 
     cfg config() {
-        response<std::string> res = io_cmd("M120");
+        response<std::string> res = io_cmd("D120");
 
         response<cfg> rcfg = res.map<cfg>([](const std::string &line) {
             return parse_hw_config(line);
