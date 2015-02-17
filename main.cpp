@@ -256,7 +256,20 @@ private:
 
 class pr655 {
 public:
-    typedef int status;
+
+    template<typename T>
+    struct response {
+
+        response(int code) : code(code) { }
+        response(int code, const T &payload) : code(code), data(payload) { }
+
+        explicit operator bool() const {
+            return code == 0;
+        }
+
+        int code;
+        T data;
+    };
 
     struct cfg {
         unsigned short n_points;
@@ -294,14 +307,14 @@ public:
 
     std::string serial_number() {
         std::string resp = io.send_and_recv_line("D110");
-        status res = parse_status(resp);
+        response<std::string> res = parse_status(resp);
 
         return resp;
     }
 
     std::string model_number() {
         std::string resp = io.send_and_recv_line("D111");
-        status res = parse_status(resp);
+        response<std::string> res = parse_status(resp);
 
         return resp;
     }
@@ -309,11 +322,11 @@ public:
     void units(bool metric) {
         std::string cmd = metric ? "SU1" : "SU0";
         std::string resp = io.send_and_recv_line(cmd);
-        status res = parse_status(resp);
+        response<std::string> res = parse_status(resp);
 
     }
 
-    status istatus() {
+    response<std::string> istatus() {
         std::string resp = io.send_and_recv_line("I");
         return parse_status(resp);
     }
@@ -382,7 +395,7 @@ public:
         size_t to_erase = resp.size() > 5 && resp[5] == ',' ? 6 : 5;
         resp.erase(0, to_erase);
 
-        return code;
+        return response<std::string>(code, resp);
     }
 
 
@@ -411,14 +424,17 @@ int main(int argc, char **argv) {
 
         meter.units(true);
 
-        std::cout << meter.istatus() << std::endl;
-
-        meter.measure();
-
+        std::cout << meter.istatus().code << std::endl;
         device::pr655::cfg config = meter.config();
         std::cout << config.wl_start << " " << config.wl_stop << " " << config.wl_inc << std::endl;
 
-        std::cout << meter.istatus() << std::endl;
+        spectral_data data = meter.measure();
+
+        if (data.is_valid) {
+            std::cerr << "have valid spectral data" << std::endl;
+        }
+
+        std::cout << meter.istatus().code << std::endl;
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
     }
