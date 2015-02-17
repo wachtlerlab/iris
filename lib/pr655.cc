@@ -43,13 +43,10 @@ spectral_data pr655::spectral() {
     for (uint32_t i = 0; i < hw.n_points; i++) {
         std::string line = io.recv_line();
 
-        unsigned short lambda;
-        float ri;
+        unsigned short lambda = 0;
+        float ri = -1;
         std::sscanf(line.c_str(), "%hu,%f", &lambda, &ri);
-
         data.data.push_back(ri);
-
-        std::cout << lambda << " | " << ri << std::endl;
     }
 
     return data;
