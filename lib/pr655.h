@@ -7,8 +7,9 @@ struct spectral_data {
 
     bool is_valid;
 
-    std::vector<uint16_t> points;
-    std::vector<float>    data;
+    uint16_t           wl_start;
+    uint16_t           wl_step;
+    std::vector<float> data;
 };
 
 namespace device {

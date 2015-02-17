@@ -34,18 +34,19 @@ spectral_data pr655::spectral() {
 
     spectral_data data;
     data.is_valid = res.code == 0;
+    data.wl_start = hw.wl_start;
+    data.wl_step = hw.wl_inc;
 
     // |qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
     // |wl,spectral data CRLF
 
-    for(uint32_t i = 0; i < hw.n_points; i++) {
+    for (uint32_t i = 0; i < hw.n_points; i++) {
         std::string line = io.recv_line();
 
         unsigned short lambda;
         float ri;
         std::sscanf(line.c_str(), "%hu,%f", &lambda, &ri);
 
-        data.points.push_back(lambda);
         data.data.push_back(ri);
 
         std::cout << lambda << " | " << ri << std::endl;
