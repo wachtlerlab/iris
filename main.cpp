@@ -373,6 +373,18 @@ public:
         return data;
     }
 
+    bool measure() {
+        response<std::string> res = io_cmd("M120");
+
+        if (res) {
+            hw = parse_hw_config(res.data);
+            auto now = std::chrono::system_clock::now();
+            lm = std::chrono::system_clock::to_time_t(now);
+        }
+
+        return res.code == 0;
+    }
+
     response<std::string> parse_status(const std::string &resp) {
 
         if (resp.size() < 5) {
@@ -450,6 +462,8 @@ int main(int argc, char **argv) {
         meter.units(true);
 
         std::cout << meter.istatus().code << std::endl;
+
+        meter.measure();
 
         device::pr655::cfg config = meter.config();
         std::cout << config.wl_start << " " << config.wl_stop << " " << config.wl_inc << std::endl;
