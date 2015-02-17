@@ -294,7 +294,6 @@ public:
         io.send_data("PHOTO");
         std::vector<char> resp = io.recv_data(12, 1000);
         std::string line(resp.data(), resp.size());
-        std::cerr << "[" << line << "]" << std::endl;
         bool res = !line.compare(1, 11, "REMOTE MODE");
         io.wait(1000);
         return res;
@@ -306,35 +305,27 @@ public:
     }
 
     std::string serial_number() {
-        std::string resp = io.send_and_recv_line("D110");
-        response<std::string> res = parse_status(resp);
-
-        return resp;
+        response<std::string> res = io_cmd("D110");
+        return res.data;
     }
 
     std::string model_number() {
-        std::string resp = io.send_and_recv_line("D111");
-        response<std::string> res = parse_status(resp);
-
-        return resp;
+        response<std::string> res = io_cmd("D111");
+        return res.data;
     }
 
     void units(bool metric) {
         std::string cmd = metric ? "SU1" : "SU0";
-        std::string resp = io.send_and_recv_line(cmd);
-        response<std::string> res = parse_status(resp);
-
+        response<std::string> res = io_cmd(cmd);
     }
 
     response<std::string> istatus() {
-        std::string resp = io.send_and_recv_line("I");
-        return parse_status(resp);
+        return io_cmd("I");
     }
 
     cfg config() {
-        std::string resp = io.send_and_recv_line("D120");
-        status res = parse_status(resp);
-        if (res != 0) {
+        response<std::string> res = io_cmd("D120");
+        if (!res) {
             return cfg();
         }
         //qqqqq,pp,bw,bb,ee,ii,nrp,frp,lrp CRLF
@@ -343,7 +334,7 @@ public:
 
         cfg hwcfg;
 
-        int ret = std::sscanf(resp.c_str(), "%hu,%f,%hu,%hu,%hu,%d,%d,%d",
+        int ret = std::sscanf(res.data.c_str(), "%hu,%f,%hu,%hu,%hu,%d,%d,%d",
                               &hwcfg.n_points, &hwcfg.bandwidth,
                               &hwcfg.wl_start, &hwcfg.wl_stop, &hwcfg.wl_inc,
                               &nrp, &frp, &lrp);
@@ -356,13 +347,10 @@ public:
     }
 
     spectral_data measure() {
-        io.send_data("M5");
-
-        std::string header = io.recv_line(50000);
-        status res = parse_status(header);
+        response<std::string> res = io_cmd("M5");
 
         spectral_data data;
-        data.is_valid = res == 0;
+        data.is_valid = res.code == 0;
 
         // |qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
         // |wl,spectral data CRLF
@@ -383,7 +371,7 @@ public:
         return data;
     }
 
-    status parse_status(std::string &resp) {
+    response<std::string> parse_status(const std::string &resp) {
 
         if (resp.size() < 5) {
             throw std::invalid_argument("Cannot parse status code (< 5)");
@@ -392,12 +380,24 @@ public:
         int code = std::stoi(resp);
         std::cerr << "[D] L: [" << resp.data() << "] (" << resp.size() << ") -> " << code << std::endl;
 
-        size_t to_erase = resp.size() > 5 && resp[5] == ',' ? 6 : 5;
-        resp.erase(0, to_erase);
-
-        return response<std::string>(code, resp);
+        size_t pos = resp.size() > 5 && resp[5] == ',' ? 6 : 5;
+        return response<std::string>(code, resp.substr(pos));
     }
 
+    response<std::string> io_cmd(const std::string &cmd) {
+        if (cmd.empty()) {
+            throw std::invalid_argument("Command must not be empty");
+        }
+
+        bool is_measurement = cmd[0] == 'M';
+        io.send_data(cmd);
+        io.wait(200);
+
+        sleeper::rep tout = is_measurement ? 50000 : 5000;
+        std::string l = io.recv_line(tout);
+
+        return parse_status(l);
+    }
 
 private:
     serial io;
