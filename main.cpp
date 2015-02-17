@@ -267,6 +267,15 @@ public:
             return code == 0;
         }
 
+        template<typename U>
+        response<U> map(const std::function<U(const T&)> &f) const {
+            if (code == 0) {
+                return response<U>(code, f(data));
+            } else {
+                return response<U>(code, U());
+            }
+        }
+
         int code;
         T data;
     };
