@@ -231,15 +231,6 @@ public:
         }
     }
 
-    std::vector<char> send_and_recv(const std::string &cmd,
-                                    size_t             to_read,
-                                    sleeper::rep       t_rest = 200,
-                                    sleeper::rep       t_read = 5000) {
-        send_data(cmd);
-        wait(t_rest);
-        return recv_data(to_read, t_read);
-    }
-
     std::string send_and_recv_line(const std::string &cmd, sleeper::rep t_pause = 200) {
         send_data(cmd);
         wait(t_pause);
@@ -287,11 +278,13 @@ public:
     }
 
     bool start() {
-        std::vector<char> resp = io.send_and_recv("PHOTO", 12, 1000);
+        io.send_data("PHOTO");
+        std::vector<char> resp = io.recv_data(12, 1000);
         std::string line(resp.data(), resp.size());
         std::cerr << "[" << line << "]" << std::endl;
-
-        return !line.compare(1, 11, "REMOTE MODE");
+        bool res = !line.compare(1, 11, "REMOTE MODE");
+        io.wait(1000);
+        return res;
     }
 
     void stop() {
