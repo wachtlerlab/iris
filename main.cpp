@@ -291,7 +291,7 @@ public:
 
     };
 
-    pr655(const serial &port) : io(port) {}
+    pr655(const serial &port) : io(port), lm(-1) {}
 
     static pr655 open(const std::string &path) {
         serial s = serial::open(path);
@@ -417,7 +417,9 @@ private:
     }
 
 private:
-    serial io;
+    serial      io;
+    std::time_t lm;
+    cfg         hw;
 };
 
 
