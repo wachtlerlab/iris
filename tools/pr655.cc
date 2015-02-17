@@ -288,7 +288,6 @@ public:
         unsigned short wl_inc;
 
         float bandwidth;
-
     };
 
     pr655(const serial &port) : io(port), lm(-1) {}
