@@ -342,8 +342,14 @@ public:
         return rcfg.data;
     }
 
-    spectral_data measure() {
-        response<std::string> res = io_cmd("M5");
+    spectral_data spectral() {
+
+        if (lm < 0) {
+            //FIXME: maybe just measure in that case?
+            throw std::invalid_argument("Need to measure before getting spectral data");
+        }
+
+        response<std::string> res = io_cmd("D5");
 
         spectral_data data;
         data.is_valid = res.code == 0;
@@ -351,7 +357,7 @@ public:
         // |qqqqq,UUUU,w.wwwe+eee,i.iiie-ee,p.pppe+ee CRLF [16]
         // |wl,spectral data CRLF
 
-        for(uint32_t i = 0; i < 101; i++) {
+        for(uint32_t i = 0; i < hw.n_points; i++) {
             std::string line = io.recv_line();
 
             unsigned short lambda;
@@ -448,7 +454,7 @@ int main(int argc, char **argv) {
         device::pr655::cfg config = meter.config();
         std::cout << config.wl_start << " " << config.wl_stop << " " << config.wl_inc << std::endl;
 
-        meter.measure();
+        meter.spectral();
 
         std::cout << meter.istatus().code << std::endl;
     } catch (const std::exception &e) {
