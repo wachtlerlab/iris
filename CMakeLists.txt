@@ -50,5 +50,8 @@ target_link_libraries(spectre ${LINK_LIBS})
 
 set(pr655_SOURCES tools/pr655.cc)
 add_executable(pr655 ${pr655_SOURCES})
-
 target_link_libraries(pr655 spectre)
+
+set(calib_SOURCES tools/calibrate.cc)
+add_executable(calib ${calib_SOURCES})
+target_link_libraries(calib spectre)
