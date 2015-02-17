@@ -333,26 +333,13 @@ public:
     }
 
     cfg config() {
-        response<std::string> res = io_cmd("D120");
-        if (!res) {
-            return cfg();
-        }
-        //qqqqq,pp,bw,bb,ee,ii,nrp,frp,lrp CRLF
-        int pp, bb, ee, ii, nrp, frp, lrp;
-        float bw;
+        response<std::string> res = io_cmd("M120");
 
-        cfg hwcfg;
+        response<cfg> rcfg = res.map<cfg>([](const std::string &line) {
+            return parse_hw_config(line);
+        });
 
-        int ret = std::sscanf(res.data.c_str(), "%hu,%f,%hu,%hu,%hu,%d,%d,%d",
-                              &hwcfg.n_points, &hwcfg.bandwidth,
-                              &hwcfg.wl_start, &hwcfg.wl_stop, &hwcfg.wl_inc,
-                              &nrp, &frp, &lrp);
-
-        if (ret != 8) {
-            throw std::runtime_error("Could not parse config line");
-        }
-
-        return hwcfg;
+        return rcfg.data;
     }
 
     spectral_data measure() {
@@ -409,6 +396,27 @@ public:
     }
 
 private:
+
+    static cfg parse_hw_config(const std::string &line) {
+        //qqqqq,pp,bw,bb,ee,ii,nrp,frp,lrp CRLF
+        int pp, bb, ee, ii, nrp, frp, lrp;
+        float bw;
+
+        cfg hwcfg;
+
+        int ret = std::sscanf(line.c_str(), "%hu,%f,%hu,%hu,%hu,%d,%d,%d",
+                              &hwcfg.n_points, &hwcfg.bandwidth,
+                              &hwcfg.wl_start, &hwcfg.wl_stop, &hwcfg.wl_inc,
+                              &nrp, &frp, &lrp);
+
+        if (ret != 8) {
+            throw std::runtime_error("Could not parse config line");
+        }
+
+        return hwcfg;
+    }
+
+private:
     serial io;
 };
 
@@ -434,14 +442,11 @@ int main(int argc, char **argv) {
         meter.units(true);
 
         std::cout << meter.istatus().code << std::endl;
+
         device::pr655::cfg config = meter.config();
         std::cout << config.wl_start << " " << config.wl_stop << " " << config.wl_inc << std::endl;
 
-        spectral_data data = meter.measure();
-
-        if (data.is_valid) {
-            std::cerr << "have valid spectral data" << std::endl;
-        }
+        meter.measure();
 
         std::cout << meter.istatus().code << std::endl;
     } catch (const std::exception &e) {
