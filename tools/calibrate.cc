@@ -49,7 +49,14 @@ int main(int argc, char **argv)
     }
 
     const GLFWvidmode *mm = modes + (n_modes - 1);
-    GLFWwindow* window = glfwCreateWindow(mm->width, mm->height, "Calibration", primary, NULL);
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_SAMPLES, 2);
+
+    GLFWwindow* window = glfwCreateWindow(mm->width, mm->height, "Calibration", primary, nullptr);
 
     if (!window) {
         glfwTerminate();
