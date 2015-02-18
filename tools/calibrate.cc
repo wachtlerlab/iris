@@ -61,6 +61,22 @@ int main(int argc, char **argv)
 
     glfwSetErrorCallback(error_callback);
 
+    int n_monis;
+    GLFWmonitor** monitors = glfwGetMonitors(&n_monis);
+
+    for (int i = 0; i < n_monis; i++) {
+        std::cout << "Monitor: " << glfwGetMonitorName(monitors[i]) << std::endl;
+        int phy_width, phy_height;
+        glfwGetMonitorPhysicalSize(monitors[i], &phy_width, &phy_height);
+        std::cout << "\t size: " << phy_width << "×" << phy_height << " [mm]" << std::endl;
+
+        const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
+        const double dpi = mode->width / (phy_width / 25.4);
+        std::cout << "\t dpi:  " << dpi  << std::endl;
+
+        std::cout << std::endl;
+    }
+
     GLFWmonitor *primary = glfwGetPrimaryMonitor();
     std::cout << "Monitor: " << glfwGetMonitorName(primary) << std::endl;
 
@@ -68,7 +84,7 @@ int main(int argc, char **argv)
     const GLFWvidmode* modes = glfwGetVideoModes(primary, &n_modes);
 
     for (int i = 0; i < n_modes; i++) {
-        std::cout << i << ": " << modes[i].width << " x " << modes[i].height;
+        std::cout << i << ": " << modes[i].width << " × " << modes[i].height;
         std::cout << " \t " << modes[i].redBits << " " << modes[i].greenBits << " " << modes[i].blueBits;
         std::cout << " @ " << modes[i].refreshRate << "Hz" << std::endl;
     }
