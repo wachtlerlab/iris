@@ -1,12 +1,37 @@
-#define GLFW_INCLUDE_GLCOREARB
-#include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
+#include <glue/shader.h>
+#include <glue/buffer.h>
+#include <glue/arrays.h>
+
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 #include <string>
+
+
+static const char vs_simple[] = R"SHDR(
+#version 330
+
+layout(location = 0) in vec2 pos;
+
+uniform mat4 viewport;
+
+void main()
+{
+    gl_Position = viewport * vec4(pos, 0.0, 1.0);
+}
+)SHDR";
+
+static const char fs_simple[] = R"SHDR(
+#version 330
+
+out vec4 finalColor;
+uniform vec4 plot_color;
+
+void main() {
+    finalColor = plot_color;
+}
+)SHDR";
 
 static void error_callback(int error, const char* description)
 {
@@ -26,6 +51,7 @@ void wnd_key_cb(GLFWwindow *wnd, int key, int scancode, int action, int mods) {
     }
 }
 
+namespace gl = glue;
 
 int main(int argc, char **argv)
 {
@@ -36,8 +62,7 @@ int main(int argc, char **argv)
     glfwSetErrorCallback(error_callback);
 
     GLFWmonitor *primary = glfwGetPrimaryMonitor();
-
-    std::cout << glfwGetMonitorName(primary) << std::endl;
+    std::cout << "Monitor: " << glfwGetMonitorName(primary) << std::endl;
 
     int n_modes;
     const GLFWvidmode* modes = glfwGetVideoModes(primary, &n_modes);
@@ -77,9 +102,68 @@ int main(int argc, char **argv)
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
 
+    // *****
+    gl::shader vs = gl::shader::make(vs_simple, GL_VERTEX_SHADER);
+    gl::shader fs = gl::shader::make(fs_simple, GL_FRAGMENT_SHADER);
+
+    vs.compile();
+    fs.compile();
+
+    gl::program prg = gl::program::make();
+    prg.attach({vs, fs});
+    prg.link();
+
+    std::vector<float> box = { -0.5f,  0.5f,
+                               -0.5f, -0.5f,
+                                0.5f, -0.5f,
+
+                                0.5f,  0.5f,
+                               -0.5f,  0.5f,
+                                0.5f, -0.5f};
+
+    gl::buffer bb = gl::buffer::make();
+    gl::vertex_array va = gl::vertex_array::make();
+
+    bb.bind();
+    va.bind();
+
+    bb.data(box);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    bb.unbind();
+    va.unbind();
+
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+
+    glm::mat4 vp;
+    if (height > width) {
+        float scale = width / static_cast<float>(height);
+        vp = glm::scale(glm::mat4(1), glm::vec3(1.0f, scale, 1.0f));
+    } else {
+        float scale = height / static_cast<float>(width);
+        vp = glm::scale(glm::mat4(1), glm::vec3(scale, 1.0f, 1.0f));
+    }
+
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        prg.use();
+        GLfloat point_color[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
+        prg.uniform("plot_color", point_color);
+        prg.uniform("viewport", vp);
+
+        va.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        va.unbind();
+        prg.unuse();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
