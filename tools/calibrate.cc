@@ -12,6 +12,8 @@
 #include <chrono>
 #include <cstring>
 
+#include <boost/program_options.hpp>
+
 static const char vs_simple[] = R"SHDR(
 #version 330
 
@@ -270,6 +272,28 @@ private:
 
 int main(int argc, char **argv)
 {
+    namespace po = boost::program_options;
+
+    std::string device;
+    std::string mdev;
+
+    po::options_description opts("calibration tool");
+    opts.add_options()
+            ("help", "produce help message")
+            ("device", po::value<std::string>(&device))
+            ("monitor", po::value<std::string>(&mdev));
+
+    po::positional_options_description pos;
+
+    po::variables_map vm;
+    po::store(po::command_line_parser(argc, argv).options(opts).positional(pos).run(), vm);
+    po::notify(vm);
+
+    if (vm.count("help") > 0) {
+        std::cout << opts << std::endl;
+        return 0;
+    }
+
     if (!glfwInit()) {
         exit(EXIT_FAILURE);
     }
@@ -277,10 +301,13 @@ int main(int argc, char **argv)
     glfwSetErrorCallback(error_callback);
 
     int n_monis;
-    GLFWmonitor** monitors = glfwGetMonitors(&n_monis);
+    GLFWmonitor **monitors = glfwGetMonitors(&n_monis);
+    GLFWmonitor *primary = glfwGetPrimaryMonitor();
+    GLFWmonitor *mtarget = nullptr;
 
     for (int i = 0; i < n_monis; i++) {
-        std::cout << "Monitor: " << glfwGetMonitorName(monitors[i]) << std::endl;
+        const std::string name = glfwGetMonitorName(monitors[i]);
+        std::cout << "Monitor: " <<  name << std::endl;
         int phy_width, phy_height;
         glfwGetMonitorPhysicalSize(monitors[i], &phy_width, &phy_height);
         std::cout << "\t size: " << phy_width << "×" << phy_height << " [mm]" << std::endl;
@@ -289,14 +316,40 @@ int main(int argc, char **argv)
         const double dpi = mode->width / (phy_width / 25.4);
         std::cout << "\t dpi:  " << dpi  << std::endl;
 
+        if (monitors[i] == primary) {
+            std::cout << "\t [primary]" << std::endl;
+        }
+
+        if (mtarget == nullptr && name == mdev) {
+            mtarget = monitors[i];
+            std::cout << "\t [selected]" << std::endl;
+        }
+
         std::cout << std::endl;
     }
 
-    GLFWmonitor *primary = glfwGetPrimaryMonitor();
-    std::cout << "Monitor: " << glfwGetMonitorName(primary) << std::endl;
+    if (!mdev.empty() && mtarget == nullptr) {
+        const char *cstr = mdev.c_str();
+        char *cend;
+        unsigned long k = strtoul(cstr, &cend, 10);
+        if (cstr != cend) {
+            if (k >= n_monis) {
+                std::cerr << "monitor index out of range" << std::endl;
+                return -1;
+            }
+
+            mtarget = monitors[k];
+        }
+    }
+
+    if (mtarget == nullptr) {
+        mtarget = primary;
+    }
+
+    std::cout << "Monitor: " << glfwGetMonitorName(mtarget) << std::endl;
 
     int n_modes;
-    const GLFWvidmode* modes = glfwGetVideoModes(primary, &n_modes);
+    const GLFWvidmode* modes = glfwGetVideoModes(mtarget, &n_modes);
 
     for (int i = 0; i < n_modes; i++) {
         std::cout << i << ": " << modes[i].width << " × " << modes[i].height;
@@ -312,7 +365,7 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_SAMPLES, 2);
 
-    GLFWwindow* window = glfwCreateWindow(mm->width, mm->height, "Calibration", primary, nullptr);
+    GLFWwindow* window = glfwCreateWindow(mm->width, mm->height, "Calibration", mtarget, nullptr);
 
     if (!window) {
         glfwTerminate();
