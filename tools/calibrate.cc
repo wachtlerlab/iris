@@ -7,7 +7,9 @@
 
 #include <iostream>
 #include <string>
-
+#include <thread>
+#include <atomic>
+#include <chrono>
 
 static const char vs_simple[] = R"SHDR(
 #version 330
@@ -32,6 +34,89 @@ void main() {
     finalColor = plot_color;
 }
 )SHDR";
+
+
+class looper {
+public:
+
+    enum class state : int {
+        Waiting = 0,
+        NextDisplay = 1,
+        NextMeasure = 2,
+        Stop = 3
+    };
+
+protected:
+    virtual bool display() = 0;
+    virtual void refresh() = 0;
+    virtual void measure() = 0;
+
+public:
+    looper() : news(state::Waiting) {}
+
+    bool render() {
+
+        state cur = news;
+        if (cur == state::Stop) {
+            return false;
+        }
+
+        bool do_run = true;
+        if (cur == state::NextDisplay) {
+            do_run = display();
+            state next = do_run ? state::NextMeasure : state::Stop;
+            news.compare_exchange_strong(cur, next);
+            cur = news;
+        }
+
+        if (do_run) {
+            refresh();
+        }
+
+        return do_run;
+    }
+
+    void loop() {
+        news = state::NextDisplay;
+
+        state cur_state;
+        while ((cur_state = news) != state::Stop) {
+
+            if (cur_state != state::NextMeasure) {
+                std::chrono::milliseconds tsleep(100);
+                std::this_thread::sleep_for(tsleep);
+                continue;
+            }
+
+            measure();
+            news.compare_exchange_strong(cur_state, state::NextDisplay);
+        }
+    }
+
+    void start() {
+
+        if (news != state::Waiting) {
+            throw std::invalid_argument("wrong state");
+        }
+
+        thd = std::thread(&looper::loop, this);
+
+        while(news != state::NextDisplay) {
+            std::chrono::milliseconds tsleep(50);
+            std::this_thread::sleep_for(tsleep);
+        }
+    }
+
+    virtual ~looper() {
+        if (thd.joinable()) {
+            thd.join();
+        }
+    }
+
+private:
+    std::thread        thd;
+    std::atomic<state> news;
+};
 
 static void error_callback(int error, const char* description)
 {
