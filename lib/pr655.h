@@ -50,7 +50,26 @@ public:
         float bandwidth;
     };
 
+    pr655() : io(), lm(-1) {}
+
     pr655(const serial &port) : io(port), lm(-1) {}
+
+    pr655& operator=(const pr655 &other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        try {
+            stop();
+        } catch (...) {
+        }
+
+        io = other.io;
+        lm = other.lm;
+        hw = other.hw;
+
+        return *this;
+    }
 
     static pr655 open(const std::string &path) {
         serial s = serial::open(path);
