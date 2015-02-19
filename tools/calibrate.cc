@@ -7,7 +7,9 @@
 
 #include <iostream>
 #include <string>
-
+#include <thread>
+#include <atomic>
+#include <chrono>
 
 static const char vs_simple[] = R"SHDR(
 #version 330
@@ -32,6 +34,72 @@ void main() {
     finalColor = plot_color;
 }
 )SHDR";
+
+
+class looper {
+public:
+
+    enum class state : int {
+        Waiting = 0,
+        NeedDisplay = 1,
+        NeedMeasure = 2,
+        Stop = 3
+    };
+
+public:
+    virtual bool display() = 0;
+    virtual void measure() = 0;
+
+    bool render() {
+
+        state cur = news;
+        if (cur != state::NeedDisplay) {
+            return cur != state::Stop;
+        }
+
+        bool stop = display();
+
+        state next = stop ? state::Stop : state::NeedMeasure;
+        store_state(next, state::NeedDisplay);
+
+        return !stop;
+    }
+
+    void loop() {
+
+        state cur_state;
+        while ((cur_state = news) != state::Stop) {
+
+            if (cur_state != state::NeedMeasure) {
+                std::chrono::milliseconds tsleep(500);
+                std::this_thread::sleep_for(tsleep);
+                continue;
+            }
+
+            measure();
+            store_state(state::NeedDisplay, state::NeedMeasure);
+        }
+    }
+
+    void start() {
+        thd = std::thread(looper::loop, this);
+    }
+
+    virtual ~looper() {
+        if (thd.joinable()) {
+            thd.join();
+        }
+    }
+
+private:
+
+    inline bool store_state(state new_state, state old_state) {
+        return news.compare_exchange_strong(new_state, old_state);
+    }
+
+    std::thread        thd;
+    std::atomic<state> news;
+};
 
 static void error_callback(int error, const char* description)
 {
