@@ -1,4 +1,6 @@
 
+#include <pr655.h>
+
 #include <glue/shader.h>
 #include <glue/buffer.h>
 #include <glue/arrays.h>
@@ -161,7 +163,7 @@ struct rgb {
 class robot : public looper {
 public:
 
-    robot(GLFWwindow *wnd) : window(wnd) {
+    robot(GLFWwindow *wnd, device::pr655 &meter) : window(wnd), meter(meter) {
         init();
     }
 
@@ -204,10 +206,32 @@ public:
     }
 
     void measure() override {
-        std::cout << " Measuring ..." << std::endl;
-        std::chrono::milliseconds tsleep(2000);
-        std::this_thread::sleep_for(tsleep);
-        std::cout << " done" << std::endl;
+        std::string prefix = "#";
+
+        std::cerr << " Measuring ..." << std::endl;
+        meter.measure();
+        std::cerr << " ... getting data ..." << std::endl;
+
+        device::pr655::cfg config = meter.config();
+
+        std::cout << prefix << " λ start \t stop \t step" << std::endl;
+        std::cout << prefix << "   " <<  config.wl_start;
+        std::cout << " \t " << config.wl_stop << " \t " << config.wl_inc << std::endl;
+
+        std::cout << std::endl;
+
+        spectral_data data = meter.spectral();
+
+        std::cout << prefix << "spectral data" << std::endl;
+        std::cout << prefix << "λ \t ri" << std::endl;
+
+        for (size_t i = 0; i < data.data.size(); i++) {
+            std::cout << data.wl_start + i * data.wl_step << " \t ";
+            std::cout << data.data[i] << std::endl;
+        }
+
+        std::cout << std::endl;
+        std::cerr << " done" << std::endl;
     }
 
     void init() {
@@ -267,6 +291,8 @@ private:
     GLfloat color[4];
     std::vector<rgb> stim;
     size_t pos;
+
+    device::pr655 &meter;
 };
 
 
@@ -293,6 +319,25 @@ int main(int argc, char **argv)
         std::cout << opts << std::endl;
         return 0;
     }
+
+    // ****
+
+    device::pr655 meter;
+
+    try {
+        meter = device::pr655::open(device);
+
+        meter.start();
+        std::cerr << meter.model_number();
+        std::cerr << " is ready!" << std::endl;
+
+    } catch (const std::exception &e) {
+        std::cerr << "E: " << e.what() << std::endl;
+        meter.stop();
+        return -1;
+    }
+
+    // ****
 
     if (!glfwInit()) {
         exit(EXIT_FAILURE);
@@ -387,7 +432,7 @@ int main(int argc, char **argv)
     glEnable(GL_MULTISAMPLE);
 
     // *****
-    robot bender(window);
+    robot bender(window, meter);
 
     bender.start();
 
@@ -400,6 +445,7 @@ int main(int argc, char **argv)
         glfwPollEvents();
     }
 
+    meter.stop();
     std::cerr << "Goodbay. Have a nice day!" << std::endl;
 
     glfwTerminate();
