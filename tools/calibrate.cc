@@ -206,31 +206,12 @@ public:
     }
 
     void measure() override {
-        std::string prefix = "#";
-
         std::cerr << " Measuring ..." << std::endl;
+
         meter.measure();
-        std::cerr << " ... getting data ..." << std::endl;
-
-        device::pr655::cfg config = meter.config();
-
-        std::cout << prefix << " λ start \t stop \t step" << std::endl;
-        std::cout << prefix << "   " <<  config.wl_start;
-        std::cout << " \t " << config.wl_stop << " \t " << config.wl_inc << std::endl;
-
-        std::cout << std::endl;
-
         spectral_data data = meter.spectral();
 
-        std::cout << prefix << "spectral data" << std::endl;
-        std::cout << prefix << "λ \t ri" << std::endl;
-
-        for (size_t i = 0; i < data.data.size(); i++) {
-            std::cout << data.wl_start + i * data.wl_step << " \t ";
-            std::cout << data.data[i] << std::endl;
-        }
-
-        std::cout << std::endl;
+        resp.push_back(data);
         std::cerr << " done" << std::endl;
     }
 
@@ -274,8 +255,17 @@ public:
                 {0.0f, 1.0f, 0.0f},
                 {0.0f, 0.0f, 1.0f}};
         pos = 0;
+
+        stim.reserve(stim.size());
     }
 
+    const std::vector<rgb> & stimulation() const {
+        return stim;
+    }
+
+    const std::vector<spectral_data> & response() const {
+        return resp;
+    }
 
 private:
     gl::shader vs;
@@ -287,14 +277,50 @@ private:
     gl::vertex_array va;
 
     GLFWwindow *window;
+    device::pr655 &meter;
 
+    // state
     GLfloat color[4];
-    std::vector<rgb> stim;
     size_t pos;
 
-    device::pr655 &meter;
+    // data
+    std::vector<rgb> stim;
+    std::vector<spectral_data> resp;
 };
 
+void dump_stdout(const robot &r) {
+
+    const std::vector<rgb> &stim = r.stimulation();
+    const std::vector<spectral_data> &resp = r.response();
+
+    if (resp.empty()) {
+        std::cout << "No data!" << std::endl;
+    }
+
+    std::vector<rgb> RGB = {{1.0f, 0.0f, 0.0f},
+                            {0.0f, 1.0f, 0.0f},
+                            {0.0f, 0.0f, 1.0f}};
+
+    uint16_t wave = resp[0].wl_start;
+    uint16_t step = resp[0].wl_step;
+    size_t nwaves = resp[0].data.size();
+
+    const std::string prefix = "# ";
+
+    std::cout << prefix << "spectral data" << std::endl;
+    std::cout << prefix << "λ \t   red   \t   green   \t   blue  " << std::endl;
+
+    for (size_t i = 0; i < nwaves; i++) {
+        std::cout << wave + i * step << " \t ";
+
+        for (size_t k = 0; k < resp.size(); k++) {
+            std::cout << "  " << resp[k].data[i] << "\t";
+        }
+
+        std::cout  << std::endl;
+    }
+
+}
 
 int main(int argc, char **argv)
 {
@@ -446,10 +472,11 @@ int main(int argc, char **argv)
     }
 
     meter.stop();
+
+    dump_stdout(bender);
+
     std::cerr << "Goodbay. Have a nice day!" << std::endl;
 
     glfwTerminate();
     return 0;
-
-
 }
