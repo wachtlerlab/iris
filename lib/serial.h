@@ -87,6 +87,16 @@ public:
         fd = dup(other.fd);
     }
 
+    serial& operator=(const serial &other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        close(fd);
+        fd = dup(other.fd);
+        return *this;
+    }
+
     static serial open(const std::string &str);
 
     void send_data(const std::string &str);
