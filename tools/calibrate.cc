@@ -10,6 +10,7 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+#include <cstring>
 
 static const char vs_simple[] = R"SHDR(
 #version 330
@@ -138,6 +139,135 @@ void wnd_key_cb(GLFWwindow *wnd, int key, int scancode, int action, int mods) {
 
 namespace gl = glue;
 
+struct rgb {
+
+    rgb(float r, float g, float b) : r(r), g(g), b(b), a(1.0f) {}
+
+    union {
+        struct {
+            float r;
+            float g;
+            float b;
+            float a;
+        };
+        struct {
+            float data[4];
+        };
+    };
+};
+
+class robot : public looper {
+public:
+
+    robot(GLFWwindow *wnd) : window(wnd) {
+        init();
+    }
+
+    bool display() override {
+
+        if (pos == stim.size()) {
+            return false;
+        }
+
+        rgb cur = stim[pos++];
+        memcpy(color, cur.data, sizeof(cur));
+        return true;
+    }
+
+    void refresh() override {
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
+        glm::mat4 vp;
+        if (height > width) {
+            float scale = width / static_cast<float>(height);
+            vp = glm::scale(glm::mat4(1), glm::vec3(1.0f, scale, 1.0f));
+        } else {
+            float scale = height / static_cast<float>(width);
+            vp = glm::scale(glm::mat4(1), glm::vec3(scale, 1.0f, 1.0f));
+        }
+
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        prg.use();
+        prg.uniform("plot_color", color);
+        prg.uniform("viewport", vp);
+
+        va.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        va.unbind();
+        prg.unuse();
+    }
+
+    void measure() override {
+        std::cout << " Measuring ..." << std::endl;
+        std::chrono::milliseconds tsleep(2000);
+        std::this_thread::sleep_for(tsleep);
+        std::cout << " done" << std::endl;
+    }
+
+    void init() {
+        vs = gl::shader::make(vs_simple, GL_VERTEX_SHADER);
+        fs = gl::shader::make(fs_simple, GL_FRAGMENT_SHADER);
+
+        vs.compile();
+        fs.compile();
+
+        prg = gl::program::make();
+        prg.attach({vs, fs});
+        prg.link();
+
+        std::vector<float> box = { -0.5f,  0.5f,
+                                   -0.5f, -0.5f,
+                                   0.5f, -0.5f,
+
+                                   0.5f,  0.5f,
+                                   -0.5f,  0.5f,
+                                   0.5f, -0.5f};
+
+        bb = gl::buffer::make();
+        va = gl::vertex_array::make();
+
+        bb.bind();
+        va.bind();
+
+        bb.data(box);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
+        bb.unbind();
+        va.unbind();
+
+        stim = {{1.0f, 0.0f, 0.0f},
+                {0.0f, 1.0f, 0.0f},
+                {0.0f, 0.0f, 1.0f}};
+        pos = 0;
+    }
+
+
+private:
+    gl::shader vs;
+    gl::shader fs;
+
+    gl::program prg;
+
+    gl::buffer bb;
+    gl::vertex_array va;
+
+    GLFWwindow *window;
+
+    GLfloat color[4];
+    std::vector<rgb> stim;
+    size_t pos;
+};
+
+
 int main(int argc, char **argv)
 {
     if (!glfwInit()) {
@@ -204,71 +334,20 @@ int main(int argc, char **argv)
     glEnable(GL_MULTISAMPLE);
 
     // *****
-    gl::shader vs = gl::shader::make(vs_simple, GL_VERTEX_SHADER);
-    gl::shader fs = gl::shader::make(fs_simple, GL_FRAGMENT_SHADER);
+    robot bender(window);
 
-    vs.compile();
-    fs.compile();
+    bender.start();
 
-    gl::program prg = gl::program::make();
-    prg.attach({vs, fs});
-    prg.link();
+    bool keep_looping = true;
+    while (keep_looping && !glfwWindowShouldClose(window)) {
 
-    std::vector<float> box = { -0.5f,  0.5f,
-                               -0.5f, -0.5f,
-                                0.5f, -0.5f,
-
-                                0.5f,  0.5f,
-                               -0.5f,  0.5f,
-                                0.5f, -0.5f};
-
-    gl::buffer bb = gl::buffer::make();
-    gl::vertex_array va = gl::vertex_array::make();
-
-    bb.bind();
-    va.bind();
-
-    bb.data(box);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    bb.unbind();
-    va.unbind();
-
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-
-    glm::mat4 vp;
-    if (height > width) {
-        float scale = width / static_cast<float>(height);
-        vp = glm::scale(glm::mat4(1), glm::vec3(1.0f, scale, 1.0f));
-    } else {
-        float scale = height / static_cast<float>(width);
-        vp = glm::scale(glm::mat4(1), glm::vec3(scale, 1.0f, 1.0f));
-    }
-
-    while (!glfwWindowShouldClose(window)) {
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        prg.use();
-        GLfloat point_color[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
-        prg.uniform("plot_color", point_color);
-        prg.uniform("viewport", vp);
-
-        va.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        va.unbind();
-        prg.unuse();
+        keep_looping = bender.render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    std::cerr << "Goodbay. Have a nice day!" << std::endl;
 
     glfwTerminate();
     return 0;
