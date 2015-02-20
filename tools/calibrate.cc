@@ -4,6 +4,7 @@
 #include <glue/shader.h>
 #include <glue/buffer.h>
 #include <glue/arrays.h>
+#include <glue/colors.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -143,23 +144,6 @@ void wnd_key_cb(GLFWwindow *wnd, int key, int scancode, int action, int mods) {
 
 namespace gl = glue;
 
-struct rgb {
-
-    rgb(float r, float g, float b) : r(r), g(g), b(b), a(1.0f) {}
-
-    union {
-        struct {
-            float r;
-            float g;
-            float b;
-            float a;
-        };
-        struct {
-            float data[4];
-        };
-    };
-};
-
 class robot : public looper {
 public:
 
@@ -173,7 +157,7 @@ public:
             return false;
         }
 
-        rgb cur = stim[pos++];
+        gl::color::rgb cur = stim[pos++];
         memcpy(color, cur.data, sizeof(cur));
         return true;
     }
@@ -259,7 +243,7 @@ public:
         stim.reserve(stim.size());
     }
 
-    const std::vector<rgb> & stimulation() const {
+    const std::vector<gl::color::rgb> & stimulation() const {
         return stim;
     }
 
@@ -284,11 +268,13 @@ private:
     size_t pos;
 
     // data
-    std::vector<rgb> stim;
+    std::vector<gl::color::rgb> stim;
     std::vector<spectral_data> resp;
 };
 
 void dump_stdout(const robot &r) {
+
+    using namespace gl::color;
 
     const std::vector<rgb> &stim = r.stimulation();
     const std::vector<spectral_data> &resp = r.response();
