@@ -207,7 +207,8 @@ void wnd_key_cb(GLFWwindow *wnd, int key, int scancode, int action, int mods) {
 class robot : public looper {
 public:
 
-    robot(GLFWwindow *wnd, device::pr655 &meter) : window(wnd), meter(meter) {
+    robot(GLFWwindow *wnd, device::pr655 &meter, std::vector<gl::color::rgb> &stim)
+            : window(wnd), meter(meter), stim(stim) {
         init();
     }
 
@@ -295,9 +296,6 @@ public:
         bb.unbind();
         va.unbind();
 
-        stim = {{1.0f, 0.0f, 0.0f},
-                {0.0f, 1.0f, 0.0f},
-                {0.0f, 0.0f, 1.0f}};
         pos = 0;
 
         stim.reserve(stim.size());
@@ -343,10 +341,6 @@ void dump_stdout(const robot &r) {
         std::cout << "No data!" << std::endl;
     }
 
-    std::vector<rgb> RGB = {{1.0f, 0.0f, 0.0f},
-                            {0.0f, 1.0f, 0.0f},
-                            {0.0f, 0.0f, 1.0f}};
-
     uint16_t wave = resp[0].wl_start;
     uint16_t step = resp[0].wl_step;
     size_t nwaves = resp[0].data.size();
@@ -354,10 +348,18 @@ void dump_stdout(const robot &r) {
     const std::string prefix = "# ";
 
     std::cout << prefix << "spectral data" << std::endl;
-    std::cout << prefix << "λ \t   red   \t   green   \t   blue  " << std::endl;
+    std::cout << prefix << "λ    \t ";
+
+    for (size_t i = 0; i < stim.size(); i ++) {
+        print_color_hex(stim[i]);
+        std::cout << "  \t  ";
+    }
+
+    std::cout << std::endl;
+    std::cout << std::scientific;
 
     for (size_t i = 0; i < nwaves; i++) {
-        std::cout << wave + i * step << " \t ";
+        std::cout << std::dec << wave + i * step << " \t ";
 
         for (size_t k = 0; k < resp.size(); k++) {
             std::cout << "  " << resp[k].data[i] << "\t";
@@ -365,6 +367,8 @@ void dump_stdout(const robot &r) {
 
         std::cout  << std::endl;
     }
+
+    std::cout << std::defaultfloat;
 
 }
 
@@ -504,7 +508,10 @@ int main(int argc, char **argv)
     glEnable(GL_MULTISAMPLE);
 
     // *****
-    robot bender(window, meter);
+    std::vector<float> steps = make_steps(16);
+    std::vector<gl::color::rgb> colors = make_stim(steps);
+
+    robot bender(window, meter, colors);
 
     bender.start();
 
