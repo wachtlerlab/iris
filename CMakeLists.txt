@@ -55,3 +55,12 @@ target_link_libraries(pr655 spectre)
 set(calib_SOURCES tools/calibrate.cc)
 add_executable(calib ${calib_SOURCES})
 target_link_libraries(calib spectre)
+
+set(gen_SOURCES tools/pgen.cc)
+add_executable(spx-gen ${gen_SOURCES})
+target_link_libraries(spx-gen spectre)
+
+set(csv_SOURCES tools/csv.cc)
+add_executable(spx-csv ${csv_SOURCES})
+target_link_libraries(spx-csv spectre)
+
