@@ -1,5 +1,5 @@
-#ifndef SPX_PR655_H
-#define SPX_PR655_H
+#ifndef IRIS_PR655_H
+#define IRIS_PR655_H
 
 #include <serial.h>
 

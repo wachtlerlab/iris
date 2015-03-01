@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.4)
-project(spectre)
+project(iris)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 
@@ -42,16 +42,16 @@ include_directories(lib)
 file(GLOB_RECURSE lib_SOURCES lib/*.cc)
 file(GLOB_RECURSE lib_INCLUDES lib/*.h)
 
-add_library(spectre SHARED ${lib_INCLUDES} ${lib_SOURCES})
-target_link_libraries(spectre ${LINK_LIBS})
+add_library(iris SHARED ${lib_INCLUDES} ${lib_SOURCES})
+target_link_libraries(iris ${LINK_LIBS})
 
 #######################################
 # tools
 
 set(pr655_SOURCES tools/pr655.cc)
 add_executable(pr655 ${pr655_SOURCES})
-target_link_libraries(pr655 spectre)
+target_link_libraries(pr655 iris)
 
 set(calib_SOURCES tools/calibrate.cc)
-add_executable(calib ${calib_SOURCES})
-target_link_libraries(calib spectre)
+add_executable(iris-measure ${calib_SOURCES})
+target_link_libraries(iris-measure cerulean)

@@ -1,5 +1,5 @@
-#ifndef SPX_SERIAL_H
-#define SPX_SERIAL_H
+#ifndef IRIS_SERIAL_H
+#define IRIS_SERIAL_H
 
 #include <iostream>
 #include <sstream>
