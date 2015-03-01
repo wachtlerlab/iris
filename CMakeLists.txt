@@ -52,6 +52,10 @@ set(pr655_SOURCES tools/pr655.cc)
 add_executable(pr655 ${pr655_SOURCES})
 target_link_libraries(pr655 iris)
 
+set(info_SOURCES tools/info.cc)
+add_executable(iris-info ${info_SOURCES})
+target_link_libraries(iris-info cerulean)
+
 set(calib_SOURCES tools/calibrate.cc)
 add_executable(iris-measure ${calib_SOURCES})
 target_link_libraries(iris-measure cerulean)
