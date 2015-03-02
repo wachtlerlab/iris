@@ -55,3 +55,11 @@ target_link_libraries(pr655 iris)
 set(calib_SOURCES tools/calibrate.cc)
 add_executable(iris-measure ${calib_SOURCES})
 target_link_libraries(iris-measure cerulean)
+
+########################################
+# playground
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/play.cc")
+  add_executable(iris-play EXCLUDE_FROM_ALL play.cc)
+  target_link_libraries(iris-play cerulean)
+endif()
