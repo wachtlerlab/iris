@@ -67,6 +67,10 @@ public:
         return primary().handle == handle;
     }
 
+    explicit operator bool() {
+        return handle == nullptr;
+    }
+
 private:
     GLFWmonitor *handle;
 };
