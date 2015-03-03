@@ -35,12 +35,20 @@ link_directories(${GLFW_LIBRARY_DIRS}
 
 set(LINK_LIBS ${LINK_LIBS} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${FREETYPE_LIBRARIES})
 
+########################################
+# HDF5
+
+set(HDF5_USE_STATIC_LIBS OFF)
+find_package (HDF5 REQUIRED COMPONENTS C)
+include_directories (${HDF5_INCLUDE_DIR})
+set (LINK_LIBS ${LINK_LIBS} ${HDF5_LIBRARIES})
+
 #######################################
 # lib
 
 include_directories(lib)
-file(GLOB_RECURSE lib_SOURCES lib/*.cc)
-file(GLOB_RECURSE lib_INCLUDES lib/*.h)
+file(GLOB_RECURSE lib_SOURCES lib/*.cc lib/*.cpp)
+file(GLOB_RECURSE lib_INCLUDES lib/*.h lib/*.hpp)
 
 add_library(iris SHARED ${lib_INCLUDES} ${lib_SOURCES})
 target_link_libraries(iris ${LINK_LIBS})
