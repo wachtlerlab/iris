@@ -49,6 +49,12 @@ public:
         glfwMakeContextCurrent(wnd);
     }
 
+    extent framebuffer_size() const {
+        int width, height;
+        glfwGetFramebufferSize(wnd, &width, &height);
+        return extent(width, height);
+    }
+
     virtual void framebuffer_size_changed(extent size) { }
     virtual void key_event(int key, int scancode, int action, int mods) { }
     virtual void mouse_button_event(int button, int action, int mods) { }
