@@ -57,6 +57,10 @@ window::window(GLFWwindow *window) : wnd(window) {
 
 window::~window() {
 
+    if (wnd == nullptr) {
+        return;
+    }
+
     glfwSetFramebufferSizeCallback(wnd, nullptr);
     glfwSetWindowCloseCallback(wnd, nullptr);
     glfwSetWindowSizeCallback(wnd, nullptr);
