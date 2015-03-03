@@ -47,7 +47,7 @@ void main() {
 // ***
 namespace gl = glue;
 
-void print_color(const gl::color::rgb &c) {
+void print_color(const gl::color::rgba &c) {
     std::cout << std::fixed << std::setprecision(5);
     std::cout << c.r << ",";
     std::cout << c.g << ",";
@@ -55,7 +55,7 @@ void print_color(const gl::color::rgb &c) {
     std::cout << std::defaultfloat;
 }
 
-void print_color_hex(const gl::color::rgb &c) {
+void print_color_hex(const gl::color::rgba &c) {
 
     int r = static_cast<int>(c.r * 255.0f);
     int g = static_cast<int>(c.g * 255.0f);
@@ -67,14 +67,14 @@ void print_color_hex(const gl::color::rgb &c) {
 }
 
 
-std::vector<gl::color::rgb> make_stim(const std::vector<float> &steps) {
-    std::vector<gl::color::rgb> res;
+std::vector<gl::color::rgba> make_stim(const std::vector<float> &steps) {
+    std::vector<gl::color::rgba> res;
 
     const size_t n_steps = steps.size();
 
     for (size_t i = 0; i < n_steps; i++) {
         const auto v = steps[i];
-        gl::color::rgb c = {v, 0.0f, 0.f};
+        gl::color::rgba c = {v, 0.0f, 0.f};
 
         res.push_back(c);
 
@@ -207,7 +207,7 @@ void wnd_key_cb(GLFWwindow *wnd, int key, int scancode, int action, int mods) {
 class robot : public looper {
 public:
 
-    robot(GLFWwindow *wnd, device::pr655 &meter, std::vector<gl::color::rgb> &stim)
+    robot(GLFWwindow *wnd, device::pr655 &meter, std::vector<gl::color::rgba> &stim)
             : window(wnd), meter(meter), stim(stim) {
         init();
     }
@@ -218,7 +218,7 @@ public:
             return false;
         }
 
-        gl::color::rgb cur = stim[pos++];
+        gl::color::rgba cur = stim[pos++];
         memcpy(color, cur.data, sizeof(cur));
         return true;
     }
@@ -301,7 +301,7 @@ public:
         stim.reserve(stim.size());
     }
 
-    const std::vector<gl::color::rgb> & stimulation() const {
+    const std::vector<gl::color::rgba> & stimulation() const {
         return stim;
     }
 
@@ -326,7 +326,7 @@ private:
     size_t pos;
 
     // data
-    std::vector<gl::color::rgb> stim;
+    std::vector<gl::color::rgba> stim;
     std::vector<spectral_data> resp;
 };
 
@@ -334,7 +334,7 @@ void dump_stdout(const robot &r) {
 
     using namespace gl::color;
 
-    const std::vector<rgb> &stim = r.stimulation();
+    const std::vector<rgba> &stim = r.stimulation();
     const std::vector<spectral_data> &resp = r.response();
 
     if (resp.empty()) {
@@ -509,7 +509,7 @@ int main(int argc, char **argv)
 
     // *****
     std::vector<float> steps = make_steps(16);
-    std::vector<gl::color::rgb> colors = make_stim(steps);
+    std::vector<gl::color::rgba> colors = make_stim(steps);
 
     robot bender(window, meter, colors);
 

@@ -4,10 +4,10 @@
 namespace glue {
 namespace color {
 
-struct rgb {
+struct rgba {
 
-    rgb() : r(0.0f), g(0.0f), b(0.0f) {}
-    rgb(float r, float g, float b) : r(r), g(g), b(b), a(1.0f) {}
+    rgba() : r(0.0f), g(0.0f), b(0.0f) {}
+    rgba(float r, float g, float b) : r(r), g(g), b(b), a(1.0f) {}
 
     union {
         struct {
