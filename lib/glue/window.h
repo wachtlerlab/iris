@@ -49,7 +49,8 @@ public:
         glfwMakeContextCurrent(wnd);
     }
 
-    virtual void framebuffer_size_changed(extent size) {}
+    virtual void framebuffer_size_changed(extent size) { }
+    virtual void key_event(int key, int scancode, int action, int mods) { }
 
 
 private:
