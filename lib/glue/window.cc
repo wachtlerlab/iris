@@ -18,7 +18,8 @@ static void cursor_gl_cb(GLFWwindow *gl_win, double x, double y) {
 }
 
 static void mouse_button_gl_cb(GLFWwindow *gl_win, int button, int action, int mods) {
-    //window *wnd = GET_WND(gl_win);
+    window *wnd = GET_WND(gl_win);
+    wnd->mouse_button_event(button, action, mods);
 }
 
 static void key_gl_cb(GLFWwindow *gl_win, int key, int scancode, int action, int mods) {

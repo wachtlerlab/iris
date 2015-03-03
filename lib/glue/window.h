@@ -51,6 +51,7 @@ public:
 
     virtual void framebuffer_size_changed(extent size) { }
     virtual void key_event(int key, int scancode, int action, int mods) { }
+    virtual void mouse_button_event(int button, int action, int mods) { }
 
 
 private:
