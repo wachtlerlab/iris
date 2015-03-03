@@ -18,6 +18,21 @@ protected:
 public:
     static window make(int height, int width, const std::string &title, monitor m = monitor{});
 
+    window(const window &) = delete;
+    window& operator=(const window &) = delete;
+
+    window(window &&other) : wnd(other.wnd) {
+        other.wnd = nullptr;
+    }
+
+    window& operator=(window &&other) {
+        if (other.wnd == this->wnd) {
+            return *this;
+        }
+        std::swap(this->wnd, other.wnd);
+        return *this;
+    }
+
     virtual ~window();
 
     bool should_close() const {
