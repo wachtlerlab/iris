@@ -40,7 +40,7 @@ GLFWwindow* window::make(int height, int width, const std::string &title, monito
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     GLFWmonitor *moni = static_cast<GLFWmonitor *>(m);
-    GLFWwindow *wnd = glfwCreateWindow(height, width, title.c_str(), moni, nullptr);
+    GLFWwindow *wnd = glfwCreateWindow(width, height, title.c_str(), moni, nullptr);
 
     if (!wnd) {
         throw std::runtime_error("Could not create window");
