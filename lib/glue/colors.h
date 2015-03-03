@@ -27,6 +27,9 @@ struct rgba {
     rgba() : r(0.0f), g(0.0f), b(0.0f) {}
     rgba(float r, float g, float b) : r(r), g(g), b(b), a(1.0f) {}
 
+    rgba(const rgb &c) : r(c.r), g(c.g), b(c.b), a(1.0f) {}
+    operator rgb() const { return rgb(r, g, b); }
+
     union {
         struct {
             float r;
