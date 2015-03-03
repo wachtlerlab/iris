@@ -22,6 +22,7 @@ protected:
 public:
     window() : wnd(nullptr) { }
     window(int height, int width, const std::string &title, monitor m = monitor{});
+    window(const std::string &title, monitor m);
 
     window(const window &) = delete;
     window& operator=(const window &) = delete;

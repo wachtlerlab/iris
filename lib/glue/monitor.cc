@@ -56,7 +56,7 @@ static float diag(const extent &s) {
 }
 
 float monitor::ppi() const {
-    // take the last one, which is hopefully the one with the highestresolution
+    // take the last one, which is hopefully the one with the highest resolution
     std::vector<mode> mms = modes();
     mode cur = mms.back();
     extent phy = physical_size();

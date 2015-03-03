@@ -82,6 +82,18 @@ window::window(int height, int width, const std::string &title, monitor m)
         : window(make(height, width, title, m)) {
 }
 
+
+window::window(const std::string &title, monitor m) {
+    std::vector<monitor::mode> mm =  m.modes();
+    monitor::mode best = mm.back();
+
+    int height = static_cast<int>(best.size.height);
+    int width = static_cast<int>(best.size.width);
+
+    wnd = make(height, width, title, m);
+    init();
+}
+
 window::~window() {
     cleanup();
 }
