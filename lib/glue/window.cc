@@ -28,7 +28,7 @@ static void key_gl_cb(GLFWwindow *gl_win, int key, int scancode, int action, int
     }
 }
 
-window window::make(int height, int width, const std::string &title, monitor m) {
+GLFWwindow* window::make(int height, int width, const std::string &title, monitor m) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -41,7 +41,7 @@ window window::make(int height, int width, const std::string &title, monitor m) 
         throw std::runtime_error("Could not create window");
     }
 
-    return window(wnd);
+    return wnd;
 }
 
 window::window(GLFWwindow *window) : wnd(window) {
@@ -53,6 +53,11 @@ window::window(GLFWwindow *window) : wnd(window) {
     glfwSetFramebufferSizeCallback(wnd, fb_size_gl_cb);
     glfwSetCursorPosCallback(wnd, cursor_gl_cb);
     glfwSetMouseButtonCallback(wnd, mouse_button_gl_cb);
+}
+
+
+window::window(int height, int width, const std::string &title, monitor m)
+        : window(make(height, width, title, m)) {
 }
 
 window::~window() {

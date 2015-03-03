@@ -14,9 +14,10 @@ namespace glue {
 class window {
 protected:
     window(GLFWwindow *window);
+    static GLFWwindow* make(int height, int width, const std::string &title, monitor m = monitor{});
 
 public:
-    static window make(int height, int width, const std::string &title, monitor m = monitor{});
+    window(int height, int width, const std::string &title, monitor m = monitor{});
 
     window(const window &) = delete;
     window& operator=(const window &) = delete;
