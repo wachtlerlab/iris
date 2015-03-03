@@ -49,15 +49,18 @@ GLFWwindow* window::make(int height, int width, const std::string &title, monito
     return wnd;
 }
 
-window::window(GLFWwindow *window) : wnd(window) {
+void window::init() {
 
-    glfwSetWindowUserPointer(wnd, this);
-
+    glfwSetWindowUserPointer(wnd, this)
+            ;
     glfwSetKeyCallback(wnd, key_gl_cb);
-
     glfwSetFramebufferSizeCallback(wnd, fb_size_gl_cb);
     glfwSetCursorPosCallback(wnd, cursor_gl_cb);
     glfwSetMouseButtonCallback(wnd, mouse_button_gl_cb);
+}
+
+window::window(GLFWwindow *window) : wnd(window) {
+    init();
 }
 
 
