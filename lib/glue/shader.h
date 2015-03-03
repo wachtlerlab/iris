@@ -3,6 +3,7 @@
 #define GLUE_SHADER_H
 
 #include <glue/named.h>
+#include <glue/colors.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -94,12 +95,24 @@ public:
         glUniform1i(uniform(uniform_name), v);
     }
 
-    void uniform(const char *uniform_name, float (&v)[4]) {
+    void uniform(const char *uniform_name, const float (&v)[4]) {
         glUniform4fv(uniform(uniform_name), 1, v);
+    }
+
+    void uniform(const char *uniform_name, const float (&v)[3]) {
+        glUniform3fv(uniform(uniform_name), 1, v);
     }
 
     void uniform(const char *uniform_name, float v) {
         glUniform1f(uniform(uniform_name), v);
+    }
+
+    void uniform(const char *uniform_name, const color::rgb &color) {
+        uniform(uniform_name, color.data);
+    }
+
+    void uniform(const char *uniform_name, const color::rgba &color) {
+        uniform(uniform_name, color.data);
     }
 
     static void delete_name(GLuint my_name) {
