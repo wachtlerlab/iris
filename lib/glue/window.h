@@ -18,7 +18,7 @@ protected:
 public:
     static window make(int height, int width, const std::string &title, monitor m = monitor{});
 
-    ~window();
+    virtual ~window();
 
     bool should_close() const {
         return glfwWindowShouldClose(wnd) != 0;
