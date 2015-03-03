@@ -14,7 +14,9 @@ static void fb_size_gl_cb(GLFWwindow *gl_win, int width, int height) {
 }
 
 static void cursor_gl_cb(GLFWwindow *gl_win, double x, double y) {
-    //window *wnd = GET_WND(gl_win);
+    window *wnd = GET_WND(gl_win);
+    point pos(static_cast<float>(x), static_cast<float>(y));
+    wnd->pointer_moved(pos);
 }
 
 static void mouse_button_gl_cb(GLFWwindow *gl_win, int button, int action, int mods) {
