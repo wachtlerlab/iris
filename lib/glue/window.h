@@ -27,14 +27,24 @@ public:
     window& operator=(const window &) = delete;
 
     window(window &&other) : wnd(other.wnd) {
+        other.cleanup();
         other.wnd = nullptr;
+        init();
     }
 
     window& operator=(window &&other) {
         if (other.wnd == this->wnd) {
             return *this;
         }
+
+        this->cleanup();
+        other.cleanup();
+
         std::swap(this->wnd, other.wnd);
+
+        this->init();
+        other.init();
+
         return *this;
     }
 
