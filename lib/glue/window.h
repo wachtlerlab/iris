@@ -17,6 +17,7 @@ protected:
     static GLFWwindow* make(int height, int width, const std::string &title, monitor m = monitor{});
 
     void init();
+    void cleanup();
 
 public:
     window() : wnd(nullptr) { }

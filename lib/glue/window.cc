@@ -51,24 +51,15 @@ GLFWwindow* window::make(int height, int width, const std::string &title, monito
 
 void window::init() {
 
-    glfwSetWindowUserPointer(wnd, this)
-            ;
+    glfwSetWindowUserPointer(wnd, this);
     glfwSetKeyCallback(wnd, key_gl_cb);
     glfwSetFramebufferSizeCallback(wnd, fb_size_gl_cb);
     glfwSetCursorPosCallback(wnd, cursor_gl_cb);
     glfwSetMouseButtonCallback(wnd, mouse_button_gl_cb);
 }
 
-window::window(GLFWwindow *window) : wnd(window) {
-    init();
-}
 
-
-window::window(int height, int width, const std::string &title, monitor m)
-        : window(make(height, width, title, m)) {
-}
-
-window::~window() {
+void window::cleanup() {
 
     if (wnd == nullptr) {
         return;
@@ -81,6 +72,18 @@ window::~window() {
     glfwSetCursorPosCallback(wnd, nullptr);
     glfwSetKeyCallback(wnd, nullptr);
     glfwSetMouseButtonCallback(wnd, nullptr);
+}
+
+window::window(GLFWwindow *window) : wnd(window) {
+    init();
+}
+
+window::window(int height, int width, const std::string &title, monitor m)
+        : window(make(height, width, title, m)) {
+}
+
+window::~window() {
+    cleanup();
 }
 
 }
