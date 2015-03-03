@@ -32,11 +32,8 @@ public:
         glfwMakeContextCurrent(wnd);
     }
 
-private:
-    static void fb_size_cb(GLFWwindow *gl_win, int width, int height);
-    static void cursor_cb(GLFWwindow *gl_win, double x, double y);
-    static void mouse_button_cb(GLFWwindow *gl_win, int button, int action, int mods);
-    static void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods);
+    virtual void framebuffer_size_changed(extent size) {}
+
 
 private:
     GLFWwindow *wnd;

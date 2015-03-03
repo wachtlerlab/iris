@@ -5,6 +5,28 @@
 
 namespace glue {
 
+#define GET_WND(wnd__) static_cast<window *>(glfwGetWindowUserPointer(wnd__))
+
+static void fb_size_gl_cb(GLFWwindow *gl_win, int width, int height) {
+    window *wnd = GET_WND(gl_win);
+    glViewport(0, 0, width, height);
+    wnd->framebuffer_size_changed(extent(width, height));
+}
+
+static void cursor_gl_cb(GLFWwindow *gl_win, double x, double y) {
+    //window *wnd = GET_WND(gl_win);
+}
+
+static void mouse_button_gl_cb(GLFWwindow *gl_win, int button, int action, int mods) {
+    //window *wnd = GET_WND(gl_win);
+}
+
+static void key_gl_cb(GLFWwindow *gl_win, int key, int scancode, int action, int mods) {
+    //window *wnd = GET_WND(gl_win);
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(gl_win, GL_TRUE);
+    }
+}
 
 window window::make(int height, int width, const std::string &title, monitor m) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -26,11 +48,11 @@ window::window(GLFWwindow *window) : wnd(window) {
 
     glfwSetWindowUserPointer(wnd, this);
 
-    glfwSetKeyCallback(wnd, key_cb);
+    glfwSetKeyCallback(wnd, key_gl_cb);
 
-    glfwSetFramebufferSizeCallback(wnd, fb_size_cb);
-    glfwSetCursorPosCallback(wnd, cursor_cb);
-    glfwSetMouseButtonCallback(wnd, mouse_button_cb);
+    glfwSetFramebufferSizeCallback(wnd, fb_size_gl_cb);
+    glfwSetCursorPosCallback(wnd, cursor_gl_cb);
+    glfwSetMouseButtonCallback(wnd, mouse_button_gl_cb);
 }
 
 window::~window() {
@@ -44,24 +66,4 @@ window::~window() {
     glfwSetMouseButtonCallback(wnd, nullptr);
 }
 
-#define GET_WND(wnd__) static_cast<window *>(glfwGetWindowUserPointer(wnd__))
-
-void window::fb_size_cb(GLFWwindow *gl_win, int width, int height) {
-    //window *wnd = GET_WND(gl_win);
-}
-
-void window::cursor_cb(GLFWwindow *gl_win, double x, double y) {
-    //window *wnd = GET_WND(gl_win);
-}
-
-void window::mouse_button_cb(GLFWwindow *gl_win, int button, int action, int mods) {
-    //window *wnd = GET_WND(gl_win);
-}
-
-void window::key_cb(GLFWwindow *gl_win, int key, int scancode, int action, int mods) {
-    //window *wnd = GET_WND(gl_win);
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(gl_win, GL_TRUE);
-    }
-}
 }
