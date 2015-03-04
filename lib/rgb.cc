@@ -1,8 +1,18 @@
 #include "rgb.h"
 
+#include <algorithm>
+#include <utility>
+#include <iomanip>
+
 namespace iris {
 
-
+std::tuple<int, int, int> rgb::as_int(float base) const {
+    int a[3];
+    std::transform(raw, raw + 3, a, [base](const float v){
+        return static_cast<int>(v * base);
+    });
+    return std::make_tuple(a[0], a[1], a[2]);
+}
 
 std::vector<rgb> rgb::gen(const std::vector<rgb> &base, const std::vector<float> &steps) {
 

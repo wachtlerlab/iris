@@ -2,6 +2,8 @@
 #define IRIS_RGB_H
 
 #include <vector>
+#include <ostream>
+#include <tuple>
 
 namespace iris {
 
@@ -19,6 +21,8 @@ struct rgb {
 
         float raw[3];
     };
+
+    std::tuple<int, int, int> as_int(float base = 255.0f) const;
 
     static std::vector<rgb> gen(const std::vector<rgb> &base, const std::vector<float> &steps);
     static std::vector<float> linspace(size_t n);
