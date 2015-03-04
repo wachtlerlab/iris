@@ -1,6 +1,8 @@
 #ifndef IRIS_RGB_H
 #define IRIS_RGB_H
 
+#include <vector>
+
 namespace iris {
 
 struct rgb {
@@ -17,6 +19,9 @@ struct rgb {
 
         float raw[3];
     };
+
+    static std::vector<rgb> gen(const std::vector<rgb> &base, const std::vector<float> &steps);
+    static std::vector<float> linspace(size_t n);
 
     static constexpr rgb white() { return rgb(1.0f, 1.0f, 1.0f);}
     static constexpr rgb black() { return rgb(0.0f, 0.0f, 0.0f); }
