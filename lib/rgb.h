@@ -5,8 +5,8 @@ namespace iris {
 
 struct rgb {
 
-    rgb() : r(0.0f), g(0.0f), b(0.0f) {}
-    rgb(float r, float g, float b) : r(r), g(g), b(b) {}
+    constexpr rgb() : r(0.0f), g(0.0f), b(0.0f) {}
+    constexpr rgb(float r, float g, float b) : r(r), g(g), b(b) {}
 
     union {
         struct {
