@@ -40,4 +40,21 @@ std::vector<float> rgb::linspace(size_t n) {
 
     return steps;
 }
+
+std::ostream& operator<<(std::ostream &os, const rgb &color) {
+    auto flags = os.flags();
+
+    if ((flags & std::ostream::hex) != 0) {
+        int r, g, b;
+        std::tie(r, g, b) = color.as_int(255.0f);
+        os << std::setw(2) << std::setfill('0') << std::fixed << r;
+        os << std::setw(2) << std::setfill('0') << std::fixed << g;
+        os << std::setw(2) << std::setfill('0') << std::fixed << b;
+    } else {
+        os << color.r << ", " << color.g << ", " << color.b;
+    }
+
+    return os;
+}
+
 } //iris::

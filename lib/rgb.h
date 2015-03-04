@@ -39,6 +39,9 @@ struct rgb {
 
 };
 
+
+std::ostream& operator<<(std::ostream &os, const rgb &color);
+
 }
 
 #endif
