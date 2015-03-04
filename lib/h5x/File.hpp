@@ -18,7 +18,7 @@
 #include <boost/optional.hpp>
 
 namespace h5x {
-class File : Group {
+class File : public Group {
 public:
     File() : Group() {}
     File(hid_t hid) : Group(hid) {}
