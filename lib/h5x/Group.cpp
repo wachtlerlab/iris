@@ -12,11 +12,6 @@
 
 namespace h5x {
 
-Group::Group() : LocID() {}
-Group::Group(hid_t hid) : LocID(hid) {}
-Group::Group(const Group &other) : LocID(other) {}
-
-
 bool Group::hasObject(const std::string &name) const {
     // empty string should return false, not exception (which H5Lexists would)
     if (name.empty()) {
@@ -128,7 +123,7 @@ DataSet Group::createData(const std::string &name,
         }
     }
 
-    BaseHDF5 dcpl = H5Pcreate(H5P_DATASET_CREATE);
+    HId dcpl = H5Pcreate(H5P_DATASET_CREATE);
     dcpl.check("Could not create data creation plist");
 
     if (!chunks && guess_chunks) {
@@ -169,7 +164,7 @@ Group Group::openGroup(const std::string &name, bool create) const {
         g = Group(H5Gopen(hid, name.c_str(), H5P_DEFAULT));
         g.check("Group::openGroup(): Could not open group: " + name);
     } else if (create) {
-        BaseHDF5 gcpl = H5Pcreate(H5P_GROUP_CREATE);
+        HId gcpl = H5Pcreate(H5P_GROUP_CREATE);
         gcpl.check("Unable to create group with name '" + name + "'! (H5Pcreate)");
 
         //we want hdf5 to keep track of the order in which links were created so that

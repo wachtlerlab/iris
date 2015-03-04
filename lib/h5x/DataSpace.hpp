@@ -9,20 +9,19 @@
 // Author: Christian Kellner <kellner@bio.lmu.de>
 
 #include <h5x/NDSize.hpp>
-
-#include <h5x/BaseHDF5.hpp>
+#include <h5x/HId.hpp>
 
 #ifndef NIX_DATASPACE_H
 #define NIX_DATASPACE_H
 
 namespace h5x {
 
-class DataSpace : public BaseHDF5 {
+class DataSpace : public HId {
 public:
 
-    DataSpace() : BaseHDF5(H5S_ALL) { }
-    DataSpace(hid_t space) : BaseHDF5(space) { }
-    DataSpace(const DataSpace &other) : BaseHDF5(other) { }
+    DataSpace() : HId(H5S_ALL) { }
+    DataSpace(hid_t space) : HId(space) { }
+    DataSpace(const DataSpace &other) : HId(other) { }
 
     NDSize extent() const;
 

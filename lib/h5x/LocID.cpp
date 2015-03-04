@@ -12,13 +12,13 @@
 
 namespace h5x {
 
-LocID::LocID() : BaseHDF5() {}
+LocID::LocID() : HId() {}
 
 
-LocID::LocID(hid_t hid) : BaseHDF5(hid) {}
+LocID::LocID(hid_t hid) : HId(hid) {}
 
 
-LocID::LocID(const LocID &other) : BaseHDF5(other) {}
+LocID::LocID(const LocID &other) : HId(other) {}
 
 
 bool LocID::hasAttr(const std::string &name) const {

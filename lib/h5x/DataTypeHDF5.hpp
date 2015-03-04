@@ -10,20 +10,20 @@
 #define NIX_DATA_TYPE_HDF5_H
 
 #include <h5x/TypeId.hpp>
-#include <h5x/BaseHDF5.hpp>
+#include <h5x/HId.hpp>
 
 namespace h5x {
 
-class DataType : public BaseHDF5 {
+class DataType : public HId {
 
 public:
-    DataType() : BaseHDF5() { }
+    DataType() : HId() { }
 
-    DataType(hid_t hid) : BaseHDF5(hid, false) { }
+    DataType(hid_t hid) : HId(hid, false) { }
 
-    DataType(hid_t hid, bool is_copy) : BaseHDF5(hid, is_copy) { }
+    DataType(hid_t hid, bool is_copy) : HId(hid, is_copy) { }
 
-    DataType(const DataType &other) : BaseHDF5(other) { }
+    DataType(const DataType &other) : HId(other) { }
 
 
     //Basically the same as DataType(hid_t, true)

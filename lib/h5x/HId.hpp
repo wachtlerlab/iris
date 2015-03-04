@@ -91,7 +91,7 @@ private:
 };
 
 
-class BaseHDF5 {
+class HId {
 
 protected:
 
@@ -99,27 +99,27 @@ protected:
 
 public:
 
-    BaseHDF5() : hid(H5I_INVALID_HID) { }
+    HId() : hid(H5I_INVALID_HID) { }
 
-    BaseHDF5(hid_t hid) : BaseHDF5(hid, false) { };
+    HId(hid_t hid) : HId(hid, false) { };
 
-    BaseHDF5(hid_t hid, bool is_copy) : hid(hid) {
+    HId(hid_t hid, bool is_copy) : hid(hid) {
         if (is_copy) {
             inc();
         }
     }
 
-    BaseHDF5(const BaseHDF5 &other);
+    HId(const HId &other);
 
-    BaseHDF5(BaseHDF5 &&other);
+    HId(HId &&other);
 
-    BaseHDF5& operator=(const BaseHDF5 &other);
+    HId & operator=(const HId &other);
 
-    BaseHDF5& operator=(BaseHDF5 &&other);
+    HId & operator=(HId &&other);
 
-    bool operator==(const BaseHDF5 &other) const;
+    bool operator==(const HId &other) const;
 
-    bool operator!=(const BaseHDF5 &other) const;
+    bool operator!=(const HId &other) const;
 
     //NB: use the following functions with caution
     hid_t h5id() const; //no refcount increase
@@ -138,7 +138,7 @@ public:
 
     virtual void close();
 
-    virtual ~BaseHDF5();
+    virtual ~HId();
 
 protected:
 

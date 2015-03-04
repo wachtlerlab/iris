@@ -6,26 +6,26 @@
 // modification, are permitted under the terms of the BSD License. See
 // LICENSE file in the root of the Project.
 
-#include <h5x/BaseHDF5.hpp>
+#include "HId.hpp"
 #include <h5x/ExceptionHDF5.hpp>
 
 
 namespace h5x {
 
 
-BaseHDF5::BaseHDF5(const BaseHDF5 &other)
+HId::HId(const HId &other)
     : hid(other.hid)
 {
     inc();
 }
 
 
-BaseHDF5::BaseHDF5(BaseHDF5 &&other) : hid(other.hid) {
+HId::HId(HId &&other) : hid(other.hid) {
     other.invalidate();
 }
 
 
-BaseHDF5& BaseHDF5::operator=(const BaseHDF5 &other) {
+HId &HId::operator=(const HId &other) {
     if (hid != other.hid) {
         dec();
         hid = other.hid;
@@ -35,14 +35,14 @@ BaseHDF5& BaseHDF5::operator=(const BaseHDF5 &other) {
 }
 
 
-BaseHDF5& BaseHDF5::operator=(BaseHDF5 &&other) {
+HId &HId::operator=(HId &&other) {
     hid = other.hid;
     other.invalidate();
     return *this;
 }
 
 
-bool BaseHDF5::operator==(const BaseHDF5 &other) const {
+bool HId::operator==(const HId &other) const {
     if (H5Iis_valid(hid) && H5Iis_valid(other.hid))
         return hid == other.hid;
     else
@@ -50,17 +50,17 @@ bool BaseHDF5::operator==(const BaseHDF5 &other) const {
 }
 
 
-bool BaseHDF5::operator!=(const BaseHDF5 &other) const {
+bool HId::operator!=(const HId &other) const {
     return !(*this == other);
 }
 
 
-hid_t BaseHDF5::h5id() const {
+hid_t HId::h5id() const {
     return hid;
 }
 
 
-int BaseHDF5::refCount() const {
+int HId::refCount() const {
     if (H5Iis_valid(hid)) {
         return H5Iget_ref(hid);
     } else {
@@ -68,13 +68,13 @@ int BaseHDF5::refCount() const {
     }
 }
 
-bool BaseHDF5::isValid() const {
+bool HId::isValid() const {
     HTri res = H5Iis_valid(hid);
-    res.check("BaseHDF5::isValid() failed");
+    res.check("HId::isValid() failed");
     return res.result();
 }
 
-std::string BaseHDF5::name() const {
+std::string HId::name() const {
     if (! H5Iis_valid(hid)) {
         //maybe throw an exception?
         return "";
@@ -98,32 +98,32 @@ std::string BaseHDF5::name() const {
 }
 
 
-void BaseHDF5::close() {
+void HId::close() {
     dec();
     invalidate();
 }
 
 
-BaseHDF5::~BaseHDF5() {
+HId::~HId() {
     close();
 }
 
 
-void BaseHDF5::inc() const {
+void HId::inc() const {
     if (H5Iis_valid(hid)) {
         H5Iinc_ref(hid);
     }
 }
 
 
-void BaseHDF5::dec() const {
+void HId::dec() const {
     if (H5Iis_valid(hid)) {
         H5Idec_ref(hid);
     }
 }
 
 
-void BaseHDF5::invalidate() {
+void HId::invalidate() {
     hid = H5I_INVALID_HID;
 }
 

@@ -14,13 +14,13 @@
 namespace h5x {
 
 
-Attribute::Attribute() : BaseHDF5() {
+Attribute::Attribute() : HId() {
 }
 
-Attribute::Attribute(hid_t hid) : BaseHDF5(hid) {
+Attribute::Attribute(hid_t hid) : HId(hid) {
 }
 
-Attribute::Attribute(const Attribute &other) : BaseHDF5(other) {
+Attribute::Attribute(const Attribute &other) : HId(other) {
 }
 
 

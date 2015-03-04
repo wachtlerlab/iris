@@ -25,13 +25,13 @@ class Group : public LocID {
 
 public:
 
-    Group();
+    Group() : LocID() {}
 
-    Group(hid_t hid);
+    Group(hid_t hid) : LocID(hid) {}
 
-    Group(hid_t hid, bool is_copy) : LocID(hid, is_copy) { }
+    Group(hid_t hid, bool is_copy) : LocID(hid, is_copy) {}
 
-    Group(const Group &other);
+    Group(const Group &other) : LocID(other) {}
 
     bool hasObject(const std::string &path) const;
     ndsize_t objectCount() const;

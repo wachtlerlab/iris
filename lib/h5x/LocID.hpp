@@ -11,20 +11,20 @@
 #ifndef NIX_LOCATION_H5_H
 #define NIX_LOCATION_H5_H
 
-#include <h5x/BaseHDF5.hpp>
+#include <h5x/HId.hpp>
 #include <h5x/Attribute.hpp>
 #include <h5x/Hydra.hpp>
 #include <h5x/DataTypeHDF5.hpp>
 
 namespace h5x {
 
-class LocID : public BaseHDF5 {
+class LocID : public HId {
 public:
     LocID();
 
     LocID(hid_t hid);
 
-    LocID(hid_t hid, bool is_copy) : BaseHDF5(hid, is_copy) { }
+    LocID(hid_t hid, bool is_copy) : HId(hid, is_copy) { }
 
     LocID(const LocID &other);
 

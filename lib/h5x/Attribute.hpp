@@ -16,7 +16,7 @@
 
 namespace h5x {
 
-class  Attribute : public BaseHDF5 {
+class  Attribute : public HId {
 public:
     Attribute();
     Attribute(hid_t hid);
