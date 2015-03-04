@@ -68,6 +68,9 @@ set(measure_SOURCES tools/measure.cc)
 add_executable(iris-measure ${measure_SOURCES})
 target_link_libraries(iris-measure iris)
 
+add_executable(iris-cgen tools/cgen.cc)
+target_link_libraries(iris-cgen iris)
+
 ########################################
 # playground
 
