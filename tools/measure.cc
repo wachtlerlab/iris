@@ -5,6 +5,8 @@
 #include <glue/buffer.h>
 #include <glue/arrays.h>
 #include <glue/colors.h>
+#include <glue/monitor.h>
+#include <glue/window.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -421,64 +423,37 @@ int main(int argc, char **argv)
 
     glfwSetErrorCallback(error_callback);
 
-    int n_monis;
-    GLFWmonitor **monitors = glfwGetMonitors(&n_monis);
-    GLFWmonitor *primary = glfwGetPrimaryMonitor();
-    GLFWmonitor *mtarget = nullptr;
+    gl::monitor mtarget = gl::monitor::primary();
 
-    for (int i = 0; i < n_monis; i++) {
-        const std::string name = glfwGetMonitorName(monitors[i]);
-        std::cout << "Monitor: " <<  name << std::endl;
-        int phy_width, phy_height;
-        glfwGetMonitorPhysicalSize(monitors[i], &phy_width, &phy_height);
-        std::cout << "\t size: " << phy_width << "×" << phy_height << " [mm]" << std::endl;
+    if (!mdev.empty()) {
 
-        const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
-        const double dpi = mode->width / (phy_width / 25.4);
-        std::cout << "\t dpi:  " << dpi  << std::endl;
+        std::vector<gl::monitor> mm = gl::monitor::monitors();
 
-        if (monitors[i] == primary) {
-            std::cout << "\t [primary]" << std::endl;
-        }
-
-        if (mtarget == nullptr && name == mdev) {
-            mtarget = monitors[i];
-            std::cout << "\t [selected]" << std::endl;
-        }
-
-        std::cout << std::endl;
-    }
-
-    if (!mdev.empty() && mtarget == nullptr) {
         const char *cstr = mdev.c_str();
         char *cend;
         unsigned long k = strtoul(cstr, &cend, 10);
         if (cstr != cend) {
-            if (k >= n_monis) {
+            if (k >= mm.size()) {
                 std::cerr << "monitor index out of range" << std::endl;
                 return -1;
             }
 
-            mtarget = monitors[k];
+            mtarget = mm[k];
+        } else {
+            auto pos = std::find_if(mm.begin(), mm.end(), [mdev](const gl::monitor &m) {
+                return m.name() == mdev;
+            });
+
+            if (pos == mm.end()) {
+                std::cerr << "could not find monitor" << std::endl;
+                return 0;
+            }
+
+            mtarget = *pos;
         }
     }
 
-    if (mtarget == nullptr) {
-        mtarget = primary;
-    }
-
-    std::cout << "Monitor: " << glfwGetMonitorName(mtarget) << std::endl;
-
-    int n_modes;
-    const GLFWvidmode* modes = glfwGetVideoModes(mtarget, &n_modes);
-
-    for (int i = 0; i < n_modes; i++) {
-        std::cout << i << ": " << modes[i].width << " × " << modes[i].height;
-        std::cout << " \t " << modes[i].redBits << " " << modes[i].greenBits << " " << modes[i].blueBits;
-        std::cout << " @ " << modes[i].refreshRate << "Hz" << std::endl;
-    }
-
-    const GLFWvidmode *mm = modes + (n_modes - 1);
+    std::cout << "Monitor: " << mtarget.name() << std::endl;
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -486,7 +461,8 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_SAMPLES, 2);
 
-    GLFWwindow* window = glfwCreateWindow(mm->width, mm->height, "Calibration", mtarget, nullptr);
+    gl::window w = gl::window("iris - calibration - Measure", mtarget);
+    GLFWwindow* window = static_cast<GLFWwindow *>(w);
 
     if (!window) {
         glfwTerminate();
