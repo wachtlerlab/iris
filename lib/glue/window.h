@@ -83,6 +83,10 @@ public:
         return wnd;
     }
 
+    explicit operator bool() const {
+        return wnd != nullptr;
+    }
+
 private:
     GLFWwindow *wnd;
 };
