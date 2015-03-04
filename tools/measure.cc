@@ -200,16 +200,10 @@ static void check_gl_error(const std::string &prefix = "") {
     }
 }
 
-void wnd_key_cb(GLFWwindow *wnd, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(wnd, GL_TRUE);
-    }
-}
-
 class robot : public looper {
 public:
 
-    robot(GLFWwindow *wnd, device::pr655 &meter, std::vector<gl::color::rgba> &stim)
+    robot(gl::window &wnd, device::pr655 &meter, std::vector<gl::color::rgba> &stim)
             : window(wnd), meter(meter), stim(stim) {
         init();
     }
@@ -226,15 +220,14 @@ public:
     }
 
     void refresh() override {
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        gl::extent fb = window.framebuffer_size();
 
         glm::mat4 vp;
-        if (height > width) {
-            float scale = width / static_cast<float>(height);
+        if (fb.height > fb.width) {
+            float scale = fb.width / fb.height;
             vp = glm::scale(glm::mat4(1), glm::vec3(1.0f, scale, 1.0f));
         } else {
-            float scale = height / static_cast<float>(width);
+            float scale = fb.height / fb.width;
             vp = glm::scale(glm::mat4(1), glm::vec3(scale, 1.0f, 1.0f));
         }
 
@@ -320,7 +313,7 @@ private:
     gl::buffer bb;
     gl::vertex_array va;
 
-    GLFWwindow *window;
+    gl::window &window;
     device::pr655 &meter;
 
     // state
@@ -462,16 +455,7 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_SAMPLES, 2);
 
     gl::window w = gl::window("iris - calibration - Measure", mtarget);
-    GLFWwindow* window = static_cast<GLFWwindow *>(w);
-
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    glfwSetKeyCallback(window, wnd_key_cb);
+    w.make_current_context();
 
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
     std::cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
@@ -487,16 +471,16 @@ int main(int argc, char **argv)
     std::vector<float> steps = make_steps(16);
     std::vector<gl::color::rgba> colors = make_stim(steps);
 
-    robot bender(window, meter, colors);
+    robot bender(w, meter, colors);
 
     bender.start();
 
     bool keep_looping = true;
-    while (keep_looping && !glfwWindowShouldClose(window)) {
+    while (keep_looping && !w.should_close()) {
 
         keep_looping = bender.render();
 
-        glfwSwapBuffers(window);
+        w.swap_buffers();
         glfwPollEvents();
     }
 
