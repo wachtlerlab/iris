@@ -13,7 +13,7 @@
 #define H5X_ID_H
 
 #include <h5x/Hydra.hpp>
-#include <h5x/ExceptionHDF5.hpp>
+#include <h5x/Error.hpp>
 
 #include <hdf5.h>
 

@@ -6,8 +6,8 @@
 // modification, are permitted under the terms of the BSD License. See
 // LICENSE file in the root of the Project.
 
-#include "HId.hpp"
-#include <h5x/ExceptionHDF5.hpp>
+#include <h5x/HId.hpp>
+#include <h5x/Error.hpp>
 
 
 namespace h5x {

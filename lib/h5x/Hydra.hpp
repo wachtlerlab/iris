@@ -10,7 +10,7 @@
 
 #include <h5x/NDSize.hpp>
 #include <h5x/TypeId.hpp>
-#include <h5x/ExceptionHDF5.hpp>
+#include <h5x/Error.hpp>
 
 #include <type_traits>
 #include <limits>

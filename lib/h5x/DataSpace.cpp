@@ -9,7 +9,7 @@
 // Author: Christian Kellner <kellner@bio.lmu.de>
 
 #include <h5x/DataSpace.hpp>
-#include <h5x/ExceptionHDF5.hpp>
+#include <h5x/Error.hpp>
 
 namespace h5x {
 

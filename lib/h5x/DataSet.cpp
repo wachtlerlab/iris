@@ -7,7 +7,7 @@
 // LICENSE file in the root of the Project.
 
 #include <h5x/DataSet.hpp>
-#include <h5x/ExceptionHDF5.hpp>
+#include <h5x/Error.hpp>
 
 #include <iostream>
 #include <cmath>
