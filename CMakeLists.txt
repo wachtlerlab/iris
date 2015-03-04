@@ -64,8 +64,8 @@ set(info_SOURCES tools/info.cc)
 add_executable(iris-info ${info_SOURCES})
 target_link_libraries(iris-info iris)
 
-set(calib_SOURCES tools/calibrate.cc)
-add_executable(iris-measure ${calib_SOURCES})
+set(measure_SOURCES tools/measure.cc)
+add_executable(iris-measure ${measure_SOURCES})
 target_link_libraries(iris-measure iris)
 
 ########################################
