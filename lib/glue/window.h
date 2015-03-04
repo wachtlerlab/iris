@@ -74,6 +74,15 @@ public:
     virtual void mouse_button_event(int button, int action, int mods) { }
     virtual void pointer_moved(point pos) { }
 
+
+    explicit operator GLFWwindow*() {
+        return wnd;
+    }
+
+    explicit operator const GLFWwindow*() const {
+        return wnd;
+    }
+
 private:
     GLFWwindow *wnd;
 };
