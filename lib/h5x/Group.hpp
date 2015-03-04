@@ -10,7 +10,7 @@
 #define H5X_GROUP_H
 
 #include <h5x/LocID.hpp>
-#include <h5x/DataSetHDF5.hpp>
+#include <h5x/DataSet.hpp>
 #include <h5x/DataSpace.hpp>
 #include <h5x/Hydra.hpp>
 

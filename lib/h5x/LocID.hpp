@@ -14,7 +14,7 @@
 #include <h5x/HId.hpp>
 #include <h5x/Attribute.hpp>
 #include <h5x/Hydra.hpp>
-#include <h5x/DataTypeHDF5.hpp>
+#include <h5x/DataType.hpp>
 
 namespace h5x {
 

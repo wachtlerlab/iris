@@ -7,7 +7,7 @@
 // LICENSE file in the root of the Project.
 
 
-#include <h5x/DataTypeHDF5.hpp>
+#include <h5x/DataType.hpp>
 
 #include <stdexcept>
 #include <iostream>

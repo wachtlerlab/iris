@@ -9,7 +9,7 @@
 // Author: Christian Kellner <kellner@bio.lmu.de>
 
 #include <h5x/Attribute.hpp>
-#include <h5x/DataTypeHDF5.hpp>
+#include <h5x/DataType.hpp>
 
 namespace h5x {
 

@@ -12,7 +12,7 @@
 #define H5X_ATTRIBUTE_H
 
 #include <h5x/DataSpace.hpp>
-#include <h5x/DataTypeHDF5.hpp>
+#include <h5x/DataType.hpp>
 
 namespace h5x {
 

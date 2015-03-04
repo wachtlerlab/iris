@@ -6,7 +6,7 @@
 // modification, are permitted under the terms of the BSD License. See
 // LICENSE file in the root of the Project.
 
-#include <h5x/DataSetHDF5.hpp>
+#include <h5x/DataSet.hpp>
 #include <h5x/ExceptionHDF5.hpp>
 
 #include <iostream>

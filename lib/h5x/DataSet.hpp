@@ -11,7 +11,7 @@
 
 #include <h5x/Selection.hpp>
 #include <h5x/DataSpace.hpp>
-#include <h5x/DataTypeHDF5.hpp>
+#include <h5x/DataType.hpp>
 #include <h5x/LocID.hpp>
 #include <h5x/Hydra.hpp>
 
