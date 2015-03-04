@@ -8,8 +8,8 @@
 //
 // Author: Christian Kellner <kellner@bio.lmu.de>
 
-#ifndef NIX_EXCEPTION_H5_H
-#define NIX_EXCEPTION_H5_H
+#ifndef H5X_EXCEPTION_H
+#define H5X_EXCEPTION_H
 
 #include <hdf5.h>
 

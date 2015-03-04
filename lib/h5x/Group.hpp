@@ -6,8 +6,8 @@
 // modification, are permitted under the terms of the BSD License. See
 // LICENSE file in the root of the Project.
 
-#ifndef NIX_GROUP_H
-#define NIX_GROUP_H
+#ifndef H5X_GROUP_H
+#define H5X_GROUP_H
 
 #include <h5x/LocID.hpp>
 #include <h5x/DataSetHDF5.hpp>

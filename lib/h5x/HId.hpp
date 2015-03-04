@@ -9,8 +9,8 @@
 // Author: Adrian Stoewer <adrian.stoewer@rz.ifi.lmu.de>
 //         Christian Kellner <kellner@bio.lmu.de>
 
-#ifndef NIX_WRAP_ID_H
-#define NIX_WRAP_ID_H
+#ifndef H5X_ID_H
+#define H5X_ID_H
 
 #include <h5x/Hydra.hpp>
 #include <h5x/ExceptionHDF5.hpp>

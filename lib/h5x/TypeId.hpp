@@ -8,8 +8,8 @@
 //
 // Author: Christian Kellner <kellner@bio.lmu.de>
 
-#ifndef NIX_DATATYPE_H
-#define NIX_DATATYPE_H
+#ifndef H5X_TYPEID_H
+#define H5X_TYPEID_H
 
 
 #include <cstdint>

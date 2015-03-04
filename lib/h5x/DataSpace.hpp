@@ -11,8 +11,8 @@
 #include <h5x/NDSize.hpp>
 #include <h5x/HId.hpp>
 
-#ifndef NIX_DATASPACE_H
-#define NIX_DATASPACE_H
+#ifndef H5X_DATASPACE_H
+#define H5X_DATASPACE_H
 
 namespace h5x {
 

@@ -8,8 +8,8 @@
 //
 // Author: Christian Kellner <kellner@bio.lmu.de>
 
-#ifndef NIX_ATTRIBUTE_H5_H
-#define NIX_ATTRIBUTE_H5_H
+#ifndef H5X_ATTRIBUTE_H
+#define H5X_ATTRIBUTE_H
 
 #include <h5x/DataSpace.hpp>
 #include <h5x/DataTypeHDF5.hpp>

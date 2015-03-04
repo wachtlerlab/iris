@@ -6,8 +6,8 @@
 // modification, are permitted under the terms of the BSD License. See
 // LICENSE file in the root of the Project.
 
-#ifndef NIX_PSIZE_H
-#define NIX_PSIZE_H
+#ifndef NDSIZE_H
+#define NDSIZE_H
 
 #include <cstdint>
 #include <stdexcept>

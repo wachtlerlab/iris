@@ -6,8 +6,8 @@
 // modification, are permitted under the terms of the BSD License. See
 // LICENSE file in the root of the Project.
 
-#ifndef NIX_DATA_TYPE_HDF5_H
-#define NIX_DATA_TYPE_HDF5_H
+#ifndef H5X_DATATYPE_H
+#define H5X_DATATYPE_H
 
 #include <h5x/TypeId.hpp>
 #include <h5x/HId.hpp>

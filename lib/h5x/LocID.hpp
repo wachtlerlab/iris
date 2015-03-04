@@ -8,8 +8,8 @@
 //
 // Author: Christian Kellner <kellner@bio.lmu.de>
 
-#ifndef NIX_LOCATION_H5_H
-#define NIX_LOCATION_H5_H
+#ifndef H5X_LOC_ID_H
+#define H5X_LOC_ID_H
 
 #include <h5x/HId.hpp>
 #include <h5x/Attribute.hpp>

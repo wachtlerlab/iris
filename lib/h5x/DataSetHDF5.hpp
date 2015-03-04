@@ -6,8 +6,8 @@
 // modification, are permitted under the terms of the BSD License. See
 // LICENSE file in the root of the Project.
 
-#ifndef NIX_DATASET_H
-#define NIX_DATASET_H
+#ifndef H5X_DATASET_H
+#define H5X_DATASET_H
 
 #include <h5x/Selection.hpp>
 #include <h5x/DataSpace.hpp>

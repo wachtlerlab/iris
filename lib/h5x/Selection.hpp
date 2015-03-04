@@ -6,8 +6,8 @@
 // modification, are permitted under the terms of the BSD License. See
 // LICENSE file in the root of the Project.
 
-#ifndef NIX_SELECTION_H
-#define NIX_SELECTION_H
+#ifndef H5X_SELECTION_H
+#define H5X_SELECTION_H
 
 #include <h5x/NDSize.hpp>
 #include <h5x/Hydra.hpp>
