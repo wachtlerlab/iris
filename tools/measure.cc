@@ -1,4 +1,6 @@
 
+#include <h5x/File.hpp>
+
 #include <pr655.h>
 
 #include <iris.h>
@@ -352,6 +354,52 @@ void dump_stdout(const robot &r) {
     std::cout << std::defaultfloat;
 }
 
+void save_data_h5(const std::string &path, const robot &r) {
+
+    const std::vector<iris::rgb> &stim = r.stimulation();
+    const std::vector<spectral_data> &resp = r.response();
+
+    if (resp.empty()) {
+        std::cout << "[W] No data!" << std::endl;
+        return;
+    }
+
+    size_t nwl = resp[0].data.size();
+
+    h5x::NDSize dims = {resp.size(), nwl};
+    h5x::File fd = h5x::File::open(path, "a");
+    h5x::DataSet ds;
+    if (!fd.hasData("spectra")) {
+        ds = fd.createData("spectra", h5x::TypeId::Float, dims);
+    } else {
+        ds = fd.openData("spectra");
+    }
+
+    for(size_t i = 0; i < resp.size(); i++) {
+        const std::vector<float> data = resp[i].data;
+        h5x::Selection memSel(data);
+        h5x::Selection fileSel(ds.getSpace());
+        h5x::NDSize count = {static_cast<size_t>(1), nwl};
+        h5x::NDSize offset = {i, static_cast<size_t>(0)};
+        fileSel.select(count, offset);
+        ds.write(h5x::TypeId::Float, data.data(), fileSel, memSel);
+    }
+
+    ds.setAttr("wl_start", resp[0].wl_start);
+    ds.setAttr("wl_step", resp[0].wl_step);
+
+    if (! fd.hasData("patches")) {
+        h5x::NDSize dc = {stim.size(), static_cast<size_t>(3)};
+        h5x::DataSet patches;
+        patches = fd.createData("patches", h5x::TypeId::Float, dc);
+        patches.setExtent(dc);
+        patches.write(h5x::TypeId::Float, dims, static_cast<const void *>(stim.data()));
+    }
+
+    ds.close();
+    fd.close();
+}
+
 std::vector<iris::rgb> read_color_list(std::string path) {
     if (path == "-") {
         path = "/dev/stdin";
@@ -508,6 +556,7 @@ int main(int argc, char **argv)
 
     meter.stop();
     dump_stdout(bender);
+    save_data_h5("spectra.h5", bender);
     bender.stop();
     bender = nullptr;
 
