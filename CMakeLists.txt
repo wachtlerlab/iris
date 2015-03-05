@@ -71,6 +71,9 @@ target_link_libraries(iris-measure iris)
 add_executable(iris-cgen tools/cgen.cc)
 target_link_libraries(iris-cgen iris)
 
+add_executable(iris-calibrate tools/calibrate.cc)
+target_link_libraries(iris-calibrate iris)
+
 ########################################
 # playground
 
