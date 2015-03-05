@@ -1,6 +1,8 @@
 
 #include <pr655.h>
 
+#include <iris.h>
+
 #include <glue/shader.h>
 #include <glue/buffer.h>
 #include <glue/arrays.h>
@@ -206,8 +208,7 @@ public:
             return false;
         }
 
-        gl::color::rgba cur = stim[pos++];
-        memcpy(color, cur.data, sizeof(cur));
+        color = stim[pos++];
         return true;
     }
 
@@ -287,6 +288,7 @@ public:
         pos = 0;
 
         stim.reserve(stim.size());
+        color = iris::rgb::cyan();
     }
 
     const std::vector<gl::color::rgba> & stimulation() const {
@@ -309,7 +311,7 @@ private:
     device::pr655 &meter;
 
     // state
-    GLfloat color[4];
+    gl::color::rgba color;
     size_t pos;
 
     // data
