@@ -67,6 +67,13 @@ public:
         allocate();
     }
 
+    spectra(spectra &&o) : storage(o.storage), n_spectra(o.n_spectra), n_samples(o.n_samples),
+                           wl_start(o.wl_start), wl_step(o.wl_step), ids(std::move(o.ids)) {
+        o.storage = nullptr;
+        o.n_spectra = 0;
+        o.n_samples = 0;
+    }
+
     ~spectra() {
         if (storage != nullptr) {
             std::allocator<float> al;
