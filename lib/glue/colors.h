@@ -1,6 +1,10 @@
 #ifndef GLUE_COLOR_H
 #define GLUE_COLOR_H
 
+#ifdef HAVE_IRIS
+#include <rgb.h>
+#endif
+
 namespace glue {
 namespace color {
 
@@ -30,6 +34,13 @@ struct rgba {
 
     rgba(const rgb &c) : r(c.r), g(c.g), b(c.b), a(1.0f) {}
     operator rgb() const { return rgb(r, g, b); }
+
+    #ifdef HAVE_IRIS
+    rgba& operator=(const iris::rgb &o) {
+        r = o.r; g = o.g; b = o.b; a = 1.0f;
+        return *this;
+    }
+    #endif
 
     union {
         struct {
