@@ -5,6 +5,8 @@
 #include <ostream>
 #include <tuple>
 
+#include <cstring>
+
 namespace iris {
 
 struct rgb {
@@ -21,6 +23,11 @@ struct rgb {
 
         float raw[3];
     };
+
+    rgb& operator=(const rgb &o) {
+        memcpy(raw, o.raw, sizeof(o.raw));
+        return *this;
+    }
 
     std::tuple<int, int, int> as_int(float base = 255.0f) const;
 
