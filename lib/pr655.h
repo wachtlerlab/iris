@@ -50,6 +50,14 @@ public:
         float bandwidth;
     };
 
+    struct brightness {
+        float Y;
+        float x;
+        float y;
+        float ut;
+        float vt;
+    };
+
     pr655() : io(), lm(-1) {}
 
     pr655(const serial &port) : io(port), lm(-1) {}
@@ -112,6 +120,8 @@ public:
 
     spectral_data spectral();
 
+    response<brightness> brightness_pm();
+
     bool measure();
 
 private:
@@ -119,6 +129,7 @@ private:
     response<std::string> io_cmd(const std::string &cmd);
     static response<std::string> parse_status(const std::string &resp);
     static cfg parse_hw_config(const std::string &line);
+    static brightness parse_brightness(const std::string &line);
 
 private:
     serial      io;

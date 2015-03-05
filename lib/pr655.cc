@@ -52,6 +52,22 @@ spectral_data pr655::spectral() {
     return data;
 }
 
+pr655::response<pr655::brightness> pr655::brightness_pm() {
+
+    if (lm < 0) {
+        //FIXME: maybe just measure in that case?
+        throw std::invalid_argument("Need to measure before getting spectral data");
+    }
+
+    response<std::string> res = io_cmd("D6");
+
+    response<brightness> rb = res.map<brightness>([](const std::string &line) {
+        return parse_brightness(line);
+    });
+
+    return rb;
+}
+
 
 bool pr655::measure() {
     response<std::string> res = io_cmd("M120");
@@ -114,5 +130,19 @@ pr655::cfg pr655::parse_hw_config(const std::string &line) {
 }
 
 
+pr655::brightness pr655::parse_brightness(const std::string &line) {
+    //qqqqq,UUUU,Y.YYYe+ee,x.xxxx,y.yyyy,u’.u’u’u’u’, v’.v’v’v’v’CRLF
 
+    brightness br;
+
+    std::cerr << line << std::endl;
+    int unit;
+    int ret = std::sscanf(line.c_str(), "%d,%f,%f,%f,%f,%f", &unit, &br.Y, &br.x, &br.y, &br.ut, &br.vt);
+
+    if (ret != 6) {
+        throw std::runtime_error("Could not parse brightness line");
+    }
+
+    return br;
+}
 } //namespace device

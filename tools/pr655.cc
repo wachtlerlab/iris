@@ -55,7 +55,6 @@ int main(int argc, char **argv) {
 
         std::cout << prefix << "status: " << meter.istatus().code << std::endl;
 
-
         meter.measure();
 
         device::pr655::cfg config = meter.config();
@@ -77,6 +76,13 @@ int main(int argc, char **argv) {
         }
 
         std::cout << std::endl;
+
+        device::pr655::response<device::pr655::brightness> br = meter.brightness_pm();
+        if (br) {
+            device::pr655::brightness b = br.data;
+            std::cout << "Luminance: " << b.Y << std::endl;
+            std::cout << "x: " << b.x << ", y: " << b.y << std::endl;
+        }
 
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
