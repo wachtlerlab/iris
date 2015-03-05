@@ -35,6 +35,25 @@ struct spectrum {
 
         return static_cast<float>(vsum);
     }
+
+    spectrum operator+(const spectrum &other) {
+        if (other.wl_start != wl_start || other.wl_step != wl_step ||
+                other.values.size() != values.size()) {
+            throw std::invalid_argument("Incompatible spectra");
+        }
+
+        spectrum res;
+        res.wl_start = wl_start;
+        res.wl_step = wl_step;
+        res.id = id;
+        res.values.resize(values.size());
+
+        for(size_t i = 0; i < values.size(); i++) {
+            res.values[i] = values[i] + other.values[i];
+        }
+
+        return res;
+    }
 };
 
 
