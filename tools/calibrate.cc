@@ -257,7 +257,7 @@ spectra parse_csv(const std::string path) {
         std::cout << "]" << std::endl;
 
         for(size_t k = 0; k < values.size(); k++) {
-            float tmp = std::stod(v[k+1]);
+            float tmp = std::stod(v[k + 1]);
             std::vector<float> &samples = values[k];
             samples.push_back(tmp);
         }
