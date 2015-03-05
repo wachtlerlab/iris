@@ -221,6 +221,8 @@ spectra parse_csv(const std::string path) {
     std::vector<fv_t> values;
     bool first_line = true;
 
+    std::vector<std::string> header;
+
     while (i != s.cend()) {
         bool r = boost::spirit::qi::phrase_parse(i, s.cend(), g, boost::spirit::qi::blank, v);
 
@@ -232,6 +234,11 @@ spectra parse_csv(const std::string path) {
 
             values.resize(v.size() - 1);
             first_line = false;
+            
+            header = std::move(v);
+            v.clear();
+            continue; //ignore the header
+
         } else {
             if (values.size() != v.size() - 1) {
                 std::cerr << values.size() << " vs. " << v.size() << std::endl;
@@ -287,6 +294,11 @@ spectra parse_csv(const std::string path) {
         const std::vector<float> &vs = values[i];
         float *dest = sp.data() + i * n_samples;
         memcpy(dest, vs.data(), sizeof(float) * n_samples);
+    }
+
+    if(!header.empty()) {
+        header.erase(header.begin());
+        sp.names(header);
     }
 
     return sp;
