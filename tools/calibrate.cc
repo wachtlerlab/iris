@@ -109,7 +109,7 @@ public:
         return -1;
     }
 
-    spectrum operator[](size_t n) {
+    spectrum operator[](size_t n) const {
         if (n > n_spectra) {
             throw std::out_of_range("spectrum requested is oor");
         }
