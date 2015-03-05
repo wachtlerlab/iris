@@ -26,10 +26,6 @@ static void mouse_button_gl_cb(GLFWwindow *gl_win, int button, int action, int m
 
 static void key_gl_cb(GLFWwindow *gl_win, int key, int scancode, int action, int mods) {
     window *wnd = GET_WND(gl_win);
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(gl_win, GL_TRUE);
-    }
-
     wnd->key_event(key, scancode, action, mods);
 }
 

@@ -70,10 +70,13 @@ public:
     }
 
     virtual void framebuffer_size_changed(extent size) { }
-    virtual void key_event(int key, int scancode, int action, int mods) { }
     virtual void mouse_button_event(int button, int action, int mods) { }
     virtual void pointer_moved(point pos) { }
-
+    virtual void key_event(int key, int scancode, int action, int mods) {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+            glfwSetWindowShouldClose(wnd, GL_TRUE);
+        }
+    }
 
     explicit operator GLFWwindow*() {
         return wnd;
