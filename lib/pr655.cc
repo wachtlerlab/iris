@@ -112,8 +112,7 @@ pr655::response<std::string> pr655::parse_status(const std::string &resp) {
 
 pr655::cfg pr655::parse_hw_config(const std::string &line) {
     //qqqqq,pp,bw,bb,ee,ii,nrp,frp,lrp CRLF
-    int pp, bb, ee, ii, nrp, frp, lrp;
-    float bw;
+    int nrp, frp, lrp;
 
     cfg hwcfg;
 
