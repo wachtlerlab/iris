@@ -178,6 +178,23 @@ public:
         return s;
     }
 
+    spectrum operator[](const std::string &name) const {
+        ssize_t pos = find_spectrum(name);
+        if (pos < 0) {
+            return spectrum();
+        }
+
+        return this->operator[](static_cast<size_t>(pos));
+    }
+
+    void names(std::vector<std::string> data) {
+        ids = std::move(data);
+    }
+
+    std::vector<std::string> names() const {
+        return ids;
+    }
+
 private:
     void allocate() {
         size_t n = n_spectra * n_samples;
@@ -281,7 +298,6 @@ spectra parse_csv(const std::string path) {
             samples.push_back(tmp);
         }
 
-
         v.clear();
     }
 
@@ -374,8 +390,8 @@ int main(int argc, char **argv) {
     spectra cf = parse_csv(cones);
     dump_sepctra(cf);
 
-    spectrum M = cf[1];
-    spectrum L = cf[2];
+    spectrum M = cf["M"];
+    spectrum L = cf["L"];
 
     spectrum LM = L + M;
 
