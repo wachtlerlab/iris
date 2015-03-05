@@ -49,14 +49,6 @@ void main() {
 // ***
 namespace gl = glue;
 
-void print_color(const gl::color::rgba &c) {
-    std::cout << std::fixed << std::setprecision(5);
-    std::cout << c.r << ",";
-    std::cout << c.g << ",";
-    std::cout << c.b;
-    std::cout << std::defaultfloat;
-}
-
 void print_color_hex(const gl::color::rgba &c) {
 
     int r = static_cast<int>(c.r * 255.0f);
