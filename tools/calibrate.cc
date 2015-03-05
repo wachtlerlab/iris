@@ -192,6 +192,15 @@ private:
 };
 
 static void dump_sepctra(const spectra &spec) {
+
+    std::vector<std::string> names = spec.names();
+    if (!names.empty()) {
+        for (const auto &name : names) {
+            std::cerr << name << " ";
+        }
+        std::cerr << std::endl;
+    }
+
     for (size_t i = 0; i < spec.num_spectra(); i++) {
         spectrum s = spec[i];
 
