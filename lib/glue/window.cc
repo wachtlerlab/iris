@@ -68,6 +68,8 @@ void window::cleanup() {
     glfwSetCursorPosCallback(wnd, nullptr);
     glfwSetKeyCallback(wnd, nullptr);
     glfwSetMouseButtonCallback(wnd, nullptr);
+
+    wnd = nullptr;
 }
 
 window::window(GLFWwindow *window) : wnd(window) {
