@@ -22,6 +22,7 @@
 #include <boost/program_options.hpp>
 
 #include <iomanip>
+#include <fstream>
 
 static const char vs_simple[] = R"SHDR(
 #version 330
@@ -60,42 +61,6 @@ void print_color_hex(const gl::color::rgba &c) {
     std::cout << std::hex << std::setw(2) << std::setfill('0') << r;
     std::cout << std::hex << std::setw(2) << std::setfill('0') << g;
     std::cout << std::hex << std::setw(2) << std::setfill('0') << b;
-}
-
-
-std::vector<gl::color::rgba> make_stim(const std::vector<float> &steps) {
-    std::vector<gl::color::rgba> res;
-
-    const size_t n_steps = steps.size();
-
-    for (size_t i = 0; i < n_steps; i++) {
-        const auto v = steps[i];
-        gl::color::rgba c = {v, 0.0f, 0.f};
-
-        res.push_back(c);
-
-        std::swap(c.data[0], c.data[1]);
-        res.push_back(c);
-
-        std::swap(c.data[1], c.data[2]);
-        res.push_back(c);
-
-        c.r = c.g = c.b = v;
-        res.push_back(c);
-    }
-
-    return res;
-}
-
-std::vector<float> make_steps(size_t n) {
-    std::vector<float> steps(n);
-
-    float step = 1.0f / n;
-    float cur = 0.0f;
-
-    std::generate(steps.begin(), steps.end(), [&]{ cur += step; return cur; });
-
-    return steps;
 }
 
 //***
@@ -171,10 +136,22 @@ public:
         }
     }
 
+    void stop() {
+        news = state::Stop;
+        if (thd.joinable()) {
+            thd.join();
+        }
+    }
+
     virtual ~looper() {
         if (thd.joinable()) {
             thd.join();
         }
+    }
+
+    bool is_running() const {
+        state cur = news;
+        return cur != state::Waiting && cur != state::Stop;
     }
 
 private:
@@ -197,8 +174,9 @@ static void check_gl_error(const std::string &prefix = "") {
 class robot : public looper, public gl::window {
 public:
 
-    robot(gl::monitor m, device::pr655 &meter, std::vector<gl::color::rgba> &stim)
+    robot(gl::monitor m, device::pr655 &meter, std::vector<iris::rgb> &stim)
             : gl::window("iris - measure", m), meter(meter), stim(stim) {
+        make_current_context();
         setup();
     }
 
@@ -291,13 +269,27 @@ public:
         color = iris::rgb::cyan();
     }
 
-    const std::vector<gl::color::rgba> & stimulation() const {
+    const std::vector<iris::rgb> & stimulation() const {
         return stim;
     }
 
     const std::vector<spectral_data> & response() const {
         return resp;
     }
+
+    virtual void key_event(int key, int scancode, int action, int mods) override {
+        gl::window::key_event(key, scancode, action, mods);
+
+        if (! is_running() && key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+            start();
+        }
+    }
+
+    robot& operator=(std::nullptr_t) {
+        cleanup();
+        return *this;
+    }
+
 
 private:
     gl::shader vs;
@@ -315,7 +307,7 @@ private:
     size_t pos;
 
     // data
-    std::vector<gl::color::rgba> stim;
+    std::vector<iris::rgb> stim;
     std::vector<spectral_data> resp;
 };
 
@@ -323,7 +315,7 @@ void dump_stdout(const robot &r) {
 
     using namespace gl::color;
 
-    const std::vector<rgba> &stim = r.stimulation();
+    const std::vector<iris::rgb> &stim = r.stimulation();
     const std::vector<spectral_data> &resp = r.response();
 
     if (resp.empty()) {
@@ -340,7 +332,7 @@ void dump_stdout(const robot &r) {
     std::cout << prefix << "λ    \t ";
 
     for (size_t i = 0; i < stim.size(); i ++) {
-        print_color_hex(stim[i]);
+        std::cout << std::hex << stim[i];
         std::cout << "  \t  ";
     }
 
@@ -358,7 +350,34 @@ void dump_stdout(const robot &r) {
     }
 
     std::cout << std::defaultfloat;
+}
 
+std::vector<iris::rgb> read_color_list(std::string path) {
+    if (path == "-") {
+        path = "/dev/stdin";
+    }
+
+    char buf[8] = {0, };
+
+    std::ifstream fd(path, std::ios::in);
+
+    std::vector<iris::rgb> result;
+    while(fd.getline(buf, sizeof(buf) - 1, '\n')) {
+        std::string s(buf, static_cast<size_t>(fd.gcount()));
+        iris::rgb color;
+        for (size_t i = 0; i < 3; i++) {
+            std::string sub = s.substr(2*i, 2);
+            size_t pos = 0;
+            unsigned long c = std::stoul(sub, &pos, 16);
+            if (pos == 0) {
+                throw std::runtime_error("Error while parsing color list");
+            }
+            color.raw[i] = static_cast<float>(c / 255.0f);
+        }
+        result.push_back(color);
+    }
+
+    return result;
 }
 
 int main(int argc, char **argv)
@@ -367,14 +386,17 @@ int main(int argc, char **argv)
 
     std::string device;
     std::string mdev;
+    std::string input;
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
             ("device", po::value<std::string>(&device))
-            ("monitor", po::value<std::string>(&mdev));
+            ("monitor", po::value<std::string>(&mdev))
+            ("input", po::value<std::string>(&input)->required());
 
     po::positional_options_description pos;
+    pos.add("input", 1);
 
     po::variables_map vm;
     po::store(po::command_line_parser(argc, argv).options(opts).positional(pos).run(), vm);
@@ -383,6 +405,13 @@ int main(int argc, char **argv)
     if (vm.count("help") > 0) {
         std::cout << opts << std::endl;
         return 0;
+    }
+
+    // ****
+    std::cerr << "List of colors to measure:" << std::endl;
+    std::vector<iris::rgb> colors = read_color_list(input);
+    for (auto c : colors) {
+        std::cerr << std::hex << c << std::endl;
     }
 
     // ****
@@ -449,11 +478,8 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_SAMPLES, 2);
 
     // *****
-    std::vector<float> steps = make_steps(16);
-    std::vector<gl::color::rgba> colors = make_stim(steps);
 
     robot bender(mtarget, meter, colors);
-    bender.make_current_context();
 
     // **
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
@@ -467,7 +493,9 @@ int main(int argc, char **argv)
     glEnable(GL_MULTISAMPLE);
 
     // **** and so it begins ...
-    bender.start();
+
+    std::cerr << "All ready! Press <space> to start measurement..." << std::endl;
+
 
     bool keep_looping = true;
     while (keep_looping && !bender.should_close()) {
@@ -479,8 +507,9 @@ int main(int argc, char **argv)
     }
 
     meter.stop();
-
     dump_stdout(bender);
+    bender.stop();
+    bender = nullptr;
 
     std::cerr << "Goodbay. Have a nice day!" << std::endl;
 
