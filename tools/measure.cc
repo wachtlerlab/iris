@@ -192,12 +192,12 @@ static void check_gl_error(const std::string &prefix = "") {
     }
 }
 
-class robot : public looper {
+class robot : public looper, public gl::window {
 public:
 
-    robot(gl::window &wnd, device::pr655 &meter, std::vector<gl::color::rgba> &stim)
-            : window(wnd), meter(meter), stim(stim) {
-        init();
+    robot(gl::monitor m, device::pr655 &meter, std::vector<gl::color::rgba> &stim)
+            : gl::window("iris - measure", m), meter(meter), stim(stim) {
+        setup();
     }
 
     bool display() override {
@@ -212,7 +212,7 @@ public:
     }
 
     void refresh() override {
-        gl::extent fb = window.framebuffer_size();
+        gl::extent fb = framebuffer_size();
 
         glm::mat4 vp;
         if (fb.height > fb.width) {
@@ -247,7 +247,8 @@ public:
         std::cerr << " done" << std::endl;
     }
 
-    void init() {
+    void setup() {
+
         vs = gl::shader::make(vs_simple, GL_VERTEX_SHADER);
         fs = gl::shader::make(fs_simple, GL_FRAGMENT_SHADER);
 
@@ -305,7 +306,6 @@ private:
     gl::buffer bb;
     gl::vertex_array va;
 
-    gl::window &window;
     device::pr655 &meter;
 
     // state
@@ -446,9 +446,14 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_SAMPLES, 2);
 
-    gl::window w = gl::window("iris - calibration - Measure", mtarget);
-    w.make_current_context();
+    // *****
+    std::vector<float> steps = make_steps(16);
+    std::vector<gl::color::rgba> colors = make_stim(steps);
 
+    robot bender(mtarget, meter, colors);
+    bender.make_current_context();
+
+    // **
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
     std::cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
@@ -459,20 +464,15 @@ int main(int argc, char **argv)
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
 
-    // *****
-    std::vector<float> steps = make_steps(16);
-    std::vector<gl::color::rgba> colors = make_stim(steps);
-
-    robot bender(w, meter, colors);
-
+    // **** and so it begins ...
     bender.start();
 
     bool keep_looping = true;
-    while (keep_looping && !w.should_close()) {
+    while (keep_looping && !bender.should_close()) {
 
         keep_looping = bender.render();
 
-        w.swap_buffers();
+        bender.swap_buffers();
         glfwPollEvents();
     }
 
