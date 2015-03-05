@@ -145,8 +145,18 @@ public:
         return wl_step;
     }
 
-    ssize_t find_spectrum(const std::string &id) {
-        return -1;
+    ssize_t find_spectrum(const std::string &id) const {
+
+        bool found = false;
+        size_t i;
+        for (i = 0; i < ids.size(); i++) {
+            if (id == ids[i]) {
+                found = true;
+                break;
+            }
+        }
+
+        return found ? i : -1;
     }
 
     spectrum operator[](size_t n) const {
