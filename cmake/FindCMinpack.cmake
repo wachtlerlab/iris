@@ -17,7 +17,7 @@ find_library(CMINPACK_LIBRARY NAMES cminpack libcminpack
   /usr/lib)
 
 set(CMINPACK_LIBRARIES ${CMINPACK_LIBRARY})
-set(CMINPACK_INCLUDE_DIRS ${CMINPACK_INCLUDE_DIR} )
+set(CMINPACK_INCLUDE_DIRS ${CMINPACK_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CMinpack DEFAULT_MSG
