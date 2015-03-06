@@ -1,24 +1,26 @@
 
 #include <spectra.h>
+#include <numeric>
 
 namespace iris {
 
 // ***********
 // spectrum
 
-float spectrum::operator*(const spectrum &other) {
+spectrum spectrum::operator*(const spectrum &other) {
     if (other.wl_start != wl_start || other.wl_step != wl_step ||
                 other.values.size() != values.size()) {
             throw std::invalid_argument("Incompatible spectra");
-        }
+    }
 
-        double vsum = 0;
-        for(size_t i = 0; i < values.size(); i++) {
-            double m = values[i] * other.values[i];
-            vsum += m;
-        }
+    spectrum res(wl_start, wl_step);
+    res.resize(values.size());
 
-        return static_cast<float>(vsum);
+    for(size_t i = 0; i < values.size(); i++) {
+       res[i] = values[i] * other.values[i];
+    }
+
+    return res;
  }
 
 spectrum spectrum::operator+(const spectrum &other) {

@@ -229,7 +229,7 @@ int main(int argc, char **argv) {
 
     spectrum wmax = spec[spec.num_spectra() - 1];
 
-    float lum = wmax * LM;
+    float lum = (wmax * LM).integrate();
 
     std::cout << lum << std::endl;
 

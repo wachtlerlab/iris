@@ -18,7 +18,7 @@ public:
                              values(std::move(o.values)), id(std::move(o.id)) {
     }
 
-    float operator*(const spectrum &other);
+    spectrum operator*(const spectrum &other);
     spectrum operator+(const spectrum &other);
 
     float integrate() const;
