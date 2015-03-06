@@ -16,6 +16,7 @@
 #include <fstream>
 #include <spectra.h>
 #include <rgb.h>
+#include <fit.h>
 
 namespace csv {
 namespace qi      = boost::spirit::qi;
@@ -284,10 +285,12 @@ int main(int argc, char **argv) {
     ps.read(h5x::TypeId::Float, ps_size, stim.data());
 
     std::vector<size_t> indices{};
+    std::vector<double> x;
     for (size_t p = 0; p < stim.size(); p++) {
         std::tuple<bool, bool, bool> bits = stim[p].as_bits();
         if (bits == std::make_tuple(true, false, false)) {
             indices.push_back(p);
+            x.push_back(stim[p].r * 255.0);
         }
     }
     spectrum M = cf["M"];
@@ -295,14 +298,22 @@ int main(int argc, char **argv) {
 
     spectrum LM = L + M;
 
-
+    std::vector<double> y;
     for (size_t p : indices) {
         std::cerr << std::hex << stim[p] << " ";
         spectrum cs = spec[p];
         float lum = (cs * LM).integrate();
+        y.push_back(lum);
         std::cerr << lum << std::endl;
     }
 
+    for (size_t p = 0; p < x.size(); p++) {
+        std::cerr << x[p] << ", " << y[p] << std::endl;
+    }
+
+    GammaFitter gfit(x, y);
+    gfit();
+    std::cout << gfit.Azero() << " + "<< gfit.A() << " * x ^ " << gfit.gamma();
 
     spectrum wmax = spec[spec.num_spectra() - 1];
 
