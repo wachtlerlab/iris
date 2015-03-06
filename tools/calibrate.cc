@@ -284,42 +284,47 @@ int main(int argc, char **argv) {
     std::vector<iris::rgb> stim(ps_size[0]);
     ps.read(h5x::TypeId::Float, ps_size, stim.data());
 
-    std::vector<size_t> indices{};
+    std::vector<double> y;
     std::vector<double> x;
-    for (size_t p = 0; p < stim.size(); p++) {
-        std::tuple<bool, bool, bool> bits = stim[p].as_bits();
-        if (bits == std::make_tuple(true, false, false)) {
-            indices.push_back(p);
-            x.push_back(stim[p].r * 255.0);
+
+    for (size_t cone = 0; cone < 3; cone++) {
+        spectrum cs = cf[cone];
+        std::cerr << cs.name() << std::endl;
+
+        for (size_t source = 0; source < 3; source++) {
+            std::cerr << source << std::endl;
+
+            for (size_t p = 0; p < stim.size(); p++) {
+                iris::rgb kanon = stim[p];
+
+                std::bitset<3> bs;
+                for (size_t j = 0; j < 3; j++) {
+                    auto jc = fpclassify(kanon.raw[j]);
+                    bs.set(j, j == source ? jc != FP_ZERO : jc == FP_ZERO);
+                }
+
+                if (bs.all()) {
+                    double l = (spec[p] * cs).integrate();
+                    double v = kanon.raw[source] * 255.0;
+                    x.push_back(v);
+                    y.push_back(l);
+                }
+            }
         }
     }
-    spectrum M = cf["M"];
-    spectrum L = cf["L"];
 
-    spectrum LM = L + M;
-
-    std::vector<double> y;
-    for (size_t p : indices) {
-        std::cerr << std::hex << stim[p] << " ";
-        spectrum cs = spec[p];
-        float lum = (cs * LM).integrate();
-        y.push_back(lum);
-        std::cerr << lum << std::endl;
-    }
+    std::cerr << x.size() << " " << y.size() << std::endl;
 
     for (size_t p = 0; p < x.size(); p++) {
-        std::cerr << x[p] << ", " << y[p] << std::endl;
+        std::cout << x[p] << ", " << y[p] << std::endl;
     }
 
-    GammaFitter gfit(x, y);
-    gfit();
-    std::cout << gfit.Azero() << " + "<< gfit.A() << " * x ^ " << gfit.gamma();
+    ConvFitter fitter(x, y);
+    fitter();
 
-    spectrum wmax = spec[spec.num_spectra() - 1];
-
-    float lum = (wmax * LM).integrate();
-
-    std::cout << lum << std::endl;
+    for(double p : fitter.res) {
+        std::cout << p << std::endl;
+    }
 
     fd.close();
     return 0;

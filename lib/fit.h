@@ -41,6 +41,18 @@ private:
     double res[3];
 };
 
+class ConvFitter : public Optimizer {
+public:
+    ConvFitter(const std::vector<double> x, const std::vector<double> y) : x(x), y(y) { }
+
+    virtual int eval(int m, int n, const double *p, double *fvec) const;
+    bool operator()();
+
+    std::vector<double> x;
+    std::vector<double> y;
+    double res[3 + 3*3 + 3];
+};
+
 }
 
 #endif
