@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <utility>
 #include <iomanip>
+#include <cmath>
+#include <cfloat>
+
 
 namespace iris {
 
@@ -13,6 +16,21 @@ std::tuple<int, int, int> rgb::as_int(float base) const {
     });
     return std::make_tuple(a[0], a[1], a[2]);
 }
+
+std::tuple<bool, bool, bool> rgb::as_bits() const {
+    bool a[3];
+    std::transform(raw, raw + 3, a, [](const float v){
+        switch (std::fpclassify(v)) {
+            case FP_ZERO:
+                return false;
+            default:
+                return true;
+        }
+    });
+
+    return std::make_tuple(a[0], a[1], a[2]);
+}
+
 
 std::vector<rgb> rgb::gen(const std::vector<rgb> &base, const std::vector<float> &steps) {
 
