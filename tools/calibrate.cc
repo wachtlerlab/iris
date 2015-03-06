@@ -54,7 +54,7 @@ struct spectrum {
         return values.size();
     }
 
-    std::vector<float> values;
+
 
     uint16_t wl_start;
     uint16_t wl_step;
@@ -94,6 +94,29 @@ struct spectrum {
 
         return res;
     }
+
+    float& operator[](size_t n) {
+        return values[n];
+    }
+
+    const float& operator[](size_t n) const {
+        return values[n];
+    }
+
+    const float *data() const {
+        return values.data();
+    }
+
+    float *data() {
+        return values.data();
+    }
+
+    void resize(size_t new_size) {
+        values.resize(new_size);
+    }
+
+private:
+    std::vector<float> values;
 };
 
 
@@ -172,9 +195,9 @@ public:
             s.id = ids[n];
         }
 
-        s.values.resize(n_samples);
+        s.resize(n_samples);
         float *ptr = storage + (n * n_samples);
-        std::memcpy(s.values.data(), ptr, sizeof(float) * n_samples);
+        std::memcpy(s.data(), ptr, sizeof(float) * n_samples);
         return s;
     }
 
@@ -232,7 +255,7 @@ static void dump_sepctra(const spectra &spec) {
         spectrum s = spec[i];
 
         for (size_t k = 0; k < s.samples(); k++) {
-            std::cerr << s.values[k] << ", ";
+            std::cerr << s[k] << ", ";
         }
 
         std::cerr << std::endl;
@@ -270,7 +293,7 @@ spectra parse_csv(const std::string path) {
 
             values.resize(v.size() - 1);
             first_line = false;
-            
+
             header = std::move(v);
             v.clear();
             continue; //ignore the header
@@ -293,7 +316,7 @@ spectra parse_csv(const std::string path) {
         std::cout << "]" << std::endl;
 
         for(size_t k = 0; k < values.size(); k++) {
-            float tmp = std::stod(v[k + 1]);
+            float tmp = std::stof(v[k + 1]);
             std::vector<float> &samples = values[k];
             samples.push_back(tmp);
         }
