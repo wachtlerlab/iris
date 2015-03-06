@@ -48,18 +48,14 @@ struct csv_grammar : qi::grammar<Iter, std::vector<std::string>(), Skip> {
 
 };
 
-struct spectrum {
+class spectrum {
 
-    size_t samples() const {
-        return values.size();
+    spectrum() : wl_start(0), wl_step(0), values(), id() { }
+    spectrum(uint16_t start, uint16_t step) : wl_start(start), wl_step(step) { }
+
+    spectrum(spectrum &&o) : wl_start(o.wl_start), wl_step(o.wl_step),
+                             values(std::move(o.values)), id(std::move(o.id)) {
     }
-
-
-
-    uint16_t wl_start;
-    uint16_t wl_step;
-
-    std::string id;
 
     float operator*(const spectrum &other) {
         if (other.wl_start != wl_start || other.wl_step != wl_step ||
@@ -115,8 +111,37 @@ struct spectrum {
         values.resize(new_size);
     }
 
+    size_t samples() const {
+        return values.size();
+    }
+
+    std::string name() const {
+        return id;
+    }
+
+    void name(const std::string &name) {
+        id = name;
+    }
+
+    uint16_t start() const {
+        return wl_start;
+    }
+
+    uint16_t step() const {
+        return wl_step;
+    }
+
+    ~spectrum() {
+
+    }
+
 private:
+    uint16_t wl_start;
+    uint16_t wl_step;
+
     std::vector<float> values;
+
+    std::string id;
 };
 
 
@@ -187,12 +212,10 @@ public:
             throw std::out_of_range("spectrum requested is oor");
         }
 
-        spectrum s;
-        s.wl_start = wl_start;
-        s.wl_step = wl_step;
+        spectrum s(wl_start, wl_step);
 
         if (!ids.empty() && ids.size() >= n) {
-            s.id = ids[n];
+            s.name(ids[n]);
         }
 
         s.resize(n_samples);
