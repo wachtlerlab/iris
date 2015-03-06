@@ -34,6 +34,8 @@ struct rgb {
     static std::vector<rgb> gen(const std::vector<rgb> &base, const std::vector<float> &steps);
     static std::vector<float> linspace(size_t n);
 
+    static rgb from_hex(const std::string &hexstring);
+
     static constexpr rgb white() { return rgb(1.0f, 1.0f, 1.0f);}
     static constexpr rgb black() { return rgb(0.0f, 0.0f, 0.0f); }
     static constexpr rgb gray(float level = 0.5f) { return rgb(level, level, level); }

@@ -41,6 +41,29 @@ std::vector<float> rgb::linspace(size_t n) {
     return steps;
 }
 
+
+rgb rgb::from_hex(const std::string &hexstring) {
+
+    if (hexstring.size() != 6) {
+        throw std::invalid_argument("RRGGBB format supported now");
+    }
+
+    iris::rgb color;
+    for (size_t i = 0; i < 3; i++) {
+        std::string sub = hexstring.substr(2*i, 2);
+        size_t pos = 0;
+        unsigned long c = std::stoul(sub, &pos, 16);
+        if (pos == 0) {
+            throw std::runtime_error("Error while parsing RRGGBB format");
+        }
+
+        color.raw[i] = c / 255.0f;
+    }
+
+    return iris::rgb();
+}
+
+
 std::ostream& operator<<(std::ostream &os, const rgb &color) {
     auto flags = os.flags();
 
