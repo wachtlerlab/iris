@@ -71,6 +71,63 @@ static void dump_sepctra(const iris::spectra &spec) {
     }
 }
 
+struct lhist {
+
+    lhist() : komma(0), tab(0) {}
+
+    long komma;
+    long tab;
+
+    long& operator[](std::string::value_type v) {
+        switch (v) {
+            case ',': return komma;
+            case '\t': return tab;
+            default:
+                throw std::invalid_argument("Baeh!");
+        }
+    }
+
+    static lhist make(const std::string &str) {
+        lhist h;
+        for (auto delim : keys()) {
+            long n = std::count(str.begin(), str.end(), delim);
+            h[delim] = n;
+        }
+
+        return h;
+    }
+
+    static lhist make(std::vector<lhist> &hst) {
+        lhist h;
+
+        for (auto delim : keys()) {
+            for (lhist &cur : hst) {
+                h[delim] += cur[delim];
+            }
+        }
+
+        return h;
+    }
+
+    static std::string keys() {
+        return ",\t";
+    }
+};
+
+
+std::vector<lhist> mk_line_histogram(const std::string &input) {
+    std::istringstream stream(input);
+
+    std::vector<lhist> histogram{};
+
+    for (std::string line; std::getline(stream, line); ) {
+        lhist h = lhist::make(line);
+        histogram.push_back(std::move(h));
+    }
+
+    return histogram;
+}
+
 iris::spectra parse_csv(const std::string path) {
     std::ifstream in(path);
     in.unsetf(std::ios::skipws);
