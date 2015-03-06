@@ -15,6 +15,7 @@
 
 #include <fstream>
 #include <spectra.h>
+#include <rgb.h>
 
 namespace csv {
 namespace qi      = boost::spirit::qi;
@@ -216,16 +217,35 @@ int main(int argc, char **argv) {
 
     spectra spec(sp_size[0], sp_size[1], 380, 4);
 
-    sp.read(h5x::TypeId::Float , sp_size, spec.data());
+    sp.read(h5x::TypeId::Float, sp_size, spec.data());
     dump_sepctra(spec);
 
     spectra cf = parse_csv(cones);
     dump_sepctra(cf);
 
+    std::vector<iris::rgb> stim(ps_size[0]);
+    ps.read(h5x::TypeId::Float, ps_size, stim.data());
+
+    std::vector<size_t> indices{};
+    for (size_t p = 0; p < stim.size(); p++) {
+        std::tuple<bool, bool, bool> bits = stim[p].as_bits();
+        if (bits == std::make_tuple(true, false, false)) {
+            indices.push_back(p);
+        }
+    }
     spectrum M = cf["M"];
     spectrum L = cf["L"];
 
     spectrum LM = L + M;
+
+
+    for (size_t p : indices) {
+        std::cerr << std::hex << stim[p] << " ";
+        spectrum cs = spec[p];
+        float lum = (cs * LM).integrate();
+        std::cerr << lum << std::endl;
+    }
+
 
     spectrum wmax = spec[spec.num_spectra() - 1];
 
