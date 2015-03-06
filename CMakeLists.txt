@@ -44,6 +44,12 @@ include_directories (${HDF5_INCLUDE_DIR})
 set (LINK_LIBS ${LINK_LIBS} ${HDF5_LIBRARIES})
 
 #######################################
+# cminpack
+
+find_package(CMinpack REQUIRED)
+set (LINK_LIBS ${LINK_LIBS} ${CMINPACK_LIBRARIES})
+
+#######################################
 # lib
 
 include_directories(lib)
