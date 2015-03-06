@@ -21,6 +21,8 @@ public:
     float operator*(const spectrum &other);
     spectrum operator+(const spectrum &other);
 
+    float integrate() const;
+
     float& operator[](size_t n) {
         return values[n];
     }

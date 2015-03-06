@@ -40,9 +40,16 @@ spectrum spectrum::operator+(const spectrum &other) {
     return res;
 }
 
+float spectrum::integrate() const {
+    double res = std::accumulate(values.cbegin(), values.cend(), 0.0);
+    res *= wl_step;
+    return static_cast<float>(res);
+}
+
 
 // ***********
 // spectra
+
 
 ssize_t spectra::find_spectrum(const std::string &id) const {
 
