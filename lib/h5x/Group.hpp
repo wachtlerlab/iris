@@ -78,7 +78,7 @@ template<typename T>
 void Group::setData(const std::string &name, const T &value)
 {
     const Hydra<const T> hydra(value);
-    DataType dtype = hydra.element_data_type();
+    TypeId dtype = hydra.element_data_type();
     NDSize shape = hydra.shape();
 
     DataSet ds;
@@ -103,7 +103,7 @@ bool Group::getData(const std::string &name, T &value) const
     Hydra<T> hydra(value);
     DataSet ds = openData(name);
 
-    DataType dtype = hydra.element_data_type();
+    TypeId dtype = hydra.element_data_type();
     NDSize shape = ds.size();
 
     hydra.resize(shape);
