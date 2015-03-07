@@ -18,25 +18,20 @@ static int call_opt(void *p,
 }
 
 
-bool gamma_fitter::operator()() {
-    double tol = 1.49012e-8;
-    const int m = static_cast<int>(x.size());
-    const int n = 3;
+bool fitter::operator()() {
+    double tol = tolerance();
+    const int m = num_variables();
+    const int n = num_parameter();
     const int lwa = m*n+5*n+m;
     int iwa[n];
     double wa[lwa];
     double fvec[m];
-    int info;
 
-    res[0] = y[0];
-    res[1] = 0.0003;
-    res[2] = 2.2;
-
+    double *p = params();
     void *user_data = static_cast<void *>(this);
-    info = lmdif1(call_opt, user_data, m, n, res, fvec, tol, iwa, wa, lwa);
+    fit_info = lmdif1(call_opt, user_data, m, n, p, fvec, tol, iwa, wa, lwa);
 
-
-    return true;
+    return fit_info == 1;
 }
 
 int gamma_fitter::eval(int m, int n, const double *p, double *fvec) const {
@@ -77,32 +72,5 @@ int rgb2sml_fitter::eval(int m, int n, const double *p, double *fvec) const {
     return 0;
 }
 
-bool rgb2sml_fitter::operator()() {
-    double tol = 1.49012e-8;
-    const int m = static_cast<int>(y.size());
-    const int n = static_cast<int>(sizeof(res)/ sizeof(double));
-    const int lwa = m*n+5*n+m;
-    int iwa[n];
-    double wa[lwa];
-    double fvec[m];
-    int info;
-
-    res[0] = res[1] = res[2] = 0.01;
-
-    res[3] = res[6] = res[9] = 0.00005;
-    res[4] = res[7] = res[10] = 0.00001;
-    res[5] = res[8] = res[11] = 0.00001;
-
-    res[12] = res[13] = res[14] = 0.9;
-
-    std::cerr << "m: " << m << ", n: " << n << std::endl;
-
-    void *user_data = static_cast<void *>(this);
-    info = lmdif1(call_opt, user_data, m, n, res, fvec, tol, iwa, wa, lwa);
-
-    std::cerr << "fit-info: " << info << std::endl;
-
-    return true;
-}
 
 } // iris::
