@@ -78,6 +78,11 @@ private:
 
 
 class spectra {
+
+public:
+
+static spectra from_csv(const std::string &str);
+
 public:
 
     spectra() : storage(nullptr), n_spectra(0), n_samples(0) {}
