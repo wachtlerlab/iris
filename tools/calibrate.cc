@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    h5x::File fd = h5x::File::open(input, "r");
+    h5x::File fd = h5x::File::open(input, "r+");
 
     if (!fd.hasData("spectra") || !fd.hasData("patches")) {
         std::cerr << "File missing spectra or patches" << std::endl;
@@ -89,6 +89,8 @@ int main(int argc, char **argv) {
     std::vector<double> y;
     std::vector<double> x;
 
+    size_t nspec = 0;
+
     for (size_t cone = 0; cone < 3; cone++) {
         spectrum cs = cf[cone];
         std::cerr << cs.name() << std::endl;
@@ -110,10 +112,27 @@ int main(int argc, char **argv) {
                     double v = kanon.raw[source] * 255.0;
                     x.push_back(v);
                     y.push_back(l);
+
+                    if (cone == 0 && source == 0) {
+                        nspec++;
+                    }
                 }
             }
         }
     }
+
+    h5x::DataSet cai;
+    h5x::NDSize cai_dims = {3UL, 3UL, nspec};
+    if (fd.hasData("calib-input")) {
+        cai = fd.openData("calib-input");
+    } else {
+        cai = fd.createData("calib-input", h5x::TypeId::Float, cai_dims);
+    }
+
+    cai.setExtent(cai_dims);
+    cai.write(h5x::TypeId::Double, cai_dims, y.data());
+
+    cai.setAttr("x", x);
 
     std::cerr << x.size() << " " << y.size() << std::endl;
 
@@ -127,6 +146,8 @@ int main(int argc, char **argv) {
     for(double p : fitter.res) {
         std::cout << p << std::endl;
     }
+
+    fd.setData("calib-res", fitter.res);
 
     fd.close();
     return 0;
