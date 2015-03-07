@@ -56,7 +56,7 @@ int GammaFitter::eval(int m, int n, const double *p, double *fvec) const {
 }
 
 
-int ConvFitter::eval(int m, int n, const double *p, double *fvec) const {
+int rgb2sml_fitter::eval(int m, int n, const double *p, double *fvec) const {
 
     const int N = m / (3*3);
 
@@ -77,7 +77,7 @@ int ConvFitter::eval(int m, int n, const double *p, double *fvec) const {
     return 0;
 }
 
-bool ConvFitter::operator()() {
+bool rgb2sml_fitter::operator()() {
     double tol = 1.49012e-8;
     const int m = static_cast<int>(y.size());
     const int n = static_cast<int>(sizeof(res)/ sizeof(double));

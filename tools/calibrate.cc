@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
         std::cout << x[p] << ", " << y[p] << std::endl;
     }
 
-    ConvFitter fitter(x, y);
+    rgb2sml_fitter fitter(x, y);
     fitter();
 
     for(double p : fitter.res) {

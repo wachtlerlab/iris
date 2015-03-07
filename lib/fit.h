@@ -41,9 +41,9 @@ private:
     double res[3];
 };
 
-class ConvFitter : public Optimizer {
+class rgb2sml_fitter : public Optimizer {
 public:
-    ConvFitter(const std::vector<double> x, const std::vector<double> y) : x(x), y(y) { }
+    rgb2sml_fitter(const std::vector<double> x, const std::vector<double> y) : x(x), y(y) { }
 
     virtual int eval(int m, int n, const double *p, double *fvec) const;
     bool operator()();
