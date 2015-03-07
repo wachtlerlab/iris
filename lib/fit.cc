@@ -18,7 +18,7 @@ static int call_opt(void *p,
 }
 
 
-bool GammaFitter::operator()() {
+bool gamma_fitter::operator()() {
     double tol = 1.49012e-8;
     const int m = static_cast<int>(x.size());
     const int n = 3;
@@ -39,7 +39,7 @@ bool GammaFitter::operator()() {
     return true;
 }
 
-int GammaFitter::eval(int m, int n, const double *p, double *fvec) const {
+int gamma_fitter::eval(int m, int n, const double *p, double *fvec) const {
     if (n != 3 || m != x.size()) {
         throw std::invalid_argument("Invalid data passed to GF");
     }

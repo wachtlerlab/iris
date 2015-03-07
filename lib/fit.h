@@ -11,10 +11,10 @@ struct Optimizer {
 };
 
 
-class GammaFitter : public Optimizer {
+class gamma_fitter : public Optimizer {
 public:
 
-    GammaFitter(const std::vector<double> x, const std::vector<double> y) : x(x), y(y) { }
+    gamma_fitter(const std::vector<double> x, const std::vector<double> y) : x(x), y(y) { }
 
     static double func(const double Azero, const double A, const double gamma, const double x) {
         return Azero + A * std::pow(x, gamma);
