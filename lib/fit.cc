@@ -68,7 +68,8 @@ int ConvFitter::eval(int m, int n, const double *p, double *fvec) const {
         for (int channel = 0; channel < 3; channel++) {
             for (int intensity = 0; intensity < N; intensity++) {
                 int i = 3*N*cone + N*channel + intensity;
-                fvec[i] = y[i] - (A0[cone] + A[3 * cone + channel] * std::pow(x[i], g[channel]));
+                double deviate = y[i] - (A0[cone] + A[3 * cone + channel] * std::pow(x[i], g[channel]));
+                fvec[i] = deviate * 1.0/std::pow(x[i], 1.1);
             }
         }
     }
