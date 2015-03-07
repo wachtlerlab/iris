@@ -6,12 +6,12 @@
 
 namespace iris {
 
-struct Optimizer {
+struct fitter {
     virtual int eval(int m, int n, const double *p, double *fvec) const = 0;
 };
 
 
-class gamma_fitter : public Optimizer {
+class gamma_fitter : public fitter {
 public:
 
     gamma_fitter(const std::vector<double> x, const std::vector<double> y) : x(x), y(y) { }
@@ -41,7 +41,7 @@ private:
     double res[3];
 };
 
-class rgb2sml_fitter : public Optimizer {
+class rgb2sml_fitter : public fitter {
 public:
     rgb2sml_fitter(const std::vector<double> x, const std::vector<double> y) : x(x), y(y) { }
 

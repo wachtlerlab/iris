@@ -13,7 +13,7 @@ static int call_opt(void *p,
                     double *fvec,
                     int iflag)
 {
-    Optimizer *opt = static_cast<Optimizer *>(p);
+    fitter *opt = static_cast<fitter *>(p);
     return opt->eval(m, n, x, fvec);
 }
 
