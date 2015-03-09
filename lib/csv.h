@@ -43,6 +43,10 @@ public:
     bool is_comment() const { return comment; };
     size_t nfields() const { return data.size(); };
 
+    const std::vector<std::string>& fields() const {
+        return data;
+    }
+
     std::vector<std::string> data;
     bool comment = false;
 };
