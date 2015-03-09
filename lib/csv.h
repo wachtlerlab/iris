@@ -97,6 +97,7 @@ struct ws_skipper : public qi::grammar<Iterator> {
     }
     qi::rule<Iterator> skip;
 };
+
 } //iris::csv
 
 template<typename Iterator>
@@ -175,11 +176,17 @@ class csv_file {
 public:
     typedef csv_iterator<internal_iter> iterator;
 
-    csv_file(const std::string &path) : ifs(path, std::ios::in), delimiter('\t') {
+    csv_file(const std::string &path, const char delimiter = '\0')
+            : ifs(path, std::ios::in), delimiter(delimiter) {
         ifs >> std::noskipws;
     }
 
     iterator begin() {
+
+        if (delimiter == '\0') {
+            delimiter = detect_delim();
+        }
+
         boost::spirit::istream_iterator f(ifs), l;
         return iterator(f, l, delimiter);
     }
