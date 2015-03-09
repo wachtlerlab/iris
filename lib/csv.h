@@ -188,6 +188,31 @@ public:
         return iterator();
     }
 
+
+    const char detect_delim() {
+
+        auto pos = ifs.tellg();
+        ifs.clear();
+        ifs.seekg(0, std::ios::beg);
+
+        const std::string dknown = ",;\t";
+        std::vector<size_t> dcount(dknown.size(), 0);
+
+        for (std::string line; std::getline(ifs, line);) {
+            for(size_t i = 0; i < dknown.size(); i++) {
+                dcount[i] += std::count(line.begin(), line.end(), dknown[i]);
+            }
+        }
+
+        auto imax = std::max_element(dcount.begin(), dcount.end());
+        auto p = std::distance(dcount.begin(), imax);
+
+        ifs.clear();
+        ifs.seekg(pos);
+
+        return dknown[p];
+    }
+
 private:
     fstream_type ifs;
     fstream_type::char_type delimiter;
