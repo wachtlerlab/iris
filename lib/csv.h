@@ -188,14 +188,12 @@ public:
         return iterator();
     }
 
-
-    const char detect_delim() {
+    const char detect_delim(const std::string dknown = ",;\t") {
 
         auto pos = ifs.tellg();
         ifs.clear();
         ifs.seekg(0, std::ios::beg);
 
-        const std::string dknown = ",;\t";
         std::vector<size_t> dcount(dknown.size(), 0);
 
         for (std::string line; std::getline(ifs, line);) {
