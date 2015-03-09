@@ -3,11 +3,7 @@
 #include <numeric>
 #include <fstream>
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/support_ascii.hpp>
-#include <boost/spirit/include/phoenix.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/spirit/include/support_istream_iterator.hpp>
+#include <csv.h>
 
 namespace iris {
 
@@ -59,128 +55,11 @@ double spectrum::integrate() const {
 // ***********
 // spectra
 
-namespace csv {
-namespace qi      = boost::spirit::qi;
-namespace phoenix = boost::phoenix;
-namespace ascii   = boost::spirit::ascii;
 
-struct record {
-    std::vector<std::string> fields;
-};
-
-template<typename Iter, typename Skip>
-struct csv_grammar : qi::grammar<Iter, std::vector<std::string>(), Skip> {
-
-    csv_grammar() : csv_grammar::base_type(rec) {
-        using qi::alpha;
-        using qi::lexeme;
-        using ascii::char_;
-
-        qstr %= lexeme['"' >> +(char_ - '"') >> '"'];
-        str  %= +(char_ - (qi::eol | ',' | "\""));
-
-        field = str | qstr;
-
-        rec %= field >> *(',' >> field ) >> (qi::eol | qi::eoi);
-    }
-
-    qi::rule<Iter, std::string(), Skip> str;
-    qi::rule<Iter, std::string(), Skip> qstr;
-    qi::rule<Iter, std::string(), Skip> field;
-    qi::rule<Iter, std::vector<std::string>(), Skip> rec;
-};
-
-};
-
-static void dump_sepctra(const iris::spectra &spec) {
-
-    std::vector<std::string> names = spec.names();
-    if (!names.empty()) {
-        for (const auto &name : names) {
-            std::cerr << name << " ";
-        }
-        std::cerr << std::endl;
-    }
-
-    for (size_t i = 0; i < spec.num_spectra(); i++) {
-        iris::spectrum s = spec[i];
-
-        for (size_t k = 0; k < s.samples(); k++) {
-            std::cerr << s[k] << ", ";
-        }
-
-        std::cerr << std::endl;
-    }
-}
-
-struct lhist {
-
-    lhist() : komma(0), tab(0) {}
-
-    long komma;
-    long tab;
-
-    long& operator[](std::string::value_type v) {
-        switch (v) {
-            case ',': return komma;
-            case '\t': return tab;
-            default:
-                throw std::invalid_argument("Baeh!");
-        }
-    }
-
-    static lhist make(const std::string &str) {
-        lhist h;
-        for (auto delim : keys()) {
-            long n = std::count(str.begin(), str.end(), delim);
-            h[delim] = n;
-        }
-
-        return h;
-    }
-
-    static lhist make(std::vector<lhist> &hst) {
-        lhist h;
-
-        for (auto delim : keys()) {
-            for (lhist &cur : hst) {
-                h[delim] += cur[delim];
-            }
-        }
-
-        return h;
-    }
-
-    static std::string keys() {
-        return ",\t";
-    }
-};
-
-
-std::vector<lhist> mk_line_histogram(const std::string &input) {
-    std::istringstream stream(input);
-
-    std::vector<lhist> histogram{};
-
-    for (std::string line; std::getline(stream, line); ) {
-        lhist h = lhist::make(line);
-        histogram.push_back(std::move(h));
-    }
-
-    return histogram;
-}
 
 spectra spectra::from_csv(const std::string &path) {
-    std::ifstream in(path);
-    in.unsetf(std::ios::skipws);
 
-    typedef std::istreambuf_iterator<char> siter;
-    std::string s((siter(in)), siter());
-
-    csv::csv_grammar<std::string::const_iterator, boost::spirit::qi::blank_type> g;
-
-    std::vector<std::string> v;
-    auto i = s.cbegin();
+    iris::csv_file csvfs(path);
 
     std::vector<uint16_t> lambda;
 
@@ -190,46 +69,35 @@ spectra spectra::from_csv(const std::string &path) {
 
     std::vector<std::string> header;
 
-    while (i != s.cend()) {
-        bool r = boost::spirit::qi::phrase_parse(i, s.cend(), g, boost::spirit::qi::blank, v);
+    for (const auto &line : csvfs) {
 
         if (first_line) {
 
-            if (v.size() < 2) {
+            if (line.nfields() < 2) {
                 throw std::invalid_argument("Invalid spectral data");
             }
 
-            values.resize(v.size() - 1);
+            values.resize(line.nfields() - 1);
             first_line = false;
 
-            header = std::move(v);
-            v.clear();
+            header = line.fields();
             continue; //ignore the header
 
         } else {
-            if (values.size() != v.size() - 1) {
-                std::cerr << values.size() << " vs. " << v.size() << std::endl;
+            if (values.size() != line.nfields() - 1) {
+                std::cerr << values.size() << " vs. " << line.nfields() << std::endl;
                 throw std::invalid_argument("Invalid spectral data");
             }
         }
 
-        uint16_t la = static_cast<uint16_t>(std::stoi(v[0]));
+        uint16_t la = static_cast<uint16_t>(std::stoi(line.fields()[0]));
         lambda.push_back(la);
-
-        std::cout << "[";
-        for (const auto &k : v) {
-            std::cout << k << ", ";
-        }
-
-        std::cout << "]" << std::endl;
-
+        
         for(size_t k = 0; k < values.size(); k++) {
-            float tmp = std::stof(v[k + 1]);
+            float tmp = std::stof(line.fields()[k + 1]);
             std::vector<float> &samples = values[k];
             samples.push_back(tmp);
         }
-
-        v.clear();
     }
 
     if (values.empty() || lambda.empty() || lambda.size() < 2) {
