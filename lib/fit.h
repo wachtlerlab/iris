@@ -1,6 +1,8 @@
 #ifndef IRIS_FIT_H
 #define IRIS_FIT_H
 
+#include <dkl.h>
+
 #include <vector>
 #include <cmath>
 
@@ -75,7 +77,7 @@ private:
 
 class rgb2sml_fitter : public fitter {
 public:
-    rgb2sml_fitter(const std::vector<double> x, const std::vector<double> y) : x(x), y(y) {
+    rgb2sml_fitter(const std::vector<double> &x, const std::vector<double> &y) : x(x), y(y) {
         res[0] = res[1] = res[2] = 0.01;
 
         res[3] = res[6] = res[9] = 0.00005;
@@ -99,8 +101,8 @@ public:
         return res;
     }
 
-    std::vector<double> x;
-    std::vector<double> y;
+    const std::vector<double> &x;
+    const std::vector<double> &y;
     double res[15]; // see num_parameter
 };
 
