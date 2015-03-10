@@ -78,6 +78,7 @@ private:
 class rgb2sml_fitter : public fitter {
 public:
     rgb2sml_fitter(const std::vector<double> &x, const std::vector<double> &y) : x(x), y(y) {
+        double *res = rgb2sml.raw;
         res[0] = res[1] = res[2] = 0.01;
 
         res[3] = res[6] = res[9] = 0.00005;
@@ -98,12 +99,12 @@ public:
     }
 
     virtual double *params() {
-        return res;
+        return rgb2sml.raw;
     }
 
     const std::vector<double> &x;
     const std::vector<double> &y;
-    double res[15]; // see num_parameter
+    dkl::parameter rgb2sml;
 };
 
 }

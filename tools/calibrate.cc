@@ -11,6 +11,7 @@
 #include <spectra.h>
 #include <rgb.h>
 #include <fit.h>
+#include <dkl.h>
 
 static void dump_sepctra(const iris::spectra &spec) {
 
@@ -130,9 +131,12 @@ int main(int argc, char **argv) {
     rgb2sml_fitter fitter(x, y);
     fitter();
 
+    dkl::parameter dklp = fitter.rgb2sml;
 
-    fd.setData("calib-res", fitter.res);
+    dklp.print(std::cout);
 
+    fd.setData("calib-res", fitter.rgb2sml.raw);
     fd.close();
+
     return 0;
 }
