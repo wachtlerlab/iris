@@ -115,18 +115,20 @@ int main(int argc, char **argv) {
         }
     }
 
+    h5x::Group cag = fd.openGroup("rgb2sml", true);
+
     h5x::DataSet cai;
     h5x::NDSize cai_dims = {3UL, 3UL, nspec};
-    if (fd.hasData("calib-input")) {
-        cai = fd.openData("calib-input");
+    if (cag.hasData("cone-activations")) {
+        cai = cag.openData("cone-activations");
     } else {
-        cai = fd.createData("calib-input", h5x::TypeId::Float, cai_dims);
+        cai = cag.createData("cone-activations", h5x::TypeId::Float, cai_dims);
     }
 
     cai.setExtent(cai_dims);
     cai.write(h5x::TypeId::Double, cai_dims, y.data());
 
-    cai.setAttr("x", x);
+    cai.setAttr("levels", x);
 
     rgb2sml_fitter fitter(x, y);
     fitter();
@@ -135,7 +137,18 @@ int main(int argc, char **argv) {
 
     dklp.print(std::cout);
 
-    fd.setData("calib-res", fitter.rgb2sml.raw);
+    cag.setData("Azero", dklp.A_zero);
+    cag.setData("gamma", dklp.gamma);
+
+    h5x::DataSet caA;
+    h5x::NDSize caA_dims = {3, 3};
+    if (cag.hasData("A")) {
+        caA = cag.openData("A");
+    } else {
+        caA = cag.createData("A", h5x::TypeId::Double, caA_dims);
+    }
+
+    caA.write(h5x::TypeId::Double , caA_dims, dklp.A);
     fd.close();
 
     return 0;
