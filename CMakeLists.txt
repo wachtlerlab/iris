@@ -50,6 +50,15 @@ find_package(CMinpack REQUIRED)
 set (LINK_LIBS ${LINK_LIBS} ${CMINPACK_LIBRARIES})
 
 #######################################
+# BLAS & LAPACK
+
+find_package(BLAS REQUIRED)
+set(LINK_LIBS ${LINK_LIBS} ${BLAS_LIBRARIES})
+
+find_package(LAPACK REQUIRED)
+set(LINK_LIBS ${LINK_LIBS} ${LAPACK_LIBRARIES})
+
+#######################################
 # lib
 
 include_directories(lib)
