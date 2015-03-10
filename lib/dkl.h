@@ -26,23 +26,35 @@ struct sml {
 
 class dkl {
 public:
+
     struct parameter {
-        double A_zero[3];
-        double A[3*3];
-        double gamma[3];
+        union {
+            struct {
+                double A_zero[3];
+                double A[9];
+                double gamma[3];
+            };
+
+            double raw[15];
+        };
+
+        void print(std::ostream &os) const;
     };
 
 public:
+
+    dkl(const parameter &init, const rgb &gray);
+
     rgb sml2rgb(const sml &input) const;
-    std::vector<rgb> sml2rgb(const std::vector<sml> &input) const;
-
     sml rgb2sml(const rgb &input) const;
-    std::vector<sml> sml2rgb(const std::vector<sml> &input) const;
+
+    rgb iso_lum(double phi, double c);
+
+    static parameter make_inverse(const parameter &p);
 
 private:
-    static paramter make_inverse(const parameter &p) const;
-
-private:
+    rgb       ref_gray;
+    parameter params;
     parameter params_rgb2sml;
     parameter params_sml2rgb;
 };
