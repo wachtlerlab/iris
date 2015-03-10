@@ -8,10 +8,20 @@ namespace iris {
 
 struct sml {
 
-    float s;
-    float m;
-    float l;
+    sml() : s(), m(), l() { }
+    sml(double s, double m, double l) : s(s), m(m), l(l) { }
+    explicit sml(double d[3]) : s(d[0]), m(d[1]), l(d[2]) { }
+    explicit sml(float d[3]) : s(d[0]), m(d[1]), l(d[2]) { }
 
+    union {
+        struct {
+            double s;
+            double m;
+            double l;
+        };
+
+        double raw[3];
+    };
 };
 
 class dkl {
