@@ -72,16 +72,11 @@ int main(int argc, char **argv) {
     h5x::NDSize sp_size = sp.size();
     h5x::NDSize ps_size = ps.size();
 
-    std::cerr << sp_size << std::endl;
-    std::cerr << ps_size << std::endl;
-
     spectra spec(sp_size[0], sp_size[1], 380, 4);
 
     sp.read(h5x::TypeId::Float, sp_size, spec.data());
-    dump_sepctra(spec);
 
     spectra cf = iris::spectra::from_csv(cones);
-    dump_sepctra(cf);
 
     std::vector<iris::rgb> stim(ps_size[0]);
     ps.read(h5x::TypeId::Float, ps_size, stim.data());
@@ -93,10 +88,8 @@ int main(int argc, char **argv) {
 
     for (size_t cone = 0; cone < 3; cone++) {
         spectrum cs = cf[cone];
-        std::cerr << cs.name() << std::endl;
 
         for (size_t source = 0; source < 3; source++) {
-            std::cerr << source << std::endl;
 
             for (size_t p = 0; p < stim.size(); p++) {
                 iris::rgb kanon = stim[p];
@@ -134,18 +127,9 @@ int main(int argc, char **argv) {
 
     cai.setAttr("x", x);
 
-    std::cerr << x.size() << " " << y.size() << std::endl;
-
-    for (size_t p = 0; p < x.size(); p++) {
-        std::cout << x[p] << ", " << y[p] << std::endl;
-    }
-
     rgb2sml_fitter fitter(x, y);
     fitter();
 
-    for(double p : fitter.res) {
-        std::cout << p << std::endl;
-    }
 
     fd.setData("calib-res", fitter.res);
 
