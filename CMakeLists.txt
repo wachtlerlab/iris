@@ -89,6 +89,9 @@ target_link_libraries(iris-cgen iris)
 add_executable(iris-calibrate tools/calibrate.cc)
 target_link_libraries(iris-calibrate iris)
 
+add_executable(iris-colorcircle tools/colorcircle.cc)
+target_link_libraries(iris-colorcircle iris)
+
 ########################################
 # playground
 
