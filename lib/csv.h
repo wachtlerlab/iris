@@ -47,6 +47,11 @@ public:
         return data;
     }
 
+    double get_double(const size_t n) const {
+        const std::string &f = data[n];
+        return std::stod(f);
+    }
+
     std::vector<std::string> data;
     bool comment = false;
 };
