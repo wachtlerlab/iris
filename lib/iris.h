@@ -4,4 +4,7 @@
 
 #define HAVE_IRIS 1
 
+#include <rgb.h>
+#include <dkl.h>
+
 #endif
