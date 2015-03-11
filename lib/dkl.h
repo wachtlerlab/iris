@@ -39,6 +39,13 @@ public:
         };
 
         void print(std::ostream &os) const;
+
+        parameter invert() const {
+            return make_inverse(*this);
+        }
+
+        static parameter make_inverse(const parameter &p);
+
     };
 
 public:
@@ -49,8 +56,6 @@ public:
     sml rgb2sml(const rgb &input) const;
 
     rgb iso_lum(double phi, double c);
-
-    static parameter make_inverse(const parameter &p);
 
 private:
     rgb       ref_gray;

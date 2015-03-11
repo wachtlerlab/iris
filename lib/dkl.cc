@@ -169,9 +169,27 @@ void dkl::parameter::print(std::ostream &os) const {
 }
 
 
+dkl::parameter dkl::parameter::make_inverse(const dkl::parameter &p) {
+    //invert A via SVD
+
+    parameter p_inv;
+
+    for(size_t i = 0; i < 3; i++) {
+        p_inv.gamma[i] = 1.0/p.gamma[i];
+    }
+
+    mat_inv(3, 3, p.A,  p_inv.A);
+
+    for(size_t i = 0; i < 3; i++) {
+        p_inv.A_zero[i] = p.A_zero[i] * -1.0;
+    }
+
+    return p_inv;
+}
+
 dkl::dkl(const dkl::parameter  &init, const rgb &gray)
  : ref_gray(gray), params(init) {
-    params_sml2rgb = make_inverse(init);
+    params_sml2rgb = params.invert();
 }
 
 rgb dkl::sml2rgb(const sml &input) const {
@@ -215,24 +233,6 @@ sml dkl::rgb2sml(const rgb &input) const{
 
     cblas_dgemv(CblasRowMajor, CblasNoTrans, M, N, 1.0, A, M, x, 1, 1.0, c, 1);
     return sml(c);
-}
-
-dkl::parameter dkl::make_inverse(const dkl::parameter &p) {
-    //invert A via SVD
-
-    parameter p_inv;
-
-    for(size_t i = 0; i < 3; i++) {
-        p_inv.gamma[i] = 1.0/p.gamma[i];
-    }
-
-    mat_inv(3, 3, p.A,  p_inv.A);
-
-    for(size_t i = 0; i < 3; i++) {
-        p_inv.A_zero[i] = p.A_zero[i] * -1.0;
-    }
-
-    return p_inv;
 }
 
 double dist(double a, double b, bool euclidean=true) {
