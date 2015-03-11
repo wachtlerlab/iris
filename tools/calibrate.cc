@@ -52,8 +52,14 @@ int main(int argc, char **argv) {
     pos.add("cone-fundamentals", 1);
 
     po::variables_map vm;
-    po::store(po::command_line_parser(argc, argv).options(opts).positional(pos).run(), vm);
-    po::notify(vm);
+    try {
+        po::store(po::command_line_parser(argc, argv).options(opts).positional(pos).run(), vm);
+        po::notify(vm);
+    } catch (const std::exception &e) {
+        std::cerr << "Error while parsing commad line options: " << std::endl;
+        std::cerr << "\t" << e.what() << std::endl;
+        return 1;
+    }
 
     if (vm.count("help") > 0) {
         std::cout << opts << std::endl;
