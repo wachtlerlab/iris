@@ -133,8 +133,16 @@ public:
 
     void update_colors() {
         std::transform(circ_phi.cbegin(), circ_phi.cend(), circ_rgb.begin(), [&](const double p){
-            return colorspace.iso_lum(p, c);
+            iris::rgb crgb = colorspace.iso_lum(p, c);
+            uint8_t creport;
+            iris::rgb res = crgb.clamp(&creport);
+            if (creport != 0) {
+                std::cerr << "[W] color clamped: " << crgb << " → " << res << " @ c: " << c << std::endl;
+            }
+            return res;
+
         });
+
     }
 
     void render();
