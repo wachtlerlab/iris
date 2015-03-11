@@ -32,6 +32,30 @@ std::tuple<bool, bool, bool> rgb::as_bits() const {
 }
 
 
+rgb rgb::clamp(uint8_t *report, float lower, float upper) const {
+    rgb res;
+    uint8_t f = 0;
+
+    for(size_t i = 0; i < 3; i++) {
+
+        if (raw[i] < lower || std::isnan(raw[i])) {
+            res.raw[i] = lower;
+            f = f | (uint8_t(1) << i);
+        } else if (raw[i] > upper) {
+            res.raw[i] = upper;
+            f = f | (uint8_t(1) << i);
+        } else {
+            res.raw[i] = raw[i];
+        }
+    }
+
+    if (report) {
+        *report = f;
+    }
+
+    return res;
+}
+
 std::vector<rgb> rgb::gen(const std::vector<rgb> &base, const std::vector<float> &steps) {
 
     std::vector<rgb> result;

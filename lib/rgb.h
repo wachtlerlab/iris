@@ -31,6 +31,7 @@ struct rgb {
 
     std::tuple<int, int, int> as_int(float base = 255.0f) const;
     std::tuple<bool, bool, bool> as_bits() const;
+    rgb clamp(uint8_t *report = nullptr, float lower=0.f, float upper=1.f) const;
 
     static std::vector<rgb> gen(const std::vector<rgb> &base, const std::vector<float> &steps);
     static std::vector<float> linspace(size_t n);
