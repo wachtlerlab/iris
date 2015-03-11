@@ -68,7 +68,7 @@ public:
     }
 
     explicit operator bool() {
-        return handle == nullptr;
+        return handle != nullptr;
     }
 
 private:
