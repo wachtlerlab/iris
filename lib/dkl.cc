@@ -256,7 +256,7 @@ rgb dkl::sml2rgb(const sml &input) const {
 
     rgb res;
     for(size_t i = 0; i < 3; i++) {
-        res.raw[i] = static_cast<float>(std::pow(c[i], params_sml2rgb.gamma[i]));
+        res.raw[i] = static_cast<float>(std::pow(c[i], params_sml2rgb.gamma[i])) / 255.0f;
     }
 
     return res;
@@ -266,7 +266,7 @@ sml dkl::rgb2sml(const rgb &input) const{
     double x[3];
 
     for(size_t i = 0; i < 3; i++) {
-        x[i] = std::pow(input.raw[i], params.gamma[i]);
+        x[i] = std::pow(input.raw[i]*255.0, params.gamma[i]);
     }
 
     double c[3];
@@ -295,11 +295,14 @@ double dist(double a, double b, bool euclidean=true) {
 rgb dkl::iso_lum(double phi, double c) {
     sml t = rgb2sml(ref_gray);
 
-    bool e = true; //do euclidean
+    bool e = false; //do euclidean
 
-    t.s = t.s * (1 + 3*c*std::sin(phi));
-    t.m = t.m * (1 - (c/dist(t.m, t.l, e))*cos(phi));
-    t.l = t.l * (1 + (c/dist(t.l, t.m, e))*cos(phi));
+    const double p_sin = std::sin(phi);
+    const double p_cos = std::cos(phi);
+
+    t.s = t.s * (1.0 + 3.0 * c * p_sin);
+    t.m = t.m * (1.0 - (c/dist(t.m, t.l, e))*p_cos);
+    t.l = t.l * (1.0 + (c/dist(t.l, t.m, e))*p_cos);
 
     return sml2rgb(t);
 }
