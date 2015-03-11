@@ -45,7 +45,7 @@ public:
         }
 
         static parameter make_inverse(const parameter &p);
-
+        static parameter from_csv(const std::string &path);
     };
 
 public:

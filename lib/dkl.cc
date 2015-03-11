@@ -1,5 +1,7 @@
 
 #include <dkl.h>
+#include <csv.h>
+
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -186,6 +188,51 @@ dkl::parameter dkl::parameter::make_inverse(const dkl::parameter &p) {
 
     return p_inv;
 }
+
+
+
+dkl::parameter dkl::parameter::from_csv(const std::string &path) {
+    enum class parse_state : int {
+        A_ZERO, A_MAT1, A_MAT2, A_MAT3, GAMMA, FIN
+    };
+
+    csv_file fd(path);
+    std::cout << path << std::endl;
+    parameter res;
+
+    parse_state state = parse_state::A_ZERO;
+    for (const auto &rec : fd) {
+        if (rec.is_comment() || rec.is_empty()) {
+            continue;
+        }
+
+        if (rec.nfields() != 3) {
+            throw std::runtime_error("Invalid CSV data for dkl::paramter");
+        }
+
+        double *dest;
+        switch(state) {
+            case parse_state::A_ZERO: dest = res.A_zero; break;
+            case parse_state::A_MAT1: dest = res.A;      break;
+            case parse_state::A_MAT2: dest = res.A + 3;  break;
+            case parse_state::A_MAT3: dest = res.A + 6;  break;
+            case parse_state::GAMMA:  dest = res.gamma;  break;
+            case parse_state::FIN:
+            std::cerr << "[W] extra data after parameter data" << std::endl;
+                return res;
+        }
+
+        for (size_t k = 0; k < 3; k++) {
+            dest[k] = rec.get_double(k);
+        }
+
+        state = static_cast<parse_state>(static_cast<int>(state) + 1);
+    }
+
+    return res;
+}
+
+
 
 dkl::dkl(const dkl::parameter  &init, const rgb &gray)
  : ref_gray(gray), params(init) {
