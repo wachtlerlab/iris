@@ -36,6 +36,7 @@ struct rgba {
     operator rgb() const { return rgb(r, g, b); }
 
     #ifdef HAVE_IRIS
+    rgba(const iris::rgb &o) : r(o.r), g(o.g), b(o.b), a(1.0f) { }
     rgba& operator=(const iris::rgb &o) {
         r = o.r; g = o.g; b = o.b; a = 1.0f;
         return *this;
