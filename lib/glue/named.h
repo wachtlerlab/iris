@@ -1,9 +1,7 @@
 #ifndef GLUE_NAMED_H
 #define GLUE_NAMED_H
 
-#define GLFW_INCLUDE_GLCOREARB
-#include <GLFW/glfw3.h>
-
+#include <glue/basic.h>
 #include <cstddef>
 
 namespace glue {

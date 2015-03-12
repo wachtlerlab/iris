@@ -1,9 +1,6 @@
 #ifndef GLUE_WINDOW_H
 #define GLUE_WINDOW_H
 
-#define GLFW_INCLUDE_GLCOREARB
-#include <GLFW/glfw3.h>
-
 #include <glue/basic.h>
 #include <glue/monitor.h>
 

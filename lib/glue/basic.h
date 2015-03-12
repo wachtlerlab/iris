@@ -2,6 +2,14 @@
 #ifndef GLUE_BASIC_H
 #define GLUE_BASIC_H
 
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#else
+#include <GL/glew.h>
+#endif
+
+#include <GLFW/glfw3.h>
+
 namespace glue {
 
 struct point {

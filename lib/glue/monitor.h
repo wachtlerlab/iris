@@ -1,13 +1,11 @@
 #ifndef GLUE_MONITOR_H
 #define GLUE_MONITOR_H
 
-#define GLFW_INCLUDE_GLCOREARB
-#include <GLFW/glfw3.h>
-
 #include <glue/basic.h>
 
 #include <vector>
 #include <string>
+#include <algorithm>
 
 namespace glue {
 
