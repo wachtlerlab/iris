@@ -6,6 +6,8 @@
 #include <memory>
 #include <iostream>
 #include <string>
+#include <bitset>
+#include <cmath>
 
 #include <fstream>
 #include <spectra.h>
@@ -103,7 +105,7 @@ int main(int argc, char **argv) {
 
                 std::bitset<3> bs;
                 for (size_t j = 0; j < 3; j++) {
-                    auto jc = fpclassify(kanon.raw[j]);
+                    auto jc = std::fpclassify(kanon.raw[j]);
                     bs.set(j, j == source ? jc != FP_ZERO : jc == FP_ZERO);
                 }
 

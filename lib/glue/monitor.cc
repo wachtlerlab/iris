@@ -52,7 +52,7 @@ monitor::mode monitor::current_mode() const {
 }
 
 static float diag(const extent &s) {
-    return std::sqrtf(std::powf(s.width, 2.0f) + std::powf(s.height, 2.0f));
+    return std::sqrt(std::pow(s.width, 2.0f) + std::pow(s.height, 2.0f));
 }
 
 float monitor::ppi() const {
