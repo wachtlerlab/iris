@@ -15,6 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
+#include <ios>
 #include <string>
 #include <thread>
 #include <atomic>
@@ -351,7 +352,7 @@ void dump_stdout(const robot &r) {
         std::cout  << std::endl;
     }
 
-    std::cout << std::defaultfloat;
+    std::cout.unsetf(std::ios_base::floatfield);
 }
 
 void save_data_h5(const std::string &path, const robot &r) {
