@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <dkl.h>
+#include <misc.h>
 
 #include <numeric>
 
@@ -123,7 +124,7 @@ public:
             : window(height, width, title, gl::monitor{}), colorspace(cspace) {
         make_current_context();
 
-        circ_phi = make_phi_circle(16);
+        circ_phi = iris::linspace(0.0, 2*M_PI, 16);
         circ_rgb.resize(circ_phi.size());
 
         update_colors();
