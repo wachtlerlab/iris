@@ -35,6 +35,13 @@ link_directories(${GLFW_LIBRARY_DIRS}
 
 set(LINK_LIBS ${LINK_LIBS} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${FREETYPE_LIBRARIES})
 
+if(NOT APPLE)
+  pkg_search_module(GLEW REQUIRED glew)
+  include_directories(${GLEW_INCLUDE_DIRS})
+  link_directories(${GLEW_LIBRARY_DIRS})
+  set(LINK_LIBS ${LINK_LIBS} ${GLEW_LIBRARIES})
+endif()
+
 ########################################
 # HDF5
 
@@ -52,21 +59,29 @@ set (LINK_LIBS ${LINK_LIBS} ${CMINPACK_LIBRARIES})
 #######################################
 # BLAS & LAPACK
 
-find_package(BLAS REQUIRED)
-set(LINK_LIBS ${LINK_LIBS} ${BLAS_LIBRARIES})
-
 find_package(LAPACK REQUIRED)
 set(LINK_LIBS ${LINK_LIBS} ${LAPACK_LIBRARIES})
 
+if(NOT APPLE)
+  set(LINK_LIBS ${LINK_LIBS} -llapacke)
+endif()
+
+find_package(BLAS REQUIRED)
+set(LINK_LIBS ${LINK_LIBS} ${BLAS_LIBRARIES})
+
 #######################################
 # lib
+
+if(NOT APPLE)
+   set(LINK_LIBS ${LINK_LIBS} -lstdc++)
+endif()
 
 include_directories(lib)
 file(GLOB_RECURSE lib_SOURCES lib/*.cc lib/*.cpp)
 file(GLOB_RECURSE lib_INCLUDES lib/*.h lib/*.hpp)
 
 add_library(iris SHARED ${lib_INCLUDES} ${lib_SOURCES})
-target_link_libraries(iris ${LINK_LIBS})
+target_link_libraries(iris PUBLIC ${LINK_LIBS})
 
 #######################################
 # tools
