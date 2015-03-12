@@ -55,7 +55,7 @@ public:
     rgb sml2rgb(const sml &input) const;
     sml rgb2sml(const rgb &input) const;
 
-    rgb iso_lum(double phi, double c);
+    rgb iso_lum(double phi, double c) const;
 
 private:
     rgb       ref_gray;

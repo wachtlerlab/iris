@@ -262,7 +262,7 @@ rgb dkl::sml2rgb(const sml &input) const {
     return res;
 }
 
-sml dkl::rgb2sml(const rgb &input) const{
+sml dkl::rgb2sml(const rgb &input) const {
     double x[3];
 
     for(size_t i = 0; i < 3; i++) {
@@ -292,7 +292,7 @@ double dist(double a, double b, bool euclidean=true) {
     }
 }
 
-rgb dkl::iso_lum(double phi, double c) {
+rgb dkl::iso_lum(double phi, double c) const {
     sml t = rgb2sml(ref_gray);
 
     bool e = false; //do euclidean
