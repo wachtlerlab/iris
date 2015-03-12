@@ -2,6 +2,7 @@
 #include <glue/window.h>
 
 #include <stdexcept>
+#include <mutex>
 
 namespace glue {
 
@@ -94,6 +95,25 @@ window::window(const std::string &title, monitor m) {
 
 window::~window() {
     cleanup();
+}
+
+#ifndef __APPLE__
+static std::once_flag glew_once;
+#endif
+
+void window::make_current_context() {
+    glfwMakeContextCurrent(wnd);
+
+#ifndef __APPLE__
+    std::call_once(glew_once, []() {
+        glewExperimental = GL_TRUE;
+        GLenum glew_err = glewInit();
+        if (GLEW_OK != glew_err) {
+            throw std::runtime_error("Could not init GLEW");
+        }
+    });
+#endif
+
 }
 
 }

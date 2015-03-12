@@ -56,9 +56,7 @@ public:
         glfwSwapBuffers(wnd);
     }
 
-    void make_current_context() {
-        glfwMakeContextCurrent(wnd);
-    }
+    void make_current_context();
 
     extent framebuffer_size() const {
         int width, height;
