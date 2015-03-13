@@ -57,6 +57,10 @@ public:
 
     rgb iso_lum(double phi, double c) const;
 
+    rgb reference_gray() const {
+        return ref_gray;
+    }
+
 private:
     rgb       ref_gray;
     parameter params;
