@@ -52,6 +52,11 @@ public:
         return std::stod(f);
     }
 
+    float get_float(const size_t n) const {
+        const std::string &f = data[n];
+        return std::stof(f);
+    }
+
     std::vector<std::string> data;
     bool comment = false;
 };
