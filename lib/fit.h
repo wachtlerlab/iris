@@ -98,7 +98,7 @@ public:
         return static_cast<int>(x.size());
     }
 
-    virtual double *params() {
+    virtual double *params() override {
         return rgb2sml.raw;
     }
 
