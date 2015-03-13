@@ -68,6 +68,10 @@ public:
         return extent(width, height);
     }
 
+    void disable_cursor() {
+        glfwSetInputMode(wnd, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
     virtual void framebuffer_size_changed(extent size) { }
     virtual void mouse_button_event(int button, int action, int mods) { }
     virtual void pointer_moved(point pos) { }
