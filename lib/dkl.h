@@ -61,6 +61,10 @@ public:
         return ref_gray;
     }
 
+    void reference_gray(const rgb &ref) {
+        ref_gray = ref;
+    }
+
 private:
     rgb       ref_gray;
     parameter params;
