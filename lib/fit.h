@@ -42,7 +42,7 @@ public:
         return Azero + A * std::pow(x, gamma);
     }
 
-    virtual int eval(int m, int n, const double *p, double *fvec) const;
+    virtual int eval(int m, int n, const double *p, double *fvec) const override;
 
     double Azero() const {
         return res[0];
@@ -88,7 +88,7 @@ public:
         res[12] = res[13] = res[14] = 0.9;
     }
 
-    virtual int eval(int m, int n, const double *p, double *fvec) const;
+    virtual int eval(int m, int n, const double *p, double *fvec) const override;
 
     virtual int num_parameter() const override {
         return 15; // 3 * Ao (AoS, AoM, AoL), 3 * gamma (R, G, B), 3x3 A, Matrix(ArS, AgS..)
