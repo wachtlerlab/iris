@@ -52,6 +52,10 @@ public:
         return glfwWindowShouldClose(wnd) != 0;
     }
 
+    void should_close(bool should) {
+        glfwSetWindowShouldClose(wnd, should ? GL_TRUE : GL_FALSE);
+    }
+
     void swap_buffers() {
         glfwSwapBuffers(wnd);
     }
