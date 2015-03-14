@@ -50,6 +50,19 @@ int gamma_fitter::eval(int m, int n, const double *p, double *fvec) const {
     return 0;
 }
 
+int sin_fitter::eval(int m, int n, const double *p, double *fvec) const {
+
+    double A = p[0];
+    double phi = p[1];
+    double f = p[2];
+
+    for(int i = 0; i < x.size(); i++) {
+        fvec[i] = y[i] - (A * sin(f*x[i] + phi) + offset);
+    }
+
+    return 0;
+}
+
 
 int rgb2sml_fitter::eval(int m, int n, const double *p, double *fvec) const {
 

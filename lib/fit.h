@@ -75,6 +75,37 @@ private:
     double res[3];
 };
 
+class sin_fitter : public fitter {
+public:
+    sin_fitter(const std::vector<double> &x, const std::vector<double> &y,
+               double offset = 0, bool fit_freq = false)
+            : x(x), y(y), offset(offset), fit_frequency(fit_freq) {
+        p[0] = 0.01;
+        p[1] = 0.0;
+        p[2] = 1;
+    }
+
+    virtual int eval(int m, int n, const double *p, double *fvec) const override;
+
+    virtual int num_parameter() const override {
+        return fit_frequency ? 3 : 2;
+    }
+
+    virtual int num_variables() const override {
+        return static_cast<int>(x.size());
+    }
+
+    virtual double *params() override {
+        return p;
+    }
+
+    const std::vector<double> &x;
+    const std::vector<double> &y;
+    double offset;
+    bool fit_frequency;
+    double p[3];
+};
+
 class rgb2sml_fitter : public fitter {
 public:
     rgb2sml_fitter(const std::vector<double> &x, const std::vector<double> &y) : x(x), y(y) {
