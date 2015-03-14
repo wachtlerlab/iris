@@ -107,6 +107,9 @@ target_link_libraries(iris-calibrate iris)
 add_executable(iris-colorcircle tools/colorcircle.cc)
 target_link_libraries(iris-colorcircle iris)
 
+add_executable(iris-fitsine tools/fitsine.cc)
+target_link_libraries(iris-fitsine iris)
+
 ########################################
 # playground
 
