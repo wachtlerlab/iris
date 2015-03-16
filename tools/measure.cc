@@ -276,7 +276,7 @@ public:
         return stim;
     }
 
-    const std::vector<spectral_data> & response() const {
+    const std::vector<spectral_data> &spectra() const {
         return resp;
     }
 
@@ -320,7 +320,7 @@ void dump_stdout(const robot &r) {
     using namespace gl::color;
 
     const std::vector<iris::rgb> &stim = r.stimulation();
-    const std::vector<spectral_data> &resp = r.response();
+    const std::vector<spectral_data> &resp = r.spectra();
 
     if (resp.empty()) {
         std::cout << "No data!" << std::endl;
@@ -359,7 +359,7 @@ void dump_stdout(const robot &r) {
 void save_data_h5(const std::string &path, const robot &r) {
 
     const std::vector<iris::rgb> &stim = r.stimulation();
-    const std::vector<spectral_data> &resp = r.response();
+    const std::vector<spectral_data> &resp = r.spectra();
 
     if (resp.empty()) {
         std::cout << "[W] No data!" << std::endl;
