@@ -77,7 +77,7 @@ int rgb2sml_fitter::eval(int m, int n, const double *p, double *fvec) const {
             for (int intensity = 0; intensity < N; intensity++) {
                 int i = 3*N*cone + N*channel + intensity;
                 double deviate = y[i] - (A0[cone] + A[3 * cone + channel] * std::pow(x[i], g[channel]));
-                fvec[i] = deviate * 1.0/std::pow(x[i], 1.1);
+                fvec[i] = deviate * 1.0/std::pow(x[i], we);
             }
         }
     }

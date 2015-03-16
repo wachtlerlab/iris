@@ -42,11 +42,13 @@ int main(int argc, char **argv) {
 
     std::string input;
     std::string cones;
+    double weight_exp = 1.1;
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
             ("cone-fundamentals,c", po::value<std::string>(&cones)->required())
+            ("weight-exponent,w", po::value<double>(&weight_exp))
             ("input", po::value<std::string>(&input)->required());
 
     po::positional_options_description pos;
@@ -138,7 +140,7 @@ int main(int argc, char **argv) {
 
     cai.setAttr("levels", x);
 
-    rgb2sml_fitter fitter(x, y);
+    rgb2sml_fitter fitter(x, y, weight_exp);
     fitter();
 
     dkl::parameter dklp = fitter.rgb2sml;
