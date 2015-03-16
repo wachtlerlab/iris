@@ -225,6 +225,9 @@ public:
         meter.measure();
         spectral_data data = meter.spectral();
 
+        device::pr655::response<device::pr655::brightness> br = meter.brightness_pm();
+
+        lum.push_back(br.data.Y);
         resp.push_back(data);
         std::cerr << " done" << std::endl;
     }
@@ -280,6 +283,10 @@ public:
         return resp;
     }
 
+    const std::vector<float> &luminance() const {
+        return lum;
+    }
+
     virtual void key_event(int key, int scancode, int action, int mods) override {
         gl::window::key_event(key, scancode, action, mods);
 
@@ -313,6 +320,7 @@ private:
     std::vector<iris::rgb> stim;
     float gray_level;
     std::vector<spectral_data> resp;
+    std::vector<float> lum;
 };
 
 void dump_stdout(const robot &r) {
@@ -356,7 +364,7 @@ void dump_stdout(const robot &r) {
     std::cout.unsetf(std::ios_base::floatfield);
 }
 
-void save_data_h5(const std::string &path, const robot &r) {
+void save_data_h5(const std::string &path, const robot &r, const gl::monitor &m, float gray_level) {
 
     const std::vector<iris::rgb> &stim = r.stimulation();
     const std::vector<spectral_data> &resp = r.spectra();
@@ -397,6 +405,10 @@ void save_data_h5(const std::string &path, const robot &r) {
         patches.setExtent(dc);
         patches.write(h5x::TypeId::Float, dims, static_cast<const void *>(stim.data()));
     }
+
+    fd.setData("luminance", r.luminance());
+    fd.setAttr("monitor", m.name());
+    fd.setAttr("gray-level", gray_level);
 
     ds.close();
     fd.close();
@@ -560,7 +572,7 @@ int main(int argc, char **argv)
 
     meter.stop();
     dump_stdout(bender);
-    save_data_h5("spectra.h5", bender);
+    save_data_h5("spectra.h5", bender, mtarget, gray_level);
     bender.stop();
     bender = nullptr;
 
