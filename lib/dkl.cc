@@ -197,7 +197,6 @@ dkl::parameter dkl::parameter::from_csv(const std::string &path) {
     };
 
     csv_file fd(path);
-    std::cout << path << std::endl;
     parameter res;
 
     parse_state state = parse_state::A_ZERO;
