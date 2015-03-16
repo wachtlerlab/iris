@@ -57,6 +57,14 @@ public:
         return std::stof(f);
     }
 
+    char get_char(const size_t n) const {
+        const std::string &f = data[n];
+        if (f.empty()) {
+            throw std::runtime_error("Could not get char");
+        }
+        return f[0];
+    }
+
     std::vector<std::string> data;
     bool comment = false;
 };
