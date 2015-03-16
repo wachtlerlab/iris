@@ -177,8 +177,8 @@ static void check_gl_error(const std::string &prefix = "") {
 class robot : public looper, public gl::window {
 public:
 
-    robot(gl::monitor m, device::pr655 &meter, std::vector<iris::rgb> &stim)
-            : gl::window("iris - measure", m), meter(meter), stim(stim) {
+    robot(gl::monitor m, device::pr655 &meter, std::vector<iris::rgb> &stim, float gray_level)
+            : gl::window("iris - measure", m), meter(meter), stim(stim), gray_level(gray_level) {
         make_current_context();
         setup();
     }
@@ -205,7 +205,7 @@ public:
             vp = glm::scale(glm::mat4(1), glm::vec3(scale, 1.0f, 1.0f));
         }
 
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glClearColor(gray_level, gray_level, gray_level, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         prg.use();
@@ -311,6 +311,7 @@ private:
 
     // data
     std::vector<iris::rgb> stim;
+    float gray_level;
     std::vector<spectral_data> resp;
 };
 
@@ -436,12 +437,14 @@ int main(int argc, char **argv)
     std::string device;
     std::string mdev;
     std::string input;
+    float       gray_level = 0.66f;
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
-            ("device", po::value<std::string>(&device))
+            ("device,d", po::value<std::string>(&device))
             ("monitor", po::value<std::string>(&mdev))
+            ("gray", po::value<float>(&gray_level), "reference gray [default=0.66]")
             ("input", po::value<std::string>(&input)->required());
 
     po::positional_options_description pos;
@@ -528,7 +531,7 @@ int main(int argc, char **argv)
 
     // *****
 
-    robot bender(mtarget, meter, colors);
+    robot bender(mtarget, meter, colors, gray_level);
 
     // **
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
