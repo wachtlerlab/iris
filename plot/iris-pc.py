@@ -36,7 +36,7 @@ def main():
 
     for c, k in [(x,y) for x in range(3) for y in range(3)]:
         plt.subplot(3, 3, (3*c+k)+1)
-        plt.plot(lum[c, k, :], spectra[c, k, :], color='dodgerblue', label='data')
+        plt.scatter(lum[c, k, :], spectra[c, k, :], color='dodgerblue', label='data', s=5)
         plt.hold(True)
         xev = np.arange(0, 255)
         yev = G(Azero[c], A[c, k], gamma[k], xev)
