@@ -19,12 +19,10 @@ int main(int argc, char **argv) {
 
     std::string infile_path;
     bool fit_freq = false;
-    double offset = 0.66;
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
-            ("offset, o", po::value<double>(&offset), "offset to fit [default=0.66]")
             ("fit-frequency", po::value<bool>(&fit_freq), "also fit sin frequency [default=false]")
             ("file", po::value<std::string>(&infile_path)->required());
 
@@ -65,11 +63,15 @@ int main(int argc, char **argv) {
         y.push_back(rec.get_double(1));
     }
 
-    iris::sin_fitter fitter(x, y, offset, fit_freq);
+    iris::sin_fitter fitter(x, y, fit_freq);
     bool res = fitter();
 
     std::cerr << "success: " << res << std::endl;
-    std::cout << fitter.p[0] << " " << fitter.p[1] << " " << fitter.p[2] <<  std::endl;
+    std::cout << fitter.p[0] << " " << fitter.p[1] << " " << fitter.p[2] << " ";
+    if (fit_freq) {
+        std::cout << fitter.p[3];
+    }
+    std::cout << std::endl;
 
     return res ? 0 : -1;
 }

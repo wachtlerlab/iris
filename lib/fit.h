@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <cmath>
+#include <iostream>
 
 namespace iris {
 
@@ -77,18 +78,31 @@ private:
 
 class sin_fitter : public fitter {
 public:
-    sin_fitter(const std::vector<double> &x, const std::vector<double> &y,
-               double offset = 0, bool fit_freq = false)
-            : x(x), y(y), offset(offset), fit_frequency(fit_freq) {
-        p[0] = 0.01;
-        p[1] = 0.0;
-        p[2] = 1;
+    sin_fitter(const std::vector<double> &x, const std::vector<double> &y, bool fit_freq = false)
+            : x(x), y(y), fit_frequency(fit_freq) {
+
+        auto result = std::minmax_element(y.cbegin(), y.cend());
+        size_t p_min = std::distance(y.begin(), result.first);
+        size_t p_max = std::distance(y.begin(), result.second);
+
+        double v_min = y[p_min];
+        double v_max = y[p_max];
+
+        double v_amp = (v_max - v_min) * 0.5;
+        double v_mid = v_min + (v_max - v_min) * 0.5;
+
+        std::cerr << v_amp << " " << v_mid << " " << std::endl;
+
+        p[0] = 0.2;
+        p[1] = 1.9;
+        p[2] = 0.67;
+        p[3] = 1;
     }
 
     virtual int eval(int m, int n, const double *p, double *fvec) const override;
 
     virtual int num_parameter() const override {
-        return fit_frequency ? 3 : 2;
+        return fit_frequency ? 4 : 3;
     }
 
     virtual int num_variables() const override {
@@ -101,9 +115,8 @@ public:
 
     const std::vector<double> &x;
     const std::vector<double> &y;
-    double offset;
     bool fit_frequency;
-    double p[3];
+    double p[4];
 };
 
 class rgb2sml_fitter : public fitter {
