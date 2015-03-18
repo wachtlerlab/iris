@@ -249,9 +249,14 @@ int main(int argc, char **argv) {
 
     std::string ca_path;
 
+    double iso_dl = 0.0;
+    double iso_phi = 0.0;
+
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
+            ("is-dl", po::value<double>(&iso_dl))
+            ("is-phi", po::value<double>(&iso_phi))
             ("calibration,c", po::value<std::string>(&ca_path)->required());
 
     po::positional_options_description pos;
@@ -261,6 +266,11 @@ int main(int argc, char **argv) {
     try {
         po::store(po::command_line_parser(argc, argv).options(opts).positional(pos).run(), vm);
         po::notify(vm);
+
+        if (vm.count("is-dl") != vm.count("is-phi")) {
+            throw std::invalid_argument("Need lumen and phase!");
+        }
+
     } catch (const std::exception &e) {
         std::cerr << "Error while parsing commad line options: " << std::endl;
         std::cerr << "\t" << e.what() << std::endl;
@@ -278,6 +288,10 @@ int main(int argc, char **argv) {
 
     iris::rgb refpoint(0.65f, 0.65f, 0.65f);
     iris::dkl cspace(params, refpoint);
+
+    if (vm.count("is-dl")) {
+        cspace.iso_slant(iso_dl, iso_phi);
+    }
 
     if (!glfwInit()) {
         return -1;
