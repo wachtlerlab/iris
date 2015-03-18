@@ -234,7 +234,7 @@ dkl::parameter dkl::parameter::from_csv(const std::string &path) {
 
 
 dkl::dkl(const dkl::parameter  &init, const rgb &gray)
- : ref_gray(gray), params(init) {
+ : ref_gray(gray), params(init), iso_dl(0.0) {
     params_sml2rgb = params.invert();
 }
 
@@ -292,7 +292,15 @@ double dist(double a, double b, bool euclidean=true) {
 }
 
 rgb dkl::iso_lum(double phi, double c) const {
-    sml t = rgb2sml(ref_gray);
+
+    double ldelta = iso_dl *
+            (std::cos(phi) * std::cos(iso_phi) +
+             std::sin(phi) * std::sin(iso_phi));
+
+    float g_level = ref_gray.r;
+    g_level += static_cast<float>(ldelta);
+    rgb ref = rgb::gray(g_level);
+    sml t = rgb2sml(ref);
 
     bool e = false; //do euclidean
 

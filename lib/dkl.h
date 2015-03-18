@@ -70,6 +70,9 @@ private:
     parameter params;
     parameter params_rgb2sml;
     parameter params_sml2rgb;
+
+    double iso_dl;
+    double iso_phi;
 };
 
 } //iris::
