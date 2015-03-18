@@ -192,6 +192,11 @@ void colorcircle::key_event(int key, int scancode, int action, int mods) {
         c += 0.01;
         std::cout << "↑ " << c << std::endl;
         update_colors();
+    } else if (key == GLFW_KEY_I && action == GLFW_PRESS) {
+        std::cout << "c: " << c << std::endl;
+        for(size_t i = 0; i < circ_phi.size(); i++) {
+            std::cout << circ_phi[i] << " → " << circ_rgb[i] << std::endl;
+        }
     }
 }
 
