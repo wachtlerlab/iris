@@ -54,10 +54,11 @@ int sin_fitter::eval(int m, int n, const double *p, double *fvec) const {
 
     double A = p[0];
     double phi = p[1];
-    double f = p[2];
+    double offset = p[2];
+    double f = fit_frequency ? p[3] : 1.0;
 
     for(int i = 0; i < x.size(); i++) {
-        fvec[i] = y[i] - (A * sin(f*x[i] + phi) + offset);
+        fvec[i] = y[i] - (offset + A * sin(f * x[i] - phi));
     }
 
     return 0;
