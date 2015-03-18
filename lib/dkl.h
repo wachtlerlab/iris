@@ -65,6 +65,11 @@ public:
         ref_gray = ref;
     }
 
+    void iso_slant(double delta_lumen, double phase) {
+        iso_dl = delta_lumen;
+        iso_phi = phase;
+    }
+
 private:
     rgb       ref_gray;
     parameter params;
