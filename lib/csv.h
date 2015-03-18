@@ -149,7 +149,7 @@ public:
         return *this;
     }
 
-    iter_type &operator++(int) {
+    iter_type operator++(int) {
         iter_type tmp(*this);
         ++(*this);
         return tmp;
