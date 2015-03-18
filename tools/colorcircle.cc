@@ -186,9 +186,11 @@ void colorcircle::key_event(int key, int scancode, int action, int mods) {
 
     if (key == GLFW_KEY_B && action == GLFW_PRESS) {
         c -= 0.01;
+        std::cout << "↓ " << c << std::endl;
         update_colors();
     } else if (key == GLFW_KEY_D && action == GLFW_PRESS) {
         c += 0.01;
+        std::cout << "↑ " << c << std::endl;
         update_colors();
     }
 }
