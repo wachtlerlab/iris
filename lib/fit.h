@@ -6,6 +6,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 namespace iris {
 
