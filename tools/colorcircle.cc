@@ -130,6 +130,7 @@ public:
         update_colors();
 
         the_box.init();
+        debug = false;
     }
 
     void update_colors() {
@@ -163,6 +164,7 @@ public:
     std::vector<iris::rgb> circ_rgb;
 
     box the_box;
+    bool debug;
 };
 
 
@@ -170,16 +172,17 @@ void colorcircle::pointer_moved(gl::point pos) {
     gl::window::pointer_moved(pos);
 
     float x = cursor.x - pos.x;
-    float y = cursor.y - pos.y;
-
-    bool s = std::signbit(x*y);
-
-    float length = std::hypot(x, y);
 
     cursor = pos;
-    phi += length * gain * (s ? -1.0 : 1.0);
+    phi += x * gain;
+    phi = fmod(phi + (2.0f * M_PI), (2.0f * M_PI));
 
     fg = colorspace.iso_lum(phi, c);
+
+
+    if (debug) {
+        std::cerr << phi << ", " << fg << std::endl;
+    }
 }
 
 void colorcircle::key_event(int key, int scancode, int action, int mods) {
@@ -202,6 +205,8 @@ void colorcircle::key_event(int key, int scancode, int action, int mods) {
         stimsize *= 0.5f;
     } else if (key == GLFW_KEY_K && action == GLFW_PRESS) {
         stimsize *= 2.0f;
+    } else if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+        debug = true;
     }
 }
 
@@ -257,12 +262,15 @@ int main(int argc, char **argv) {
     double iso_dl = 0.0;
     double iso_phi = 0.0;
 
+    bool grab_mouse = false;
+
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
             ("is-dl", po::value<double>(&iso_dl))
             ("is-phi", po::value<double>(&iso_phi))
-            ("calibration,c", po::value<std::string>(&ca_path)->required());
+            ("calibration,c", po::value<std::string>(&ca_path)->required())
+            ("grab-mouse,m", po::value<bool>(&grab_mouse));
 
     po::positional_options_description pos;
     pos.add("cone-fundamentals", 1);
@@ -303,6 +311,10 @@ int main(int argc, char **argv) {
     }
 
     colorcircle wnd = colorcircle(800, 1200, "Colorcircle", cspace);
+
+    if (grab_mouse) {
+        wnd.disable_cursor();
+    }
 
     while (! wnd.should_close()) {
 
