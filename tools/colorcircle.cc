@@ -215,6 +215,11 @@ void colorcircle::key_event(int key, int scancode, int action, int mods) {
 void colorcircle::render() {
     gl::extent fb = framebuffer_size();
 
+    phi += M_PI/180;
+    phi = fmod(phi + (2.0f * M_PI), (2.0f * M_PI));
+    fg = colorspace.iso_lum(phi, c);
+
+
     glm::mat4 vp;
     if (fb.height > fb.width) {
         float scale = fb.width / fb.height;
