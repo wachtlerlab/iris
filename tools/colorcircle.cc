@@ -123,6 +123,7 @@ public:
     colorcircle(int height, int width, const std::string &title, iris::dkl &cspace)
             : window(height, width, title, gl::monitor{}), colorspace(cspace) {
         make_current_context();
+        glfwSwapInterval(1);
 
         circ_phi = iris::linspace(0.0, 2*M_PI, 16);
         circ_rgb.resize(circ_phi.size());
