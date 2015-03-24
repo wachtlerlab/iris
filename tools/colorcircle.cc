@@ -154,7 +154,8 @@ public:
     iris::rgb fg = iris::rgb::gray(0.65f);
     iris::dkl &colorspace;
     gl::point cursor;
-    float gain = 0.005;
+    float gain = 0.0001;
+    float stimsize = 0.05f;
     double phi = 0.0;
     double c = 0.1;
 
@@ -173,7 +174,7 @@ void colorcircle::pointer_moved(gl::point pos) {
 
     bool s = std::signbit(x*y);
 
-    float length = hypot(x, y);
+    float length = std::hypot(x, y);
 
     cursor = pos;
     phi += length * gain * (s ? -1.0 : 1.0);
@@ -197,6 +198,10 @@ void colorcircle::key_event(int key, int scancode, int action, int mods) {
         for(size_t i = 0; i < circ_phi.size(); i++) {
             std::cout << circ_phi[i] << " → " << circ_rgb[i] << std::endl;
         }
+    } else if (key == GLFW_KEY_J && action == GLFW_PRESS) {
+        stimsize *= 0.5f;
+    } else if (key == GLFW_KEY_K && action == GLFW_PRESS) {
+        stimsize *= 2.0f;
     }
 }
 
@@ -236,7 +241,7 @@ void colorcircle::render() {
     }
 
     {
-        glm::mat4 tscale = glm::scale(glm::mat4(1), glm::vec3(0.2f, 0.2f, 0));
+        glm::mat4 tscale = glm::scale(glm::mat4(1), glm::vec3(stimsize, stimsize, 0));
         glm::mat4 fin = vp * tscale;
 
         gl::color::rgba color(fg);
@@ -297,7 +302,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    colorcircle wnd = colorcircle(800, 1200, "Test", cspace);
+    colorcircle wnd = colorcircle(800, 1200, "Colorcircle", cspace);
 
     while (! wnd.should_close()) {
 
