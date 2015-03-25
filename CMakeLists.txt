@@ -74,6 +74,15 @@ find_package(BLAS REQUIRED)
 set(LINK_LIBS ${LINK_LIBS} ${BLAS_LIBRARIES})
 
 #######################################
+# YAML CPP
+
+pkg_check_modules(YAMLCPP yaml-cpp)
+
+include_directories(${YAMLCPP_INCLUDE_DIRS})
+link_directories(${YAMLCPP_LIBRARY_DIRS})
+set(LINK_LIBS ${LINK_LIBS} ${YAMLCPP_LIBRARIES})
+
+#######################################
 # lib
 
 if(NOT APPLE)
