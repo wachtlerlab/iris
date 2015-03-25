@@ -37,8 +37,10 @@ serial serial::open(const std::string &str) {
     tio.c_iflag &= ~(IXON | IXOFF | IXANY);
 
     // make raw
-    tio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    tio.c_lflag &= ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL | ISIG | IEXTEN);
     tio.c_oflag &= ~OPOST;
+
+    tio.c_iflag &= ~(INLCR | IGNCR | ICRNL | IGNBRK);
 
     tio.c_cc[VMIN] = 0;
     tio.c_cc[VTIME] = 10;
