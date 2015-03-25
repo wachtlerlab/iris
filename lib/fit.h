@@ -92,11 +92,9 @@ public:
         double v_amp = (v_max - v_min) * 0.5;
         double v_mid = v_min + (v_max - v_min) * 0.5;
 
-        std::cerr << v_amp << " " << v_mid << " " << std::endl;
-
-        p[0] = 0.2;
-        p[1] = 1.9;
-        p[2] = 0.67;
+        p[0] = v_amp;
+        p[1] = x[p_max];
+        p[2] = v_mid;
         p[3] = 1;
     }
 

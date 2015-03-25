@@ -30,8 +30,7 @@ bool fitter::operator()() {
     double *p = params();
     void *user_data = static_cast<void *>(this);
     fit_info = lmdif1(call_opt, user_data, m, n, p, fvec, tol, iwa, wa, lwa);
-
-    return fit_info == 1;
+    return fit_info == 1 || fit_info == 2 || fit_info == 3;
 }
 
 int gamma_fitter::eval(int m, int n, const double *p, double *fvec) const {
@@ -58,7 +57,7 @@ int sin_fitter::eval(int m, int n, const double *p, double *fvec) const {
     double f = fit_frequency ? p[3] : 1.0;
 
     for(int i = 0; i < x.size(); i++) {
-        fvec[i] = y[i] - (offset + A * sin(f * x[i] - phi));
+        fvec[i] = y[i] - (offset + A * cos(f * x[i] - phi));
     }
 
     return 0;

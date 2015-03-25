@@ -37,7 +37,7 @@ def main():
     if phase is not None and amp is not None:
         x = np.array(sorted(set(x)))
         plt.hold(True)
-        yfit = args.offset + amp * np.sin(args.freq*x - phase)
+        yfit = args.offset + amp * np.cos(args.freq*x - phase)
         plt.plot(x, yfit, '--k')
 
     plt.show()
