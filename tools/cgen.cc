@@ -8,6 +8,7 @@ int main(int argc, char **argv) {
 
     std::string path = "-";
     size_t n_steps = 1;
+    size_t n_blocks = 1;
 
     po::options_description opts("calibration tool");
     opts.add_options()
@@ -20,6 +21,7 @@ int main(int argc, char **argv) {
             ("cyan,c", "cyan")
             ("white,w", "white")
             ("steps,N", po::value<size_t>(&n_steps))
+            ("blocks,B", po::value<size_t>(&n_blocks))
             ("file,f", po::value<std::string>(&path));
 
     po::positional_options_description pos{};
@@ -46,25 +48,14 @@ int main(int argc, char **argv) {
     std::vector<float> steps = iris::rgb::linspace(n_steps);
     std::vector<iris::rgb> cl = iris::rgb::gen(base, steps);
 
-    if (path == "-") {
+    for (size_t i = 0; i < n_blocks; i++) {
 
         for (auto c : cl) {
             std::cout << std::hex << c << std::endl;
         }
 
-    } else {
-        h5x::NDSize dims = {cl.size(), static_cast<size_t>(3)};
-        h5x::File fd = h5x::File::open(path, "a");
-        h5x::DataSet patches;
-        if (!fd.hasData("patches")) {
-            patches = fd.createData("patches", h5x::TypeId::Float, dims);
-        } else {
-            patches = fd.openData("patches");
-        }
-
-        patches.setExtent(dims);
-        patches.write(h5x::TypeId::Float, dims, static_cast<void *>(cl.data()));
     }
+
 
     return 0;
 };
