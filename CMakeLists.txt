@@ -117,6 +117,9 @@ target_link_libraries(iris-fitsine iris)
 add_executable(iris-board tools/board.cc)
 target_link_libraries(iris-board iris)
 
+add_executable(iris-convert tools/conv.cc)
+target_link_libraries(iris-convert iris)
+
 ########################################
 # playground
 
