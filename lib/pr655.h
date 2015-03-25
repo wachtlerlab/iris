@@ -82,8 +82,7 @@ public:
     }
 
     static pr655 open(const std::string &path) {
-        serial s = serial::open(path);
-        pr655 meter(s);
+        pr655 meter(serial::open(path));
         return meter;
     }
 
