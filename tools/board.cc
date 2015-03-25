@@ -14,6 +14,8 @@
 #include <misc.h>
 
 #include <numeric>
+#include <thread>
+#include <chrono>
 
 #include <boost/program_options.hpp>
 
@@ -108,11 +110,12 @@ private:
 
 class board : public gl::window {
 public:
-    board(int height, int width, const std::string &title, iris::dkl &cspace)
-            : window(height, width, title, gl::monitor{}), colorspace(cspace),
+    board(gl::monitor m, iris::dkl &cspace)
+            : window("IRIS Board", m), colorspace(cspace),
               rd(), gen(rd()), dis(0, 15)  {
         make_current_context();
         glfwSwapInterval(1);
+        disable_cursor();
 
         circ_phi = iris::linspace(0.0, 2*M_PI, 16);
         circ_rgb.resize(circ_phi.size());
@@ -183,7 +186,8 @@ void board::render() {
 
     double now = glfwGetTime();
 
-    if (now - stamp < 1.0) {
+    if (now - stamp < 3.0) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         return;
     }
 
@@ -269,7 +273,8 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    board wnd(800, 1200, "Colorcircle", cspace);
+    gl::monitor m = gl::monitor::primary();
+    board wnd(m, cspace);
 
     if (grab_mouse) {
         wnd.disable_cursor();
