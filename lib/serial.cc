@@ -106,7 +106,11 @@ std::vector<char> serial::recv_data(size_t to_read, sleeper::rep read_timeout) {
     while (pos < to_read) {
         ssize_t nread = read(fd, buf.data() + pos, to_read - pos);
         if (nread < 0) {
-            throw std::runtime_error("r failed");
+            if (errno == EAGAIN || errno == EINTR) {
+                nread = 0;
+            } else {
+                throw std::runtime_error("r failed [recv_data]");
+            }
         }
 
         pos += static_cast<size_t>(nread);
