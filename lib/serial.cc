@@ -85,6 +85,12 @@ void serial::send_data(const std::string &str) {
 
         if (!timeout.sleep(n == 0)) {
             throw std::runtime_error("w failed: timeout");
+
+    drain_retry:
+    int fres =  tcdrain(fd);
+    if (fres < 0) {
+        if (errno == EINTR) {
+            goto drain_retry;
         }
     }
 }
