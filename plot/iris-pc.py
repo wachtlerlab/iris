@@ -12,7 +12,7 @@ def G(azero, a, gamma, x):
     return [azero + a * i**gamma for i in x]
 
 def main():
-    fd = h5.File(sys.argv[1])
+    fd = h5.File(sys.argv[1], 'r')
     g = fd['/rgb2sml']
     ds = g['cone-activations']
 
