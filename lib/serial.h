@@ -87,6 +87,14 @@ public:
         fd = dup(other.fd);
     }
 
+    serial(serial &&other) {
+        if (fd > -1) {
+            close(fd);
+        }
+        fd = other.fd;
+        other.fd = -1;
+    }
+
     serial& operator=(const serial &other) {
         if (this == &other) {
             return *this;
@@ -94,6 +102,20 @@ public:
 
         close(fd);
         fd = dup(other.fd);
+        return *this;
+    }
+
+    serial& operator=(serial &&other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        if (fd > 0) {
+            close(fd);
+        }
+
+        fd = other.fd;
+        other.fd = -1;
         return *this;
     }
 
