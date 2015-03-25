@@ -88,7 +88,7 @@ void serial::send_data(const std::string &str) {
 
         }
     }
-    
+
     drain_retry:
     int fres =  tcdrain(fd);
     if (fres < 0) {
@@ -104,7 +104,7 @@ std::vector<char> serial::recv_data(size_t to_read, sleeper::rep read_timeout) {
 
     size_t pos = 0;
 
-    sleeper timeout(read_timeout, 1);
+    sleeper timeout(read_timeout, 10);
 
     while (pos < to_read) {
         ssize_t nread = read(fd, buf.data() + pos, to_read - pos);
@@ -137,7 +137,11 @@ std::string serial::recv_line(sleeper::rep read_timeout) {
     do {
         ssize_t nread = read(fd, &ch, 1);
         if (nread < 0) {
-            throw std::runtime_error("r failed");
+            if (errno == EAGAIN || errno == EINTR) {
+                nread = 0;
+            } else {
+                throw std::runtime_error("r failed [recv_line]");
+            }
         }
 
         if (nread > 0 && ch != '\r' && ch != '\n') {
