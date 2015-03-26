@@ -11,7 +11,7 @@ namespace iris {
 
 std::tuple<int, int, int> rgb::as_int(float base) const {
     int a[3];
-    std::transform(raw, raw + 3, a, [base](const float v){
+    std::transform(cbegin(), cend(), a, [base](const float v){
         return static_cast<int>(v * base);
     });
     return std::make_tuple(a[0], a[1], a[2]);
@@ -19,7 +19,7 @@ std::tuple<int, int, int> rgb::as_int(float base) const {
 
 std::tuple<bool, bool, bool> rgb::as_bits() const {
     bool a[3];
-    std::transform(raw, raw + 3, a, [](const float v){
+    std::transform(cbegin(), cend(), a, [](const float v){
         switch (std::fpclassify(v)) {
             case FP_ZERO:
                 return false;
@@ -36,16 +36,18 @@ rgb rgb::clamp(uint8_t *report, float lower, float upper) const {
     rgb res;
     uint8_t f = 0;
 
+    const rgb &self = *this;
+
     for(size_t i = 0; i < 3; i++) {
 
-        if (raw[i] < lower || std::isnan(raw[i])) {
-            res.raw[i] = lower;
+        if (self[i] < lower || std::isnan(self[i])) {
+            res[i] = lower;
             f = f | (uint8_t(1) << i);
-        } else if (raw[i] > upper) {
-            res.raw[i] = upper;
+        } else if (self[i] > upper) {
+            res[i] = upper;
             f = f | (uint8_t(1) << i);
         } else {
-            res.raw[i] = raw[i];
+            res[i] = self[i];
         }
     }
 
@@ -63,7 +65,7 @@ std::vector<rgb> rgb::gen(const std::vector<rgb> &base, const std::vector<float>
 
     for (const float step : steps) {
         for (rgb c : base) {
-            std::replace_if(c.raw, c.raw + 3, [](const float v){ return v > 0.0f; }, step);
+            std::replace_if(c.begin(), c.end(), [](const float v){ return v > 0.0f; }, step);
             result.push_back(c);
         }
     }
@@ -99,7 +101,7 @@ rgb rgb::from_hex(const std::string &hexstring) {
             throw std::runtime_error("Error while parsing RRGGBB format");
         }
 
-        color.raw[i] = c / 255.0f;
+        color[i] = c / 255.0f;
     }
 
     return iris::rgb();

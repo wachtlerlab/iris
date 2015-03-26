@@ -434,7 +434,7 @@ std::vector<iris::rgb> read_color_list(std::string path) {
             if (pos == 0) {
                 throw std::runtime_error("Error while parsing color list");
             }
-            color.raw[i] = static_cast<float>(c / 255.0f);
+            color[i] = static_cast<float>(c / 255.0f);
         }
         result.push_back(color);
     }

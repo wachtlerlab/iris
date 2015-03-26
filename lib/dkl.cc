@@ -241,7 +241,7 @@ dkl::dkl(const dkl::parameter  &init, const rgb &gray)
 rgb dkl::sml2rgb(const sml &input) const {
     double x[3];
     for(size_t i = 0; i < 3; i++) {
-        x[i] = input.raw[i] + params_sml2rgb.A_zero[i];
+        x[i] = input[i] + params_sml2rgb.A_zero[i];
     }
 
     double c[3];
@@ -255,7 +255,7 @@ rgb dkl::sml2rgb(const sml &input) const {
 
     rgb res;
     for(size_t i = 0; i < 3; i++) {
-        res.raw[i] = static_cast<float>(std::pow(c[i], params_sml2rgb.gamma[i])) / 255.0f;
+        res[i] = static_cast<float>(std::pow(c[i], params_sml2rgb.gamma[i])) / 255.0f;
     }
 
     return res;
@@ -265,7 +265,7 @@ sml dkl::rgb2sml(const rgb &input) const {
     double x[3];
 
     for(size_t i = 0; i < 3; i++) {
-        x[i] = std::pow(input.raw[i]*255.0, params.gamma[i]);
+        x[i] = std::pow(input[i]*255.0, params.gamma[i]);
     }
 
     double c[3];

@@ -143,13 +143,13 @@ int main(int argc, char **argv) {
 
                 std::bitset<3> bs;
                 for (size_t j = 0; j < 3; j++) {
-                    auto jc = std::fpclassify(kanon.raw[j]);
+                    auto jc = std::fpclassify(kanon[j]);
                     bs.set(j, j == source ? jc != FP_ZERO : jc == FP_ZERO);
                 }
 
                 if (bs.all()) {
                     double l = (spec[p] * cs).integrate();
-                    double v = kanon.raw[source] * 255.0;
+                    double v = kanon[source] * 255.0;
                     x.push_back(v);
                     y.push_back(l);
 
@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
     rgb2sml_fitter fitter(x, y, weight_exp);
     fitter();
 
-    dkl::parameter dklp = fitter.rgb2sml;
+    dkl::parameter dklp = fitter.rgb2sml();
 
     dklp.print(std::cout);
 
