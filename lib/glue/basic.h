@@ -32,34 +32,6 @@ struct extent {
 };
 
 
-struct rect {
-
-    union {
-        struct {
-            point start;
-            extent size;
-        };
-        struct {
-            float x;
-            float y;
-            float width;
-            float height;
-        };
-    };
-
-    rect() : start(), size() {}
-    rect(float x, float y, float width, float height)
-            : start(x, y), size(width, height) {
-    }
-
-
-    bool is_inside(float x, float y) const {
-        return x > start.x && x < start.x + size.width && y > start.y && y < start.y + size.height;
-    }
-
-};
-
-
 }
 
 #endif
