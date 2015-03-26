@@ -8,20 +8,16 @@ namespace iris {
 
 struct sml {
 
+    double s;
+    double m;
+    double l;
+
     sml() : s(), m(), l() { }
     sml(double s, double m, double l) : s(s), m(m), l(l) { }
     explicit sml(double d[3]) : s(d[0]), m(d[1]), l(d[2]) { }
     explicit sml(float d[3]) : s(d[0]), m(d[1]), l(d[2]) { }
 
-    union {
-        struct {
-            double s;
-            double m;
-            double l;
-        };
 
-        double raw[3];
-    };
     inline const double & operator[](const size_t n) const {
         switch (n) {
             case 0: return s;
@@ -41,15 +37,9 @@ class dkl {
 public:
 
     struct parameter {
-        union {
-            struct {
-                double A_zero[3];
-                double A[9];
-                double gamma[3];
-            };
-
-            double raw[15];
-        };
+        double A_zero[3];
+        double A[9];
+        double gamma[3];
 
         void print(std::ostream &os) const;
 
