@@ -29,6 +29,20 @@ struct rgb {
         return *this;
     }
 
+    inline const float & operator[](const size_t n) const {
+        switch (n) {
+            case 0: return r;
+            case 1: return g;
+            case 2: return b;
+            default: throw std::out_of_range("OOB access");
+        }
+    }
+
+    inline float & operator[](const size_t n) {
+        const float &cr = const_cast<const rgb *>(this)->operator[](n);
+        return const_cast<float &>(cr);
+    }
+
     std::tuple<int, int, int> as_int(float base = 255.0f) const;
     std::tuple<bool, bool, bool> as_bits() const;
     rgb clamp(uint8_t *report = nullptr, float lower=0.f, float upper=1.f) const;
