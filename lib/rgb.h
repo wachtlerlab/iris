@@ -62,6 +62,34 @@ struct rgb {
     static constexpr rgb cyan(float level = 1.0f) { return rgb(0.0f, level, level); }
     static constexpr rgb magenta(float level = 1.0f) { return rgb(level, 0.0f, level); }
 
+    //TODO: make proper random access iterator
+    template<typename T, typename Element>
+    struct iterator_t : public std::iterator<std::input_iterator_tag, Element> {
+
+        iterator_t() : color(nullptr), pos(3) { }
+        explicit iterator_t(T c) : color(c), pos(0) { }
+        iterator_t(const iterator_t &o) : color(o.color), pos(o.pos) { }
+
+        iterator_t & operator++() { ++pos; return *this; }
+        iterator_t operator++(int) { iterator_t i(*this); operator++(); return i; }
+        bool operator==(const iterator_t &rhs) const { return pos == rhs.pos; }
+        bool operator!=(const iterator_t &rhs) const { return !(*this == rhs); }
+        Element &operator*() const { return (*color)[pos]; }
+
+    private:
+        T color;
+        size_t pos;
+    };
+
+    typedef iterator_t<rgb *, float> iterator;
+    typedef const iterator_t<const rgb *, const float> const_iterator;
+
+    iterator begin() { return iterator(this); }
+    iterator end() { return iterator(); }
+
+    const_iterator cbegin() const { return const_iterator(this); }
+    const_iterator cend() const { return const_iterator(); }
+
 };
 
 
