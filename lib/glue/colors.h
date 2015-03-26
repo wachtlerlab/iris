@@ -22,17 +22,10 @@ struct rgba {
     }
     #endif
 
-    union {
-        struct {
-            float r;
-            float g;
-            float b;
-            float a;
-        };
-        struct {
-            float data[4];
-        };
-    };
+    float r;
+    float g;
+    float b;
+    float a;
 };
 
 
