@@ -22,6 +22,19 @@ struct sml {
 
         double raw[3];
     };
+    inline const double & operator[](const size_t n) const {
+        switch (n) {
+            case 0: return s;
+            case 1: return m;
+            case 2: return l;
+            default: throw std::out_of_range("OOB access");
+        }
+    }
+
+    inline double & operator[](const size_t n) {
+        const double &cr = const_cast<const sml *>(this)->operator[](n);
+        return const_cast<double &>(cr);
+    }
 };
 
 class dkl {
