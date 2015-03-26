@@ -23,13 +23,13 @@ bool fitter::operator()() {
     const int m = num_variables();
     const int n = num_parameter();
     const int lwa = m*n+5*n+m;
-    int iwa[n];
-    double wa[lwa];
-    double fvec[m];
+    std::vector<int> iwa(n);
+    std::vector<double> wa(lwa);
+    std::vector<double> fvec(m);
 
     double *p = params();
     void *user_data = static_cast<void *>(this);
-    fit_info = lmdif1(call_opt, user_data, m, n, p, fvec, tol, iwa, wa, lwa);
+    fit_info = lmdif1(call_opt, user_data, m, n, p, fvec.data(), tol, iwa.data(), wa.data(), lwa);
     return fit_info == 1 || fit_info == 2 || fit_info == 3;
 }
 
