@@ -11,21 +11,15 @@ namespace iris {
 
 struct rgb {
 
+    float r;
+    float g;
+    float b;
+
     constexpr rgb() : r(0.0f), g(0.0f), b(0.0f) {}
     constexpr rgb(float r, float g, float b) : r(r), g(g), b(b) {}
 
-    union {
-        struct {
-            float r;
-            float g;
-            float b;
-        };
-
-        float raw[3];
-    };
-
     rgb& operator=(const rgb &o) {
-        memcpy(raw, o.raw, sizeof(o.raw));
+        memcpy(this, &o, sizeof(o));
         return *this;
     }
 
