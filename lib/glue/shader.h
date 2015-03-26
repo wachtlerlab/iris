@@ -108,7 +108,9 @@ public:
     }
 
     void uniform(const char *uniform_name, const color::rgba &color) {
-        uniform(uniform_name, color.data);
+        float data[4];
+        memcpy(data, &color, sizeof(data));
+        uniform(uniform_name, data);
     }
 
     static void delete_name(GLuint my_name) {
