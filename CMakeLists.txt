@@ -76,7 +76,7 @@ set(LINK_LIBS ${LINK_LIBS} ${BLAS_LIBRARIES})
 #######################################
 # YAML CPP
 
-pkg_check_modules(YAMLCPP yaml-cpp)
+pkg_check_modules(YAMLCPP REQUIRED yaml-cpp)
 
 include_directories(${YAMLCPP_INCLUDE_DIRS})
 link_directories(${YAMLCPP_LIBRARY_DIRS})
