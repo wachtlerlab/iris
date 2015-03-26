@@ -107,10 +107,6 @@ public:
         glUniform1f(uniform(uniform_name), v);
     }
 
-    void uniform(const char *uniform_name, const color::rgb &color) {
-        uniform(uniform_name, color.data);
-    }
-
     void uniform(const char *uniform_name, const color::rgba &color) {
         uniform(uniform_name, color.data);
     }
