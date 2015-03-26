@@ -122,7 +122,6 @@ class rgb2sml_fitter : public fitter {
 public:
     rgb2sml_fitter(const std::vector<double> &x, const std::vector<double> &y, const double weight_exponent = 1.1)
             : x(x), y(y), we(weight_exponent) {
-        double *res = rgb2sml.raw;
         res[0] = res[1] = res[2] = 0.01;
 
         res[3] = res[6] = res[9] = 0.00005;
@@ -143,13 +142,19 @@ public:
     }
 
     virtual double *params() override {
-        return rgb2sml.raw;
+        return res;
+    }
+
+    dkl::parameter rgb2sml() const {
+        dkl::parameter pr;
+        memcpy(&pr, res, sizeof(res));
+        return pr;
     }
 
     const std::vector<double> &x;
     const std::vector<double> &y;
     const double we;
-    dkl::parameter rgb2sml;
+    double res[15];
 };
 
 }
