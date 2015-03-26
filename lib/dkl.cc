@@ -50,11 +50,11 @@ mat_trans(int M, int N, const double *A, double *res) {
     //totally lame matrix tranpose implementation
 
     const int K = M;
-    double B[K*K];
+    std::vector<double> B(K*K);
 
-    mat_eye(K, K, B);
+    mat_eye(K, K, B.data());
 
-    cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, N, M, K, 1.0, A, N, B, K, 0.0, res, N);
+    cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, N, M, K, 1.0, A, N, B.data(), K, 0.0, res, N);
 }
 
 static int
@@ -64,7 +64,7 @@ do_dgesdd (char jobz, int m, int n, double *A, int lda, double *s, double *U, in
 #ifdef __APPLE__
     double  cwork;
     int     lwork;
-    int     iwork[8*std::min(m ,n)];
+    std::vector<int> iwork(8*std::min(m ,n));
 
     lwork = -1;
 
@@ -73,7 +73,7 @@ do_dgesdd (char jobz, int m, int n, double *A, int lda, double *s, double *U, in
             s,
             U, &ldu,
             Vt, &ldvt,
-            &cwork, &lwork, iwork, &info);
+            &cwork, &lwork, iwork.data(), &info);
 
     if (info != 0) {
         std::cerr << "dgesdd_: error during workspace estimation: " << info << std::endl;
@@ -88,7 +88,7 @@ do_dgesdd (char jobz, int m, int n, double *A, int lda, double *s, double *U, in
             s,
             U, &ldu,
             Vt, &ldvt,
-            work, &lwork, iwork, &info);
+            work, &lwork, iwork.data(), &info);
 
 
 #else
@@ -108,35 +108,41 @@ mat_inv(int m, int n, const double  *A, double *Ai) {
     int info;
 
     const int k = std::min(m, n);
-    double s[k];
-    double U[ldu * m];
-    double Vt[ldvt * n];
-    double At[n*m];
-    double Ax[n*m];
+
+    std::vector<double> s(k);
+    std::vector<double> U(ldu * m);
+    std::vector<double> Vt(ldvt * n);
+    std::vector<double> At(n*m);
+    std::vector<double> Ax(n*m);
+
+    //double s[k];
+    //double U[ldu * m];
+    //double Vt[ldvt * n];
+    //double At[n*m];
+    //double Ax[n*m];
 
     //NB: we work in col-major because of dgesdd, so "transpose" A
-    mat_trans(m, n, A, At);
+    mat_trans(m, n, A, At.data());
 
-    info = do_dgesdd('S', m, n, At, lda, s, U, ldu, Vt, ldvt);
+    info = do_dgesdd('S', m, n, At.data(), lda, s.data(), U.data(), ldu, Vt.data(), ldvt);
 
     if (info != 0) {
         return -1;
     }
 
-    double Sw[k*k];
-    std::fill_n(Sw, k*k, 0.0);
+    std::vector<double> Sw(k*k, 0.0);
 
     for(size_t i = 0; i < k; i++) {
         Sw[i*(k+1)] = 1.0/s[i];
     }
 
-    double X[k*n];
+    std::vector<double> X(k*n);
 
-    cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, n, n, n, 1.0, Vt, ldvt, Sw,   k, 0.0,  X, k);
-    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, m, n, m, 1.0,  X,    k,  U, ldu, 0.0, Ax, m);
+    cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, n, n, n, 1.0, Vt.data(), ldvt, Sw.data(),   k, 0.0,  X.data(), k);
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, m, n, m, 1.0,  X.data(),    k,  U.data(), ldu, 0.0, Ax.data(), m);
 
     //see NB above
-    mat_trans(n, m, Ax, Ai);
+    mat_trans(n, m, Ax.data(), Ai);
 
     return 0;
 }
