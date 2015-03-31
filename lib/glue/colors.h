@@ -10,7 +10,7 @@ namespace color {
 
 struct rgba {
 
-    rgba() : r(0.0f), g(0.0f), b(0.0f) {}
+    rgba() : r(0.0f), g(0.0f), b(0.0f), a(1.0f) {}
     rgba(float r, float g, float b) : rgba(r, g, b, 1.0f) {}
     rgba(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
 
