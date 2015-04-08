@@ -11,6 +11,8 @@
 
 #include <vector>
 #include <string>
+#include <map>
+#include <memory>
 
 namespace glue {
 
@@ -55,10 +57,10 @@ private:
 
 class tf_font {
 private:
-    tf_font(FT_Face the_face) : face(the_face) { }
+    tf_font(FT_Face the_face) : face(the_face), atlases(std::make_shared<atlas_map>()) { }
 
 public:
-    tf_font() : face(nullptr) { }
+    tf_font() : face(nullptr), atlases(nullptr) { }
     tf_font(const tf_font &other) : face(other.face) {
         if (face) {
             FT_Reference_Face(face);
@@ -79,13 +81,16 @@ public:
         }
     }
 
-    tf_atlas make_atlas(size_t size, const std::string &characters);
+    tf_atlas  make_atlas(size_t size, const std::string &characters);
+    tf_atlas& atlas_for_size(size_t size);
 
 private:
     static FT_Library ft_library();
 
 private:
     FT_Face face;
+    typedef std::map<size_t, tf_atlas> atlas_map;
+    std::shared_ptr<atlas_map> atlases;
 };
 
 

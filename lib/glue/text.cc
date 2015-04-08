@@ -151,6 +151,19 @@ tf_atlas tf_font::make_atlas(size_t size, const std::string &characters) {
 }
 
 
+tf_atlas& tf_font::atlas_for_size(size_t size) {
+  auto iter = atlases->find(size);
+
+  if (iter == atlases->end()) {
+    tf_atlas atlas = make_atlas(size, "abcdefghijklmnopqrstuvwxyz");
+    auto res = atlases->insert(std::make_pair(size, atlas));
+    iter = res.first;
+  }
+
+  return iter->second;
+}
+
+
 FT_Library tf_font::ft_library() {
   static FT_Library lib;
   static std::once_flag flag;
