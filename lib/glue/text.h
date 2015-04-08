@@ -59,6 +59,11 @@ private:
 
 public:
     tf_font() : face(nullptr) { }
+    tf_font(const tf_font &other) : face(other.face) {
+        if (face) {
+            FT_Reference_Face(face);
+        }
+    }
 
     static tf_font make(const std::string &path) {
         FT_Face face;
