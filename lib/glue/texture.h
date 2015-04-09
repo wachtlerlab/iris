@@ -31,6 +31,14 @@ public:
         glBindTexture(target, name());
     }
 
+    static void parameter(GLenum target, GLenum name, GLfloat value) {
+        glTexParameterf(target, name, value);
+    }
+
+    static void parameter(GLenum target, GLenum name, GLint value) {
+        glTexParameteri(target, name, value);
+    }
+
 };
 
 } // glue::
