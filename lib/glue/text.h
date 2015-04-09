@@ -109,6 +109,7 @@ private:
     vertex_array varray;
 
     GLsizei ntriag;
+    tf_atlas atlas;
 };
 
 

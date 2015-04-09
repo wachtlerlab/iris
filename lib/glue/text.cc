@@ -258,6 +258,7 @@ text text::make(tf_atlas &ch_atlas, const std::string &str) {
   txt.vbuffer = vbuffer;
   txt.body = str;
   txt.ntriag = c;
+  txt.atlas = ch_atlas;
 
   return txt;
 }
@@ -266,6 +267,7 @@ void text::draw(glm::mat4 transform) {
   prg.use();
   varray.bind();
 
+  atlas.bind();
   prg.uniform("transform", transform);
   glDrawArrays(GL_TRIANGLES, 0, ntriag);
 
