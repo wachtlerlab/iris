@@ -39,6 +39,13 @@ public:
         glTexParameteri(target, name, value);
     }
 
+    static void pixel_store(GLenum name, GLfloat value) {
+        glPixelStoref(name, value);
+    }
+
+    static void pixel_store(GLenum name, GLint value) {
+        glPixelStorei(name, value);
+    }
 };
 
 } // glue::
