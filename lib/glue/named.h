@@ -3,18 +3,20 @@
 
 #include <glue/basic.h>
 #include <cstddef>
+#include <utility>
 
 namespace glue {
 
-template<typename T>
+template<typename T, typename U = void*>
 class named {
 
 public:
     named(std::nullptr_t) : ctrl(nullptr) { }
 
-    explicit named(GLuint name) {
+    template<typename... Args>
+    explicit named(GLuint name, Args&&... args) {
         if (name != 0) {
-            ctrl = new control_block(name);
+            ctrl = new control_block(name, std::forward<Args>(args)...);
         }
     }
 
@@ -52,6 +54,15 @@ public:
         return ctrl != nullptr && ctrl->name != 0;
     }
 
+protected:
+    U& playload() {
+        return ctrl->payload;
+    }
+
+    const U& payload() const {
+        return ctrl->payload;
+    }
+
 private:
 
     int decref() {
@@ -76,13 +87,16 @@ private:
     }
 
     struct control_block {
-        control_block(GLuint name) : refcount(1), name(name) { }
+        template<typename... Args>
+        control_block(GLuint name, Args&&... args)
+                : refcount(1), name(name), payload(std::forward<Args>(args)...) { }
 
         int incref() { return ++refcount; }
         int decref() { return --refcount; }
 
         int refcount;
         GLuint name;
+        U payload;
     };
 
 private:
