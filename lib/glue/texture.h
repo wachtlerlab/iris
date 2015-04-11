@@ -6,7 +6,7 @@
 
 namespace glue {
 
-class texture : named<texture> {
+class texture : named<> {
 public:
     texture() : named(nullptr) { }
 

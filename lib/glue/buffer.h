@@ -8,7 +8,7 @@
 
 namespace glue {
 
-class buffer : public named<buffer> {
+class buffer : public named<> {
 public:
     buffer() : named(nullptr) { }
     buffer(GLuint name) : named(name, delete_name) { }

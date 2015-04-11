@@ -7,7 +7,7 @@
 
 namespace glue {
 
-template<typename T, typename U = void*>
+template<typename U = void*>
 class named {
 public:
     typedef void(*delete_name)(GLuint name);

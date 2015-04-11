@@ -14,7 +14,7 @@
 
 namespace glue {
 
-class shader : public named<shader> {
+class shader : public named<> {
 public:
 
     shader() : named(nullptr) {}
@@ -30,7 +30,7 @@ public:
 
 };
 
-class program : public named<program> {
+class program : public named<> {
 public:
 
     program() : named(nullptr) { }

@@ -6,7 +6,7 @@
 
 namespace glue {
 
-class vertex_array : public named<vertex_array> {
+class vertex_array : public named<> {
 public:
     vertex_array(GLuint name) : named(name, delete_name) { }
 
