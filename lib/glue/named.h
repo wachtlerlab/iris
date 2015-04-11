@@ -9,14 +9,16 @@ namespace glue {
 
 template<typename T, typename U = void*>
 class named {
+public:
+    typedef void(*delete_name)(GLuint name);
 
 public:
     named(std::nullptr_t) : ctrl(nullptr) { }
 
     template<typename... Args>
-    explicit named(GLuint name, Args&&... args) {
+    explicit named(GLuint name, delete_name dn, Args&&... args) {
         if (name != 0) {
-            ctrl = new control_block(name, std::forward<Args>(args)...);
+            ctrl = new control_block(name, dn, std::forward<Args>(args)...);
         }
     }
 
@@ -47,7 +49,7 @@ public:
 
     void reset() {
         decref();
-        ctrl = new control_block(T::make_name());
+        ctrl = nullptr;
     }
 
     explicit operator bool() {
@@ -68,7 +70,6 @@ private:
     int decref() {
         if (ctrl) {
             if (ctrl->decref() == 0) {
-                T::delete_name(ctrl->name);
                 delete ctrl;
                 ctrl = nullptr;
                 return 0;
@@ -88,14 +89,20 @@ private:
 
     struct control_block {
         template<typename... Args>
-        control_block(GLuint name, Args&&... args)
-                : refcount(1), name(name), payload(std::forward<Args>(args)...) { }
+        control_block(GLuint name, delete_name dn, Args&&... args)
+                : refcount(1), name(name), name_deleter(dn),
+                  payload(std::forward<Args>(args)...) { }
+
+        ~control_block() {
+            name_deleter(name);
+        }
 
         int incref() { return ++refcount; }
         int decref() { return --refcount; }
 
         int refcount;
         GLuint name;
+        delete_name name_deleter;
         U payload;
     };
 

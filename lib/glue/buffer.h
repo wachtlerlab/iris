@@ -11,7 +11,7 @@ namespace glue {
 class buffer : public named<buffer> {
 public:
     buffer() : named(nullptr) { }
-    buffer(GLuint name) : named(name) { }
+    buffer(GLuint name) : named(name, delete_name) { }
 
     static buffer make() {
         buffer buf = make_name();

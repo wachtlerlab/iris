@@ -18,7 +18,7 @@ class shader : public named<shader> {
 public:
 
     shader() : named(nullptr) {}
-    shader(GLuint name) : named(name) { }
+    shader(GLuint name) : named(name, delete_name) { }
 
     void compile();
 
@@ -34,7 +34,7 @@ class program : public named<program> {
 public:
 
     program() : named(nullptr) { }
-    program(GLuint name) : named(name) { }
+    program(GLuint name) : named(name, delete_name) { }
 
     static program make() {
         program prg = make_name();

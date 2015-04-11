@@ -8,7 +8,7 @@ namespace glue {
 
 class vertex_array : public named<vertex_array> {
 public:
-    vertex_array(GLuint name) : named(name) { }
+    vertex_array(GLuint name) : named(name, delete_name) { }
 
     vertex_array() : named(nullptr) { }
 

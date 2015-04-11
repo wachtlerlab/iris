@@ -10,7 +10,7 @@ class texture : named<texture> {
 public:
     texture() : named(nullptr) { }
 
-    texture(GLuint name) : named(name) { }
+    texture(GLuint name) : named(name, delete_name) { }
 
     static texture make() {
         texture tex = make_name();
