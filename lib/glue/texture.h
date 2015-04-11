@@ -6,14 +6,15 @@
 
 namespace glue {
 
-class texture : named<> {
+template<typename T = void *>
+class texture_t : named<T> {
 public:
-    texture() : named(nullptr) { }
+    texture_t() : named<T>(nullptr) { }
 
-    texture(GLuint name) : named(name, delete_name) { }
+    texture_t(GLuint name) : named<T>(name, delete_name) { }
 
-    static texture make() {
-        texture tex = make_name();
+    static texture_t make() {
+        texture_t tex = make_name();
         return tex;
     }
 
@@ -28,7 +29,7 @@ public:
     }
 
     void bind(GLenum target) {
-        glBindTexture(target, name());
+        glBindTexture(target, named<T>::name());
     }
 
     static void parameter(GLenum target, GLenum name, GLfloat value) {
@@ -47,6 +48,8 @@ public:
         glPixelStorei(name, value);
     }
 };
+
+typedef texture_t<> texture;
 
 } // glue::
 
