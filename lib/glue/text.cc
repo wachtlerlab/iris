@@ -5,6 +5,7 @@
 #include <thread>
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
+#include <numeric>
 
 namespace glue {
 
@@ -114,13 +115,35 @@ void tf_atlas::add_glyphs(const std::vector<glyph_bmp> &glyphs) {
 
 
 tf_atlas tf_font::make_atlas(size_t size, const std::string &characters) {
+  std::vector<glyph_bmp> glyphs = glyphs_for(size, characters);
+  tf_atlas the_atlas(size);
+  the_atlas.add_glyphs(glyphs);
+  return the_atlas;
+}
+
+
+tf_atlas& tf_font::atlas_for_size(size_t size) {
+  auto iter = atlases->find(size);
+
+  if (iter == atlases->end()) {
+    std::string str(126 - 32, '\0');
+    std::iota(str.begin(), str.end(), 32);
+
+    tf_atlas atlas = make_atlas(size, str);
+    auto res = atlases->insert(std::make_pair(size, atlas));
+    iter = res.first;
+  }
+
+  return iter->second;
+}
+
+
+std::vector<glyph_bmp> tf_font::glyphs_for(size_t size, const std::string &u8str) {
   FT_Set_Pixel_Sizes(face, 0, size);
   FT_GlyphSlot g = face->glyph;
 
-  tf_atlas the_atlas(size);
-
   std::vector<glyph_bmp> glyphs;
-  for (const auto &ch : characters) {
+  for (const auto &ch : u8str) {
     if (FT_Load_Char(face, ch, FT_LOAD_RENDER)) {
       fprintf(stderr, "Loading character %c failed!\n", ch);
       continue;
@@ -143,23 +166,8 @@ tf_atlas tf_font::make_atlas(size_t size, const std::string &characters) {
     glyphs.emplace_back(std::move(bmp));
   }
 
-  the_atlas.add_glyphs(glyphs);
-  return the_atlas;
+  return glyphs;
 }
-
-
-tf_atlas& tf_font::atlas_for_size(size_t size) {
-  auto iter = atlases->find(size);
-
-  if (iter == atlases->end()) {
-    tf_atlas atlas = make_atlas(size, "abcdefghijklmnopqrstuvwxyz");
-    auto res = atlases->insert(std::make_pair(size, atlas));
-    iter = res.first;
-  }
-
-  return iter->second;
-}
-
 
 FT_Library tf_font::ft_library() {
   static FT_Library lib;

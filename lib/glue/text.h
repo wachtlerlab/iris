@@ -99,6 +99,8 @@ public:
     tf_atlas  make_atlas(size_t size, const std::string &characters);
     tf_atlas& atlas_for_size(size_t size);
 
+    std::vector<glyph_bmp> glyphs_for(size_t size, const std::string &u8str);
+
 private:
     static FT_Library ft_library();
 
