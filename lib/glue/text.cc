@@ -36,69 +36,14 @@ void main(void) {
 }
 )SHDR";
 
-
-tf_atlas::char_info::char_info(const FT_GlyphSlot &g, char ch, float tx, float ty) {
-  this->ch = ch;
-
-  ax = g->advance.x >> 6;
-  ay = g->advance.y >> 6;
-
-  bw = g->bitmap.width;
-  bh = g->bitmap.rows;
-
-  bl = g->bitmap_left;
-  bt = g->bitmap_top;
-
-  this->tx = tx;
-  this->ty = ty;
-}
-
-
-const tf_atlas::char_info& tf_atlas::operator[](char ch) const {
-  for (const char_info &info : index) {
-    if (info.ch == ch) {
-      return info;
-    }
-  }
-
-  throw std::runtime_error("Could not find char");
-}
-
-
-tf_atlas tf_font::make_atlas(size_t size, const std::string &characters) {
-  FT_Set_Pixel_Sizes(face, 0, size);
-  FT_GlyphSlot g = face->glyph;
-
-  unsigned h, w;
-  h = w = 0;
-
-  unsigned int roww = 0;
-  unsigned int rowh = 0;
-
-  for (const auto &ch : characters) {
-    if (FT_Load_Char(face, ch, FT_LOAD_RENDER)) {
-      std::cerr << "Loading character [" << ch << "] failed!" << std::endl;
-      continue;
-    }
-
-
-    if (roww + g->bitmap.width + 1 >= 1024) {
-      w = std::max(w, roww);
-      h += rowh;
-      roww = 0;
-      rowh = 0;
-    }
-
-    roww += g->bitmap.width + 1;
-    rowh = std::max(rowh, g->bitmap.rows);
-  }
-
-  w = std::max(w, roww);
-  h += rowh;
+tf_atlas::tf_atlas(size_t font_size)
+        : font_size(font_size), pos(), size(), rowh(0), index(), font_tex() {
+  int w = 1024;
+  int h = static_cast<int>(font_size) * 2;
 
   glActiveTexture(GL_TEXTURE0);
 
-  texture font_tex = texture::make();
+  font_tex = texture::make();
   font_tex.bind(GL_TEXTURE_2D);
 
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
@@ -110,43 +55,95 @@ tf_atlas tf_font::make_atlas(size_t size, const std::string &characters) {
   texture::parameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   texture::parameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  int ox = 0;
-  int oy = 0;
+  size.width = w;
+  size.height = h;
+}
 
-  rowh = 0;
+const glyph_tf& tf_atlas::operator[](char ch) const {
+  for (const glyph_tf &info : index) {
+    if (info.ch == ch) {
+      return info;
+    }
+  }
 
-  std::vector<tf_atlas::char_info> ci;
+  throw std::runtime_error("Could not find char");
+}
+
+void tf_atlas::add_glyphs(const std::vector<glyph_bmp> &glyphs) {
+
+  glActiveTexture(GL_TEXTURE0);
+  font_tex.bind(GL_TEXTURE_2D);
+
+  for(const glyph_bmp &bmp : glyphs) {
+
+    //"line wrap"
+    if (pos.x + bmp.width + 1 >= size.width) {
+      pos.y += rowh;
+      rowh = bmp.height;
+      pos.x = 0;
+    } else {
+      rowh = std::max(rowh, bmp.height);
+    }
+
+    if ((pos.y + rowh) > size.height) {
+      std::vector<uint8_t> data(size.height * size.width);
+      glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, data.data());
+
+      size.height += (pos.y + rowh);
+      data.resize((size.height * size.width));
+
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, size.width, size.height,
+                   0, GL_RED, GL_UNSIGNED_BYTE, data.data());
+      //std::cerr << "Increasing tf atlas size: " << size.width << " " << size.height << std::endl;
+    }
+
+    glTexSubImage2D(GL_TEXTURE_2D, 0,
+                    static_cast<int>(pos.x),
+                    static_cast<int>(pos.y),
+                    static_cast<int>(bmp.width),
+                    static_cast<int>(bmp.height),
+                    GL_RED, GL_UNSIGNED_BYTE,
+                    bmp.bytes.data());
+
+    index.emplace_back(bmp, pos.x, pos.y);
+
+    pos.x += bmp.width + 1.0f;
+  }
+
+}
+
+
+tf_atlas tf_font::make_atlas(size_t size, const std::string &characters) {
+  FT_Set_Pixel_Sizes(face, 0, size);
+  FT_GlyphSlot g = face->glyph;
+
+  tf_atlas the_atlas(size);
+
+  std::vector<glyph_bmp> glyphs;
   for (const auto &ch : characters) {
     if (FT_Load_Char(face, ch, FT_LOAD_RENDER)) {
       fprintf(stderr, "Loading character %c failed!\n", ch);
       continue;
     }
 
-    if (ox + g->bitmap.width + 1 >= 1024) {
-      oy += rowh;
-      rowh = 0;
-      ox = 0;
-    }
+    glyph_bmp bmp;
+    bmp.ch = ch;
+    bmp.ax = g->advance.x >> 6;
+    bmp.ay = g->advance.y >> 6;
 
-    glTexSubImage2D(GL_TEXTURE_2D,
-                    0,
-                    ox, oy,
-                    g->bitmap.width, g->bitmap.rows,
-                    GL_RED, GL_UNSIGNED_BYTE,
-                    g->bitmap.buffer);
+    bmp.width = g->bitmap.width;
+    bmp.height = g->bitmap.rows;
+    bmp.left = g->bitmap_left;
+    bmp.top = g->bitmap_top;
 
-    ci.emplace_back(g, ch, ox, oy);
+    size_t nbytes = static_cast<size_t>(bmp.width * bmp.height);
+    bmp.bytes.resize(nbytes, 0);
+    memcpy(bmp.bytes.data(), g->bitmap.buffer, nbytes);
 
-    rowh = std::max(rowh, g->bitmap.rows);
-    ox += g->bitmap.width + 1;
+    glyphs.emplace_back(std::move(bmp));
   }
 
-  fprintf(stderr, "Generated a %d x %d (%f kb) texture font atlas\n", w, h, w * h / 1024.0);
-  tf_atlas the_atlas(ci, font_tex);
-
-  the_atlas.w = w;
-  the_atlas.h = h;
-
+  the_atlas.add_glyphs(glyphs);
   return the_atlas;
 }
 
@@ -223,26 +220,26 @@ text text::make(tf_atlas &ch_atlas, const std::string &str) {
 
   int c = 0;
   for (char ch : str) {
-    const tf_atlas::char_info ci = ch_atlas[ch];
+    const glyph_tf ci = ch_atlas[ch];
 
-    float x2 = x + ci.bl;
-    float y2 = -y - ci.bt;
+    float x2 = x + ci.left;
+    float y2 = -y - ci.top;
 
     x += ci.ax;
     y += ci.ay;
 
-    float w = ci.bw;
-    float h = ci.bh;
+    float w = ci.width;
+    float h = ci.height;
 
     if (!w || !h)
       continue;
 
-    coords[c++] = {x2,     -y2,       ci.tx,         ci.ty};
-    coords[c++] = {x2 + w, -y2,       ci.tx + ci.bw, ci.ty};
-    coords[c++] = {x2,     -y2 - h,   ci.tx,         ci.ty + ci.bh};
-    coords[c++] = {x2 + w, -y2,       ci.tx + ci.bw, ci.ty};
-    coords[c++] = {x2,     -y2 - h,   ci.tx,         ci.ty + ci.bh};
-    coords[c++] = {x2 + w, -y2 - h,   ci.tx + ci.bw, ci.ty + ci.bh};
+    coords[c++] = {x2,     -y2,       ci.u,     ci.v};
+    coords[c++] = {x2 + w, -y2,       ci.u + w, ci.v};
+    coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
+    coords[c++] = {x2 + w, -y2,       ci.u + w, ci.v};
+    coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
+    coords[c++] = {x2 + w, -y2 - h,   ci.u + w, ci.v + h};
   }
 
   vbuffer.data(coords);

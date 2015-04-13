@@ -1,6 +1,7 @@
 #ifndef GLUE_TEXT_H
 #define GLUE_TEXT_H
 
+#include <glue/basic.h>
 #include <glue/shader.h>
 #include <glue/buffer.h>
 #include <glue/arrays.h>
@@ -18,40 +19,54 @@ namespace glue {
 
 //tf stands for texture font
 
+struct glyph {
+    char32_t ch;
+
+    //advance;
+    float ax;
+    float ay;
+
+    //the dimensions
+    float left;
+    float top;
+    float width;
+    float height;
+};
+
+struct glyph_tf : glyph {
+
+    glyph_tf(const glyph &src, float u, float v)
+            : glyph(src), u(u), v(v) {
+    }
+
+    float u;
+    float v;
+};
+
+struct glyph_bmp : glyph {
+    std::vector<uint8_t> bytes;
+};
+
+
 class tf_atlas {
 public:
-    struct char_info {
+    tf_atlas() : font_size(0) { };
+    tf_atlas(size_t font_size);
 
-        char ch;     // the char
-
-        float ax;    // advance.x
-        float ay;    // advance.y
-
-        float bw;    // bitmap.width;
-        float bh;    // bitmap.height;
-
-        float bl;    // bitmap_left;
-        float bt;    // bitmap_top;
-
-        float tx;    // x offset of glyph in texture coordinates
-        float ty;    // y offset of glyph in texture coord
-
-        char_info(const FT_GlyphSlot &g, char ch, float tx, float ty);
-    };
-
-    tf_atlas() : index(), font_tex() { }
-    tf_atlas(std::vector<char_info> nfo, texture ft_tex) : index(nfo), font_tex(ft_tex) { }
-
-    const char_info &operator[](char ch) const;
+    const glyph_tf &operator[](char ch) const;
 
     void bind() {
         font_tex.bind(GL_TEXTURE_2D);
     }
 
-    int w, h;
+    void add_glyphs(const std::vector<glyph_bmp> &glyphs);
 
 private:
-    std::vector<char_info> index;
+    size_t font_size;
+    point pos;
+    extent size;
+    float rowh;
+    std::vector<glyph_tf> index;
     texture font_tex;
 };
 
