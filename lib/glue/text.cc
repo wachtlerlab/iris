@@ -280,4 +280,95 @@ void text::draw(glm::mat4 transform) {
   prg.unuse();
 }
 
+// misc
+
+ssize_t u8_nbytes(uint8_t bytes) {
+  std::bitset<8> bs(bytes);
+
+  size_t i;
+  for (i = 0; i < bs.size(); i++) {
+    if (bs[7 - i] == 0) {
+      break;
+    }
+  }
+
+  switch (i) {            // 0123 4567
+    case 0:  return  1; // 0??? ????
+    case 1:  return -1; // 10?? ????
+    case 7:  return -1; // 1111 1110
+    case 8:  return -1; // 1111 1111
+    default: return  i; // 1... .10?
+  }
+}
+
+template<typename Iter>
+Iter u8to32(Iter begin, Iter end, char32_t &out) {
+  if (begin == end) {
+    out = 0xFFFD;
+    return end;
+  }
+
+  auto ix = *begin++;
+  uint8_t c1;
+  memcpy(&c1, &ix, 1);
+
+  ssize_t nb = u8_nbytes(c1);
+  if (nb == 1) {
+    out = c1;
+    return begin;
+  } else if (nb < 1) {
+    //TODO: synchronize
+    out = 0xFFFD;
+    return begin;
+  }
+
+  // nb > 1
+  out = c1 & (0xFFU >> (nb+1));
+  out = out << 6*(nb - 1);
+
+  size_t len = static_cast<size_t>(nb);
+  size_t i;
+  for (i = 1; begin != end && i < len; i++) {
+    ix = *begin++;
+    uint8_t ch;
+    memcpy(&ch, &ix, 1);
+
+    if ((ch & 0xC0) != 0x80) {
+      //todo: synchronize
+      out = 0xFFFD;
+      return begin;
+    }
+
+    out |= (ch & 0x3F) << 6*(nb - i - 1);
+  }
+
+  if (i != len) {
+    // incomplete character
+    out = 0xFFFD;
+  }
+
+  return begin;
+}
+
+// utility functins
+std::u32string u8to32(const std::string &istr) {
+  std::u32string res;
+
+  if (istr.empty()) {
+    return res;
+  }
+
+  auto iter = istr.cbegin();
+  auto iend = istr.cend();
+
+  while (iter != iend) {
+    char32_t ch;
+    iter = u8to32(iter, iend, ch);
+    res.push_back(ch);
+  }
+
+  return res;
+}
+
+
 } // glue::

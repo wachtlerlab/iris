@@ -130,6 +130,7 @@ private:
 };
 
 
+std::u32string u8to32(const std::string &istr);
 
 }
 
