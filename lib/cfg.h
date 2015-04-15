@@ -21,40 +21,39 @@ struct isoslant {
     int64_t     calib;
 };
 
-struct calibration {
-
-    dkl::parameter rgb2lms_params;
-
-    //metadata
-    int64_t     timestamp;
-    std::string device;
-};
 
 struct monitor {
-    std::string name;
     std::string id;
+    std::string name;
+
+    int64_t timestamp;
 
     std::string note;
 
-    //size in mm
-    float width;
-    float height;
+    //for which subsystem was
+    //configration made, (i.e. gl)
+    std::string gfx;
+
+    //physical size in mm
+    float phy_width;
+    float phy_height;
+
+    //resolution in px
+    float res_width;
+    float res_height;
 
     //calibration stuff
-    std::vector<calibration> calibrations;
-    int64_t selected_calibration;
+    dkl::parameter rgb2lms;
 };
 
 
 struct subject {
+    std::string id;
 
     std::string initials;
     std::string name;
-
-    //isoslant corrections
-    std::vector<isoslant> corrections;
-    int64_t selected_correction;
 };
+
 
 
 } //iris::cfg
