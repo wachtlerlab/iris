@@ -53,7 +53,7 @@ public:
     tf_atlas() : font_size(0) { };
     tf_atlas(size_t font_size);
 
-    const glyph_tf &operator[](char ch) const;
+    const glyph_tf &operator[](char32_t ch) const;
 
     void bind() {
         font_tex.bind(GL_TEXTURE_2D);
@@ -128,7 +128,6 @@ private:
     GLsizei ntriag;
     tf_atlas atlas;
 };
-
 
 std::u32string u8to32(const std::string &istr);
 

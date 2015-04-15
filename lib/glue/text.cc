@@ -60,7 +60,7 @@ tf_atlas::tf_atlas(size_t font_size)
   size.height = h;
 }
 
-const glyph_tf& tf_atlas::operator[](char ch) const {
+const glyph_tf& tf_atlas::operator[](char32_t ch) const {
   for (const glyph_tf &info : index) {
     if (info.ch == ch) {
       return info;
@@ -128,6 +128,7 @@ tf_atlas& tf_font::atlas_for_size(size_t size) {
   if (iter == atlases->end()) {
     std::string str(126 - 32, '\0');
     std::iota(str.begin(), str.end(), 32);
+    str += u8"π\u00b0\ufffd";
 
     tf_atlas atlas = make_atlas(size, str);
     auto res = atlases->insert(std::make_pair(size, atlas));
@@ -142,8 +143,10 @@ std::vector<glyph_bmp> tf_font::glyphs_for(size_t size, const std::string &u8str
   FT_Set_Pixel_Sizes(face, 0, size);
   FT_GlyphSlot g = face->glyph;
 
+  std::u32string u32str = u8to32(u8str);
+
   std::vector<glyph_bmp> glyphs;
-  for (const auto &ch : u8str) {
+  for (const char32_t ch : u32str) {
     if (FT_Load_Char(face, ch, FT_LOAD_RENDER)) {
       fprintf(stderr, "Loading character %c failed!\n", ch);
       continue;
@@ -187,6 +190,7 @@ FT_Library tf_font::ft_library() {
 
 text text::make(tf_atlas &ch_atlas, const std::string &str) {
 
+  std::u32string u32str = u8to32(str);
 
   struct coords_point {
     float x;
@@ -224,10 +228,10 @@ text text::make(tf_atlas &ch_atlas, const std::string &str) {
 
   float x = 0;
   float y = 0;
-  std::vector<coords_point> coords(6*str.size());
+  std::vector<coords_point> coords(6*u32str.size());
 
   int c = 0;
-  for (char ch : str) {
+  for (char32_t ch : u32str) {
     const glyph_tf ci = ch_atlas[ch];
 
     float x2 = x + ci.left;
