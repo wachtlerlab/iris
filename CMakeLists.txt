@@ -141,3 +141,11 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/play.cc")
   add_executable(iris-play EXCLUDE_FROM_ALL play.cc)
   target_link_libraries(iris-play iris)
 endif()
+
+########################################
+# Status
+MESSAGE("===============================")
+MESSAGE("Configuration:")
+MESSAGE("Freetype:")
+MESSAGE("\tinc: ${FREETYPE_INCLUDE_DIRS}")
+MESSAGE("\tlib: ${FREETYPE_LIBRARIES}")
