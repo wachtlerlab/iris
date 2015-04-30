@@ -24,6 +24,7 @@ public:
         return file(loc + maybesep + name);
     }
 
+
 private:
     std::string loc;
 };
@@ -36,7 +37,7 @@ public:
     typedef const value_type *pointer;
     typedef const value_type &reference;
 
-    dir_iterator(const file &fd) : parent(fd), dirp(nullptr), entry(nullptr) {
+    dir_iterator(const file &fd) : basepath(fd.path()), dirp(nullptr), entry(nullptr) {
 
         DIR *dfd = opendir(fd.path().c_str());
         if (dfd) {
@@ -45,7 +46,7 @@ public:
         }
     }
 
-    dir_iterator() : parent(), dirp(nullptr), entry(nullptr) { }
+    dir_iterator() : basepath(), dirp(nullptr), entry(nullptr) { }
 
 
     dir_iterator& operator++() {
@@ -60,7 +61,7 @@ public:
     }
 
     file operator*() const {
-        return parent.child(entry->d_name);
+        return file(basepath).child(entry->d_name);
     }
 
     bool operator==(const dir_iterator &o) const {
@@ -89,7 +90,7 @@ private:
     }
 
 private:
-    file parent;
+    std::string basepath;
     std::shared_ptr<DIR> dirp;
     struct dirent *entry;
     struct dirent  buffer;
