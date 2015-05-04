@@ -1,6 +1,8 @@
 
 #include <fs.h>
 
+#include <sys/stat.h>
+
 namespace fs {
 
 dir_iterator::dir_iterator(const file &fd) : dir_iterator(fd.path()) {
@@ -25,6 +27,20 @@ void dir_iterator::next() {
     do {
         readdir_r(dirp.get(), &buffer, &entry);
     } while(entry != nullptr && (!show_hidden && entry->d_name[0] == '.'));
+}
+
+
+/// file
+
+file file::make_dir(const std::string &path) {
+
+    int res = mkdir(path.c_str(), 0777);
+
+    if (res) {
+        throw std::runtime_error("Could not create directory");
+    }
+
+    return file(path);
 }
 
 }

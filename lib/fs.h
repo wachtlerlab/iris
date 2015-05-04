@@ -93,6 +93,10 @@ public:
     dir_enum children() const {
         return dir_enum(loc);
     }
+
+    static file make_dir(const std::string &path);
+
+
 private:
     std::string loc;
 };
