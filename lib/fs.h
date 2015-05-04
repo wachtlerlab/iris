@@ -78,6 +78,21 @@ public:
     }
 
 
+    // *******************
+    // directory functions
+
+    struct dir_enum {
+
+        dir_enum(const std::string &path) : path(path) { }
+        dir_iterator begin() {  return dir_iterator(path);  }
+        dir_iterator end() { return dir_iterator{}; }
+
+        std::string path;
+    };
+
+    dir_enum children() const {
+        return dir_enum(loc);
+    }
 private:
     std::string loc;
 };
