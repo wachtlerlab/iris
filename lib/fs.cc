@@ -2,6 +2,7 @@
 #include <fs.h>
 
 #include <sys/stat.h>
+#include <unistd.h>
 
 namespace fs {
 
@@ -41,6 +42,16 @@ file file::make_dir(const std::string &path) {
     }
 
     return file(path);
+}
+
+bool file::access(int mode) {
+    return ::access(loc.c_str(), mode) == 0;
+}
+
+bool file::exists() {
+    struct stat buf;
+    int res = stat(loc.c_str(), &buf);
+    return res == 0;
 }
 
 }

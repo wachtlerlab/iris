@@ -77,6 +77,10 @@ public:
         return file(loc + maybesep + name);
     }
 
+    bool access(int mode);
+
+    bool exists();
+
 
     // *******************
     // directory functions
