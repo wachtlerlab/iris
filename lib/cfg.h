@@ -5,12 +5,55 @@
 #include <vector>
 #include <cstdint>
 
-#include "dkl.h"
+#include <dkl.h>
+#include <fs.h>
+#include <spectra.h>
+
 
 namespace iris {
 namespace cfg {
 
+struct monitor {
+    std::string id;
+
+    std::string name;
+    std::string type;
+
+    std::string note;
+};
+
+struct mode {
+    std::string id;
+
+    //physical size in mm
+    float phy_width;
+    float phy_height;
+
+    //resolution in px
+    float res_width;
+    float res_height;
+
+    float refresh;
+    int   cdepth; //color-depth
+};
+
+
+// color-calibrated screen
+struct cc_screen {
+    std::string id;
+
+    std::string profile;
+
+    monitor selected_monitor;
+    mode    selected_mode;
+
+    dkl::parameter rgb2lms;
+    std::string    calibation_id;
+};
+
+
 struct isoslant {
+    std::string id;
 
     double dl;
     double phi;
@@ -22,31 +65,6 @@ struct isoslant {
 };
 
 
-struct monitor {
-    std::string id;
-    std::string name;
-
-    int64_t timestamp;
-
-    std::string note;
-
-    //for which subsystem was
-    //configration made, (i.e. gl)
-    std::string gfx;
-
-    //physical size in mm
-    float phy_width;
-    float phy_height;
-
-    //resolution in px
-    float res_width;
-    float res_height;
-
-    //calibration stuff
-    dkl::parameter rgb2lms;
-};
-
-
 struct subject {
     std::string id;
 
@@ -54,6 +72,17 @@ struct subject {
     std::string name;
 };
 
+
+///
+
+/* possible dir layout:
+ *     / monitors / __ID__ / device.monitor (or __ID__.monitor)
+ *                         / 1024x1200@85:1.mode
+ *                         / default.mode -> 1024x1200@85:1.mode [symlink]
+ *   						/ __MODE__-DATETIME#1.rgb2lms
+ *   						/ __MODE__-DATETIME#1.rgb2lms
+ *               / default -> __ID __ [symlink]
+ */
 
 
 } //iris::cfg
