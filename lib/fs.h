@@ -105,6 +105,18 @@ private:
     std::string loc;
 };
 
+
+class fn_matcher {
+public:
+    fn_matcher(const std::string pattern, int flags = 0);
+    bool operator()(const std::string &str_to_match);
+    bool operator()(const fs::file &the_file);
+
+private:
+    std::string pattern;
+    int flags;
+};
+
 }
 
 

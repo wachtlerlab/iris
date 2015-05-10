@@ -3,6 +3,7 @@
 
 #include <sys/stat.h>
 #include <unistd.h>
+#include <fnmatch.h>
 
 namespace fs {
 
@@ -54,4 +55,26 @@ bool file::exists() {
     return res == 0;
 }
 
+
+fn_matcher::fn_matcher(const std::string pattern, int flags)
+        :pattern(pattern), flags(flags) {
+
+}
+
+bool fn_matcher::operator()(const std::string &str_to_match) {
+    int res = ::fnmatch(pattern.c_str(), str_to_match.c_str(), flags);
+
+    if (res == 0) {
+        return true;
+    } else if (res == FNM_NOMATCH) {
+        return false;
+    } else {
+        throw std::runtime_error("Error while calling fnmatch(3)");
+    }
+}
+
+
+bool fn_matcher::operator()(const fs::file &the_file) {
+    return this->operator()(the_file.path()); //FIXME: should be name()
+}
 }
