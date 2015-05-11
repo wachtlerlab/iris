@@ -22,7 +22,7 @@ public:
     const std::string &identifier() const { return id; }
     uint64_t revision() const { return rev; };
 
-    std::string uid() const {
+    virtual std::string uid() const {
         char buf[1024] = {0, };
         snprintf(buf, sizeof(buf), "%llu@%s", rev, id.c_str());
         return std::string(buf);
@@ -36,6 +36,7 @@ private:
     uint64_t    rev;
 };
 
+// hardware data
 
 class monitor : public entity {
 public:
