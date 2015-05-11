@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <fnmatch.h>
 #include <libgen.h>
+#include <pwd.h>
+#include <vector>
 
 namespace fs {
 
@@ -78,6 +80,30 @@ file file::current_directory() {
 }
 
 
+file file::home_directory() {
+    char *home = getenv("HOME");
+
+    if (home != nullptr) {
+        return file(std::string(home));
+    }
+
+    long bytes = sysconf(_SC_GETPW_R_SIZE_MAX);
+
+    if (bytes == -1) {
+        throw std::runtime_error("Unable do deterime buffer size");
+    }
+
+    std::vector<char> buffer(static_cast<size_t>(bytes), 0);
+
+    struct passwd pw, *pw_res;
+    int res = getpwuid_r(getuid(), &pw, buffer.data(), buffer.size(), &pw_res);
+
+    if (res != 0) {
+        throw std::runtime_error("Unable do obtain getpwuid_r data");
+    }
+
+    return fs::file(std::string(pw_res->pw_dir));
+}
 
 fn_matcher::fn_matcher(const std::string pattern, int flags)
         :pattern(pattern), flags(flags) {
