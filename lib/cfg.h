@@ -13,7 +13,7 @@
 namespace iris {
 namespace cfg {
 
-struct entity {
+class entity {
 public:
 
     entity() : id(""), rev(0) {}
@@ -37,27 +37,53 @@ private:
 };
 
 
-struct monitor {
-    std::string id;
+class monitor : public entity {
+public:
 
+    monitor(const std::string &id, uint64_t rev) : entity(id, rev) { }
+
+    const std::string &display_name() const { return name; }
+    const std::string &notes() const { return note; }
+    const std::string &monitor_type() const { return type; };
+
+private:
     std::string name;
     std::string type;
-
     std::string note;
 };
 
-struct mode {
-    std::string id;
+//TODO: move to base library
+template<typename T>
+struct extent_t {
 
+    extent_t() : width(T(0)), height(T(0)) {}
+    extent_t(T w, T h) : width(w), height(h) {}
+
+    T width;
+    T height;
+};
+
+typedef extent_t<float> extent_f;
+
+class mode : public entity {
+public:
+
+    mode(const std::string &id, uint64_t rev) : entity(id, rev) { }
+
+    const extent_f& size() const { return phy_size; }
+    const extent_f& resolution() const { return res; }
+
+    float refresh_rate() const { return refresh; }
+    int color_depth() const { return cdepth; }
+
+private:
     //physical size in mm
-    float phy_width;
-    float phy_height;
+    extent_f phy_size;
 
     //resolution in px
-    float res_width;
-    float res_height;
+    extent_f res;
 
-    float refresh;
+    float refresh; // refresh rate of monitor in Hz
     int   cdepth; //color-depth
 };
 
