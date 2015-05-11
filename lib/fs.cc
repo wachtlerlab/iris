@@ -65,6 +65,20 @@ bool file::exists() {
 }
 
 
+file file::current_directory() {
+    char buf[PATH_MAX] = {0, };
+
+    char *res = ::getcwd(buf, sizeof(buf));
+
+    if (res == nullptr) {
+        throw std::runtime_error("Could not get current work dir");
+    }
+
+    return fs::file(res);
+}
+
+
+
 fn_matcher::fn_matcher(const std::string pattern, int flags)
         :pattern(pattern), flags(flags) {
 

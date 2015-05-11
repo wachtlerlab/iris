@@ -82,6 +82,12 @@ public:
 
     bool exists();
 
+    // obtain files
+
+    static file current_directory();
+
+    //
+
 
     // *******************
     // directory functions
