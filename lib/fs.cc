@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fnmatch.h>
+#include <libgen.h>
 
 namespace fs {
 
@@ -33,6 +34,14 @@ void dir_iterator::next() {
 
 
 /// file
+
+std::string file::name() const {
+    char *p = strdup(loc.c_str());
+    char *n = basename(p);
+    std::string res(n);
+    free(p);
+    return res;
+}
 
 file file::make_dir(const std::string &path) {
 

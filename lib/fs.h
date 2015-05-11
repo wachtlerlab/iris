@@ -67,6 +67,7 @@ public:
     file() : loc("") { }
     file(const std::string &path) : loc(path) { }
     const std::string &path() const { return loc; }
+    std::string name() const;
 
     file child(const std::string &name) const {
         if (name.empty() || loc.empty()) {
