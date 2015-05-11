@@ -155,10 +155,16 @@ struct subject {
 class store {
 public:
 
+    static store default_store();
+
     monitor default_monitor() const;
     mode default_mode(const monitor &for_monitor) const;
     calibration selected_calibration(const mode &mode) const;
 
+    monitor load_monitor(const std::string &id) const;
+    mode load_mode(const std::string &monitor_id, const std::string &mode_id) const;
+
+    calibration load_calibration(const std::string &monitor_id, const std::string &calibration_id);
 
 
 private:
