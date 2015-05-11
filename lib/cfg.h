@@ -68,7 +68,6 @@ typedef extent_t<float> extent_f;
 
 class mode : public entity {
 public:
-
     mode(const std::string &id, uint64_t rev) : entity(id, rev) { }
 
     const extent_f& size() const { return phy_size; }
@@ -89,19 +88,32 @@ private:
 };
 
 
-// color-calibrated screen
-struct cc_screen {
-    std::string id;
+struct calibration : public entity {
+public:
+    calibration(const std::string &id, uint64_t ctime) : entity(id, ctime) { }
 
-    std::string profile;
+    const std::string profile() const { return profile_id; }
+    const dkl::parameter& parameter() const { return rgb2lms; };
 
-    monitor selected_monitor;
-    mode    selected_mode;
+    const std::string monitor_uid() const { return monitor_id; }
+    const std::string mode_uid() const { return mode_id; };
 
+    virtual std::string uid() const override {
+        //FIXME: format should be __MODE__@__DATETIME
+        char buf[1024] = {0, };
+        snprintf(buf, sizeof(buf), "%llu@%s", revision(), identifier().c_str());
+        return std::string(buf);
+    }
+
+private:
+    std::string mode_id;
+    std::string monitor_id;
+    std::string profile_id;
     dkl::parameter rgb2lms;
-    std::string    calibation_id;
 };
 
+
+// subject data
 
 struct isoslant {
     std::string id;
@@ -130,11 +142,23 @@ struct subject {
  *     / monitors / __ID__ / device.monitor (or __ID__.monitor)
  *                         / 1024x1200:85$1.mode
  *                         / default.mode -> 1024x1200:5$1.mode [symlink]
- *   						/ __MODE__@DATETIME#1.rgb2lms
- *   						/ __MODE__@DATETIME#1.rgb2lms
+ *   						/ __MODE__@DATETIME_0.rgb2lms
+ *   						/ __MODE__@DATETIME_1.rgb2lms
  *               / default -> __ID __ [symlink]
  */
 
+class store {
+public:
+
+    monitor default_monitor() const;
+    mode default_mode(const monitor &for_monitor) const;
+    calibration selected_calibration(const mode &mode) const;
+
+
+
+private:
+    fs::file loc;
+};
 
 } //iris::cfg
 } //iris::
