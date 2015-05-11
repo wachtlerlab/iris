@@ -84,6 +84,6 @@ bool fn_matcher::operator()(const std::string &str_to_match) {
 
 
 bool fn_matcher::operator()(const fs::file &the_file) {
-    return this->operator()(the_file.path()); //FIXME: should be name()
+    return this->operator()(the_file.name());
 }
 }
