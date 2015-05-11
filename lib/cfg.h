@@ -70,6 +70,8 @@ class mode : public entity {
 public:
     mode(const std::string &id, uint64_t rev) : entity(id, rev) { }
 
+    const std::string monitor() const { return monitor_uid; }
+
     const extent_f& size() const { return phy_size; }
     const extent_f& resolution() const { return res; }
 
@@ -77,6 +79,9 @@ public:
     int color_depth() const { return cdepth; }
 
 private:
+    // the monitor this mode belongs to
+    std::string monitor_uid;
+
     //physical size in mm
     extent_f phy_size;
 
@@ -95,8 +100,8 @@ public:
     const std::string profile() const { return profile_id; }
     const dkl::parameter& parameter() const { return rgb2lms; };
 
-    const std::string monitor_uid() const { return monitor_id; }
-    const std::string mode_uid() const { return mode_id; };
+    const std::string monitor() const { return monitor_id; }
+    const std::string mode() const { return mode_id; };
 
     virtual std::string uid() const override {
         //FIXME: format should be __MODE__@__DATETIME
