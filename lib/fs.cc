@@ -76,6 +76,8 @@ file file::current_directory() {
         throw std::runtime_error("Could not get current work dir");
     }
 
+    //result *must* be an absolute path
+
     return fs::file(res);
 }
 
@@ -103,6 +105,11 @@ file file::home_directory() {
     }
 
     return fs::file(std::string(pw_res->pw_dir));
+}
+
+
+bool file::path_is_absolute(const std::string &path) {
+    return !path.empty() && path[0] == '/';
 }
 
 fn_matcher::fn_matcher(const std::string pattern, int flags)

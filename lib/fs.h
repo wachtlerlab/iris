@@ -107,6 +107,10 @@ public:
 
     static file make_dir(const std::string &path);
 
+    // *******************
+    // path related utils
+
+    static bool path_is_absolute(const std::string &path);
 
 private:
     std::string loc;
