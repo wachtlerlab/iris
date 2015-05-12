@@ -78,7 +78,13 @@ file file::current_directory() {
 
     //result *must* be an absolute path
 
-    return fs::file(res);
+    std::string path(res);
+
+    if (!path_is_absolute(path)) {
+        throw std::runtime_error("current work dir path is relative!");
+    }
+
+    return fs::file(path);
 }
 
 
