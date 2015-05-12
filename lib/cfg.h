@@ -13,110 +13,68 @@
 namespace iris {
 namespace cfg {
 
-class entity {
-public:
+struct entity {
 
-    entity() : id(""), rev(0) {}
-    entity(const std::string &id, uint64_t rev) : id(id), rev(rev) {}
+    entity() : my_id("") { }
+    entity(std::string the_id) : my_id(the_id) { }
 
-    const std::string &identifier() const { return id; }
-    uint64_t revision() const { return rev; };
+    virtual std::string identifier() const { return my_id; }
+    virtual std::string qualified_id() const { return my_id; };
 
-    virtual std::string uid() const {
-        char buf[1024] = {0, };
-        snprintf(buf, sizeof(buf), "%llu@%s", rev, id.c_str());
-        return std::string(buf);
-    }
-
-    explicit operator bool() const { return !id.empty(); }
-
-
-private:
-    std::string id;
-    uint64_t    rev;
+protected:
+    std::string my_id;
 };
 
-// hardware data
 
-class monitor : public entity {
-public:
+struct monitor : public entity {
 
-    monitor(const std::string &id, uint64_t rev) : entity(id, rev) { }
-
-    const std::string &display_name() const { return name; }
-    const std::string &notes() const { return note; }
-    const std::string &monitor_type() const { return type; };
-
-private:
+    std::string vendor;
     std::string name;
-    std::string type;
-    std::string note;
+    std::string year;
+    std::string notes;
+
+    struct mode {
+        float width;  // in px
+        float height;
+
+        float refresh; //in Hz
+
+        //color depth
+        int r, g, b;
+    };
+
+    mode default_mode;
 };
 
-//TODO: move to base library
-template<typename T>
-struct extent_t {
-
-    extent_t() : width(T(0)), height(T(0)) {}
-    extent_t(T w, T h) : width(w), height(h) {}
-
-    T width;
-    T height;
+struct monitor_settings : public entity {
+    std::string operator[](const std::string &key) const;
 };
 
-typedef extent_t<float> extent_f;
-
-class mode : public entity {
-public:
-    mode(const std::string &id, uint64_t rev) : entity(id, rev) { }
-
-    const std::string monitor() const { return monitor_uid; }
-
-    const extent_f& size() const { return phy_size; }
-    const extent_f& resolution() const { return res; }
-
-    float refresh_rate() const { return refresh; }
-    int color_depth() const { return cdepth; }
-
-private:
-    // the monitor this mode belongs to
-    std::string monitor_uid;
-
-    //physical size in mm
-    extent_f phy_size;
-
-    //resolution in px
-    extent_f res;
-
-    float refresh; // refresh rate of monitor in Hz
-    int   cdepth; //color-depth
-};
-
-
-struct calibration : public entity {
-public:
-    calibration(const std::string &id, uint64_t ctime) : entity(id, ctime) { }
-
-    const std::string profile() const { return profile_id; }
-    const dkl::parameter& parameter() const { return rgb2lms; };
-
-    const std::string monitor() const { return monitor_id; }
-    const std::string mode() const { return mode_id; };
-
-    virtual std::string uid() const override {
-        //FIXME: format should be __MODE__@__DATETIME
-        char buf[1024] = {0, };
-        snprintf(buf, sizeof(buf), "%llu@%s", revision(), identifier().c_str());
-        return std::string(buf);
-    }
-
-private:
-    std::string mode_id;
+struct display {
     std::string monitor_id;
-    std::string profile_id;
-    dkl::parameter rgb2lms;
+    std::string settings_id;
+
+    struct hw {
+        std::string uid;
+        std::string link;
+        std::string card;
+    };
+
+    hw platform;
+
+    std::string   gfx;
+    monitor::mode mode;
 };
 
+struct rgb2lms : public entity {
+
+    float width; //screen width in mm
+    float height; //screen width in mm
+
+    display dsy;
+
+    dkl::parameter dkl_params;
+};
 
 // subject data
 
@@ -154,18 +112,6 @@ struct subject {
 
 class store {
 public:
-
-    static store default_store();
-
-    monitor default_monitor() const;
-    mode default_mode(const monitor &for_monitor) const;
-    calibration selected_calibration(const mode &mode) const;
-
-    monitor load_monitor(const std::string &id) const;
-    mode load_mode(const std::string &monitor_id, const std::string &mode_id) const;
-
-    calibration load_calibration(const std::string &monitor_id, const std::string &calibration_id);
-
 
 private:
     fs::file loc;
