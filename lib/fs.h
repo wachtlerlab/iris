@@ -65,7 +65,7 @@ class file {
 
 public:
     file() : loc("") { }
-    file(const std::string &path) : loc(path) { }
+    file(const std::string &path);
     const std::string &path() const { return loc; }
     std::string name() const;
 

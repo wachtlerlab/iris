@@ -37,6 +37,17 @@ void dir_iterator::next() {
 
 /// file
 
+file::file(const std::string &path) : loc(path) {
+    if (!path_is_absolute(loc)) {
+        file cwd = current_directory();
+        file child = cwd.child(loc);
+        loc = child.path();
+    }
+
+    //TODO: make path canonical
+
+}
+
 std::string file::name() const {
     char *p = strdup(loc.c_str());
     char *n = basename(p);
