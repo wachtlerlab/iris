@@ -97,20 +97,32 @@ struct subject {
 
 /* possible dir layout:
  *     / monitors / __ID__ / device.monitor (or __ID__.monitor)
- *                         / 1024x1200:85$1.mode
- *                         / default.mode -> 1024x1200:5$1.mode [symlink]
- *   						/ __MODE__@DATETIME_0.rgb2lms
- *   						/ __MODE__@DATETIME_1.rgb2lms
+ *                         / __DATETIME__.settings
+ *                         / __DATETIME__.rgb2lms
  *               / default -> __ID __ [symlink]
+ *     / links.cfg
  */
 
 class store {
 public:
 
+    static store default_store();
 
+
+    monitor load_monitor(const std::string &uid) const;
+    monitor default_monitor(const std::string &uid) const;
+
+
+    rgb2lms load_rgb2lms(const display &display) const;
+
+
+    display make_display(const monitor &monitor, const monitor::mode &mode) const;
 
 private:
-    fs::file loc;
+    store(const fs::file &path);
+
+private:
+    fs::file base;
 };
 
 } //iris::cfg
