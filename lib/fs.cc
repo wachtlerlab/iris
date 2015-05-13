@@ -77,6 +77,29 @@ bool file::exists() {
     return res == 0;
 }
 
+file file::readlink() const {
+
+    std::vector<char> buffer(1024, 0);
+
+    ssize_t res = -1;
+    bool try_again = false;
+    do {
+        res = ::readlink(loc.c_str(), buffer.data(), buffer.size());
+
+        if (res > 0 && buffer.size() == res) {
+            buffer.resize(buffer.size() * 2);
+            std::fill(buffer.begin(), buffer.end(), 0);
+            try_again = true;
+        }
+
+    } while (try_again);
+
+    if (res < 0) {
+        throw std::runtime_error("Could not read the link");
+    }
+
+    return file(std::string(buffer.data()));
+}
 
 file file::current_directory() {
     char buf[PATH_MAX] = {0, };

@@ -82,6 +82,8 @@ public:
 
     bool exists();
 
+    file readlink() const;
+
     // obtain files
 
     static file current_directory();
