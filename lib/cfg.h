@@ -44,23 +44,17 @@ struct monitor : public entity {
     };
 
     mode default_mode;
-};
 
-struct monitor_settings : public entity {
-    std::string operator[](const std::string &key) const;
+    struct settings : public entity {
+        std::string operator[](const std::string &key) const;
+    };
+
 };
 
 struct display {
     std::string monitor_id;
     std::string settings_id;
-
-    struct hw {
-        std::string uid;
-        std::string link;
-        std::string card;
-    };
-
-    hw platform;
+    std::string link_id;
 
     std::string   gfx;
     monitor::mode mode;
@@ -112,6 +106,8 @@ struct subject {
 
 class store {
 public:
+
+
 
 private:
     fs::file loc;
