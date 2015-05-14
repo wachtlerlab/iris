@@ -108,11 +108,11 @@ public:
 
     static store default_store();
 
-
+    //monitor functions
+    std::string default_monitor() const;
     monitor load_monitor(const std::string &uid) const;
-    monitor default_monitor(const std::string &uid) const;
 
-
+    //calibration functions
     rgb2lms load_rgb2lms(const display &display) const;
 
 
