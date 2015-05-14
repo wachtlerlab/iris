@@ -76,6 +76,19 @@ iris::cfg::monitor iris::cfg::store::yaml2monitor(const std::string &data) {
     return monitor;
 }
 
+static void emit_mode(const monitor::mode &mode, YAML::Emitter &out) {
+    out << YAML::BeginMap;
+    out << "width" << mode.width;
+    out << "height" << mode.height;
+    out << "refresh" << mode.refresh;
+    out << "color-depth";
+    out << YAML::Flow;
+    out << YAML::BeginSeq << mode.r << mode.g << mode.b << YAML::EndSeq;
+
+    out << YAML::EndMap; //color-depth
+    out << YAML::EndMap; //mode
+}
+
 std::string iris::cfg::store::monitor2yaml(const iris::cfg::monitor &monitor) {
     YAML::Emitter out;
 
