@@ -4,6 +4,7 @@
 
 namespace iris {
 namespace cfg {
+
 iris::cfg::store iris::cfg::store::default_store() {
 
     fs::file home = fs::file::home_directory();
@@ -38,6 +39,28 @@ iris::cfg::monitor iris::cfg::store::load_monitor(const std::string &uid) const 
     return yaml2monitor(mfs.read_all());
 }
 
+
+display store::make_display(const monitor       &monitor,
+                            const monitor::mode &mode,
+                            const std::string   &gfx) const
+{
+
+    fs::file linkfile = base.child("links.cfg");
+    std::string data = linkfile.read_all();
+    YAML::Node root = YAML::Load(data);
+
+    YAML::Node gfx_node = root[gfx];
+    YAML::Node link_node = gfx_node[monitor.identifier()];
+
+    std::string link_id = link_node.as<std::string>();
+
+    display dsp;
+    dsp.link_id = link_id;
+    dsp.monitor_id = monitor.identifier();
+    dsp.mode = mode;
+
+    return dsp;
+}
 
 // yaml stuff
 
@@ -102,20 +125,30 @@ std::string iris::cfg::store::monitor2yaml(const iris::cfg::monitor &monitor) {
     out << "year" << monitor.year;
 
     out << "preferred_mode";
-    out << YAML::BeginMap;
-    out << "width" << monitor.default_mode.width;
-    out << "height" << monitor.default_mode.height;
-    out << "refresh" << monitor.default_mode.refresh;
-    out << "color-depth";
-    out << YAML::Flow;
-    out << YAML::BeginSeq << monitor.default_mode.r
-                          << monitor.default_mode.g
-                          << monitor.default_mode.b
-        << YAML::EndSeq;
-
-    out << YAML::EndMap; //color-depth
-    out << YAML::EndMap; //preferred_mode
+    emit_mode(monitor.default_mode, out);
     out << YAML::EndMap; //monitor
+
+    return std::string(out.c_str());
+}
+
+
+std::string store::display2yaml(const display &display) {
+    YAML::Emitter out;
+
+    out << YAML::BeginMap;
+    out << "display";
+
+    out << YAML::BeginMap;
+    out << "monitor_id" << display.monitor_id;
+    out << "settings_id" << display.settings_id;
+    out << "link_id" << display.link_id;
+
+    out << "gfx" << display.gfx;
+    out << "mode";
+    emit_mode(display.mode, out);
+
+    out << YAML::EndMap; //
+    out << YAML::EndMap; //display
 
     return std::string(out.c_str());
 }

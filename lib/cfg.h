@@ -118,13 +118,14 @@ public:
     rgb2lms load_rgb2lms(const display &display) const;
 
 
-    display make_display(const monitor &monitor, const monitor::mode &mode) const;
+    display make_display(const monitor &monitor, const monitor::mode &mode, const std::string &gfx) const;
 
 
     // yaml config IO
 
     static monitor yaml2monitor(const std::string &data);
     static std::string monitor2yaml(const monitor &monitor);
+    static std::string display2yaml(const display &display);
 
 private:
     store(const fs::file &path);
