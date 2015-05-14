@@ -84,6 +84,10 @@ public:
 
     file readlink() const;
 
+    // IO
+
+    std::string read_all() const;
+
     // obtain files
 
     static file current_directory();

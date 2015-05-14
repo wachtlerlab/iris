@@ -7,6 +7,7 @@
 #include <libgen.h>
 #include <pwd.h>
 #include <vector>
+#include <fstream>
 
 namespace fs {
 
@@ -99,6 +100,26 @@ file file::readlink() const {
     }
 
     return file(std::string(buffer.data()));
+}
+
+
+std::string file::read_all() const {
+    std::ifstream fd(loc, std::ios::in | std::ios::ate);
+
+    if (!fd.is_open()) {
+        throw std::runtime_error("Could not open file for reading");
+    }
+
+    std::streampos size = fd.tellg();
+    std::vector<char> data(static_cast<size_t>(size));
+    fd.seekg(0, std::ios::beg);
+    fd.read(data.data(), data.size());
+
+    if (!fd.good()) {
+        throw std::runtime_error("Error while reading data from file");
+    }
+
+    return std::string(data.data(), data.size());
 }
 
 file file::current_directory() {
