@@ -124,6 +124,7 @@ public:
     // yaml config IO
 
     static monitor yaml2monitor(const std::string &data);
+    static std::string monitor2yaml(const monitor &monitor);
 
 private:
     store(const fs::file &path);

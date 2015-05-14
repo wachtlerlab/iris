@@ -73,3 +73,34 @@ iris::cfg::monitor iris::cfg::store::yaml2monitor(const std::string &data) {
 
     return monitor;
 }
+
+std::string iris::cfg::store::monitor2yaml(const iris::cfg::monitor &monitor) {
+    YAML::Emitter out;
+
+    out << YAML::BeginMap;
+    out << "monitor";
+
+    out << YAML::BeginMap;
+    out << "id" << monitor.identifier();
+    out << "name" << monitor.name;
+    out << "vendor" << monitor.vendor;
+    out << "year" << monitor.year;
+
+    out << "preferred_mode";
+    out << YAML::BeginMap;
+    out << "width" << monitor.default_mode.width;
+    out << "height" << monitor.default_mode.height;
+    out << "refresh" << monitor.default_mode.refresh;
+    out << "color-depth";
+    out << YAML::Flow;
+    out << YAML::BeginSeq << monitor.default_mode.r
+                          << monitor.default_mode.g
+                          << monitor.default_mode.b
+        << YAML::EndSeq;
+
+    out << YAML::EndMap; //color-depth
+    out << YAML::EndMap; //preferred_mode
+    out << YAML::EndMap; //monitor
+
+    return std::string(out.c_str());
+}
