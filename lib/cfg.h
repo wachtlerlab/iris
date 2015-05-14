@@ -28,6 +28,8 @@ protected:
 
 struct monitor : public entity {
 
+    using entity::entity;
+
     std::string vendor;
     std::string name;
     std::string year;
@@ -117,6 +119,11 @@ public:
 
 
     display make_display(const monitor &monitor, const monitor::mode &mode) const;
+
+
+    // yaml config IO
+
+    static monitor yaml2monitor(const std::string &data);
 
 private:
     store(const fs::file &path);
