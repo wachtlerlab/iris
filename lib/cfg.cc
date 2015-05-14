@@ -2,6 +2,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+namespace iris {
+namespace cfg {
 iris::cfg::store iris::cfg::store::default_store() {
 
     fs::file home = fs::file::home_directory();
@@ -104,3 +106,7 @@ std::string iris::cfg::store::monitor2yaml(const iris::cfg::monitor &monitor) {
 
     return std::string(out.c_str());
 }
+
+
+} //iris::cfg::
+} //iris::
