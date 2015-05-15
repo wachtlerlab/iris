@@ -219,5 +219,30 @@ std::string store::display2yaml(const display &display) {
 }
 
 
+std::string store::rgb2lms2yaml(const rgb2lms &rgb2lms) {
+    YAML::Emitter out;
+
+    out << YAML::BeginMap;
+    out << "rgb2lms";
+    out << YAML::BeginMap;
+    out << "id" << rgb2lms.identifier();
+    out << "size" << YAML::BeginMap;
+    out << "width" << rgb2lms.width;
+    out << "height" << rgb2lms.height;
+    out << YAML::EndMap; // size
+
+    out << "display";
+    emit_display(rgb2lms.dsy, out);
+
+    std::stringstream buffer;
+    rgb2lms.dkl_params.print(buffer);
+
+    out << "dkl" << YAML::Literal << buffer.str();
+
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+
+    return std::string(out.c_str());
+}
 } //iris::cfg::
 } //iris::

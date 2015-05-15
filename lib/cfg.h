@@ -129,6 +129,7 @@ public:
     static rgb2lms yaml2rgb2lms(const std::string &data);
     static std::string monitor2yaml(const monitor &monitor);
     static std::string display2yaml(const display &display);
+    static std::string rgb2lms2yaml(const rgb2lms &rgb2lms);
 
 private:
     store(const fs::file &path);
