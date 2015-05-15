@@ -89,6 +89,7 @@ public:
     // IO
 
     std::string read_all() const;
+    void write_all(const std::string &data);
 
     // obtain files
 

@@ -135,6 +135,24 @@ std::string file::read_all() const {
     return std::string(data.data(), data.size());
 }
 
+
+void file::write_all(const std::string &data) {
+
+    bool file_exists = exists();
+    // todo: do atomic replace
+    //       make temp with mkstemp, write, rename
+    std::string filepath = loc;
+
+    std::ofstream fd(loc, std::ios::binary | std::ios::trunc);
+    fd.write(data.c_str(), data.size());
+    fd.close();
+
+    if (!fd.good()) {
+        throw std::runtime_error("Error wile writing data to file");
+    }
+
+}
+
 file file::current_directory() {
     char buf[PATH_MAX] = {0, };
 
