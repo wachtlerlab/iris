@@ -40,6 +40,40 @@ iris::cfg::monitor iris::cfg::store::load_monitor(const std::string &uid) const 
 }
 
 
+rgb2lms store::load_rgb2lms(const display &display) const {
+
+    // need to find the latest calibration that fits the display
+
+    fs::file mdir = base.child(display.monitor_id);
+    std::cout << mdir.path() << std::endl;
+
+    std::vector<fs::file> res;
+    std::copy_if(mdir.children().begin(), mdir.children().end(),
+              std::back_inserter(res), fs::fn_matcher("*.rgb2sml"));
+
+    std::sort(res.begin(), res.end(), [](const fs::file &a, const fs::file &b) {
+        return a.name() > b.name();
+    });
+
+    for (const fs::file f : res) {
+        std::string data = f.read_all();
+        rgb2lms ca = yaml2rgb2lms(data);
+
+        const struct display &d = ca.dsy;
+
+        if (d.monitor_id      == display.monitor_id &&
+                d.settings_id == display.settings_id &&
+                d.link_id     == display.link_id &&
+                d.gfx         == d.gfx) {
+
+            //FIXME:: check mode too
+            return ca;
+        }
+    }
+
+    throw std::runtime_error("Could not find any matching rgb2lms matrix");
+}
+
 display store::make_display(const monitor       &monitor,
                             const monitor::mode &mode,
                             const std::string   &gfx) const
@@ -80,8 +114,6 @@ static iris::cfg::monitor::mode yaml2mode(const YAML::Node &node) {
 }
 
 iris::cfg::monitor iris::cfg::store::yaml2monitor(const std::string &data) {
-    std::cerr << data << std::endl;
-
     YAML::Node root = YAML::Load(data);
     std::cerr << root.Type() << std::endl;
 
@@ -97,6 +129,39 @@ iris::cfg::monitor iris::cfg::store::yaml2monitor(const std::string &data) {
     monitor.default_mode = yaml2mode(start["preferred_mode"]);
 
     return monitor;
+}
+
+static display yaml2display(const YAML::Node &root) {
+
+    display display;
+    display.gfx = root["gfx"].as<std::string>();
+    display.link_id = root["link_id"].as<std::string>();
+    display.monitor_id = root["monitor_id"].as<std::string>();
+    display.settings_id = root["settings_id"].as<std::string>();
+    display.mode = yaml2mode(root["mode"]);
+
+    return display;
+
+}
+
+static std::pair<float, float> yaml2size(const YAML::Node &root) {
+    float width = root["width"].as<float>();
+    float height = root["height"].as<float>();
+    return std::make_pair(width, height);
+}
+
+rgb2lms store::yaml2rgb2lms(const std::string &data) {
+    YAML::Node doc = YAML::Load(data);
+    YAML::Node root = doc["rgb2lms"];
+
+    rgb2lms calibration(root["id"].as<std::string>());
+    std::tie(calibration.width, calibration.height) = yaml2size(root["size"]);
+    calibration.dsy = yaml2display(root["display"]);
+
+    std::string csv = root["dkl"].as<std::string>();
+    calibration.dkl_params = dkl::parameter::from_csv_data(csv);
+
+    return calibration;
 }
 
 static void emit_mode(const monitor::mode &mode, YAML::Emitter &out) {

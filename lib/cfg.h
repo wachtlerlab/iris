@@ -54,6 +54,7 @@ struct monitor : public entity {
 };
 
 struct display {
+
     std::string monitor_id;
     std::string settings_id;
     std::string link_id;
@@ -63,6 +64,7 @@ struct display {
 };
 
 struct rgb2lms : public entity {
+    using entity::entity;
 
     float width; //screen width in mm
     float height; //screen width in mm
@@ -124,6 +126,7 @@ public:
     // yaml config IO
 
     static monitor yaml2monitor(const std::string &data);
+    static rgb2lms yaml2rgb2lms(const std::string &data);
     static std::string monitor2yaml(const monitor &monitor);
     static std::string display2yaml(const display &display);
 
