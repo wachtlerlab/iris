@@ -78,6 +78,8 @@ public:
         return file(loc + maybesep + name);
     }
 
+    file parent() const;
+
     bool access(int mode);
 
     bool exists();

@@ -57,6 +57,19 @@ std::string file::name() const {
     return res;
 }
 
+
+file file::parent() const {
+    char *p = strdup(loc.c_str());
+    char *n = dirname(p);
+
+    if (n == nullptr || n[0] == '.') {
+        return fs::file();
+    }
+
+    free(p);
+    return fs::file(n);
+}
+
 file file::make_dir(const std::string &path) {
 
     int res = mkdir(path.c_str(), 0777);
