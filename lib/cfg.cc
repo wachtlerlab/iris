@@ -172,8 +172,6 @@ static void emit_mode(const monitor::mode &mode, YAML::Emitter &out) {
     out << "color-depth";
     out << YAML::Flow;
     out << YAML::BeginSeq << mode.r << mode.g << mode.b << YAML::EndSeq;
-
-    out << YAML::EndMap; //color-depth
     out << YAML::EndMap; //mode
 }
 
@@ -196,12 +194,7 @@ std::string iris::cfg::store::monitor2yaml(const iris::cfg::monitor &monitor) {
     return std::string(out.c_str());
 }
 
-
-std::string store::display2yaml(const display &display) {
-    YAML::Emitter out;
-
-    out << YAML::BeginMap;
-    out << "display";
+static void emit_display(const display &display, YAML::Emitter &out) {
 
     out << YAML::BeginMap;
     out << "monitor_id" << display.monitor_id;
@@ -211,9 +204,16 @@ std::string store::display2yaml(const display &display) {
     out << "gfx" << display.gfx;
     out << "mode";
     emit_mode(display.mode, out);
+    out << YAML::EndMap;
+}
 
-    out << YAML::EndMap; //
-    out << YAML::EndMap; //display
+std::string store::display2yaml(const display &display) {
+    YAML::Emitter out;
+
+    out << YAML::BeginMap;
+    out << "display";
+    emit_display(display, out);
+    out << YAML::EndMap; //doc
 
     return std::string(out.c_str());
 }
