@@ -82,14 +82,14 @@ do_dgesdd (char jobz, int m, int n, double *A, int lda, double *s, double *U, in
     }
 
     lwork = (int) cwork;
-    double work[lwork];
+    std::vector<double> work(lwork);
 
     dgesdd_(&jobz,
             &m, &n, A, &lda,
             s,
             U, &ldu,
             Vt, &ldvt,
-            work, &lwork, iwork.data(), &info);
+            work.data(), &lwork, iwork.data(), &info);
 
 
 #else
@@ -328,4 +328,5 @@ rgb dkl::iso_lum(double phi, double c) const {
 
     return sml2rgb(t);
 }
-}
+
+} //iris::
