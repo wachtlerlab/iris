@@ -21,6 +21,7 @@
 #endif
 
 #include <cmath>
+#include "fs.h"
 
 namespace iris {
 
@@ -195,18 +196,20 @@ dkl::parameter dkl::parameter::make_inverse(const dkl::parameter &p) {
     return p_inv;
 }
 
-
-
-dkl::parameter dkl::parameter::from_csv(const std::string &path) {
+dkl::parameter dkl::parameter::from_csv_data(const std::string &data) {
+    typedef csv_iterator<std::string::const_iterator> csv_siterator;
     enum class parse_state : int {
         A_ZERO, A_MAT1, A_MAT2, A_MAT3, GAMMA, FIN
     };
 
-    csv_file fd(path);
     parameter res;
-
     parse_state state = parse_state::A_ZERO;
-    for (const auto &rec : fd) {
+
+    for (auto iter = csv_siterator(data.begin(), data.end(), ',');
+         iter != csv_siterator();
+         ++iter) {
+        auto rec = *iter;
+
         if (rec.is_comment() || rec.is_empty()) {
             continue;
         }
@@ -223,7 +226,7 @@ dkl::parameter dkl::parameter::from_csv(const std::string &path) {
             case parse_state::A_MAT3: dest = res.A + 6;  break;
             case parse_state::GAMMA:  dest = res.gamma;  break;
             case parse_state::FIN:
-            std::cerr << "[W] extra data after parameter data" << std::endl;
+                std::cerr << "[W] extra data after parameter data" << std::endl;
                 return res;
         }
 
@@ -235,6 +238,12 @@ dkl::parameter dkl::parameter::from_csv(const std::string &path) {
     }
 
     return res;
+}
+
+dkl::parameter dkl::parameter::from_csv(const std::string &path) {
+    fs::file fd(path);
+    std::string data = fd.read_all();
+    return from_csv_data(data);
 }
 
 
