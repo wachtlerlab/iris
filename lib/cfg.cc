@@ -123,6 +123,7 @@ display store::make_display(const monitor       &monitor,
     display dsp;
     dsp.link_id = link_id;
     dsp.monitor_id = monitor.identifier();
+    dsp.settings_id = latest_settings(monitor);
     dsp.mode = mode;
 
     return dsp;
