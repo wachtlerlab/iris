@@ -143,12 +143,28 @@ void file::write_all(const std::string &data) {
     //       make temp with mkstemp, write, rename
     std::string filepath = loc;
 
-    std::ofstream fd(loc, std::ios::binary | std::ios::trunc);
+    if (file_exists) {
+        char buffer[1024] = {0, };
+        fs::file parent_dir = parent();
+        snprintf(buffer, sizeof(buffer), "%s/.%sXXXXXX", parent_dir.path().c_str(), name().c_str());
+        filepath = mktemp(buffer);
+    }
+
+    std::ofstream fd(filepath, std::ios::binary | std::ios::trunc);
     fd.write(data.c_str(), data.size());
     fd.close();
 
     if (!fd.good()) {
+        // hmm, clear out temporary file
         throw std::runtime_error("Error wile writing data to file");
+    }
+
+    if (file_exists) {
+        int res = rename(filepath.c_str(), path().c_str());
+        if (res != 0) {
+            unlink(filepath.c_str()); //ignore errors, can't do much
+            throw std::runtime_error("Atomic IO failed (rename)");
+        }
     }
 
 }
