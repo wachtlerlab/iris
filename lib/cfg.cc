@@ -93,10 +93,10 @@ rgb2lms store::load_rgb2lms(const display &display) const {
 
         const struct display &d = ca.dsy;
 
-        if (d.monitor_id      == display.monitor_id &&
-                d.settings_id == display.settings_id &&
-                d.link_id     == display.link_id &&
-                d.gfx         == d.gfx) {
+        if (d.monitor_id  == display.monitor_id &&
+            d.settings_id == display.settings_id &&
+            d.link_id     == display.link_id &&
+            d.gfx         == display.gfx) {
 
             //FIXME:: check mode too
             return ca;
