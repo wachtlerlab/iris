@@ -40,6 +40,38 @@ iris::cfg::monitor iris::cfg::store::load_monitor(const std::string &uid) const 
 }
 
 
+std::string store::latest_settings(const monitor &monitor) const {
+    std::vector<std::string> setting_ids = list_settings(monitor);
+    if (setting_ids.empty()) {
+        return std::string("");
+    }
+
+    return setting_ids.front();
+}
+
+std::vector<std::string> store::list_settings(const monitor &monitor) const {
+
+    fs::file mdir = base.child(monitor.qualified_id());
+
+    std::vector<fs::file> res;
+    std::copy_if(mdir.children().begin(), mdir.children().end(),
+                 std::back_inserter(res), fs::fn_matcher("*.settings"));
+
+    std::sort(res.begin(), res.end(), [](const fs::file &a, const fs::file &b) {
+        return a.name() > b.name();
+    });
+
+    std::vector<std::string> ids;
+    std::transform(res.begin(), res.end(), std::back_inserter(ids), [](const fs::file &f) {
+        std::string name = f.name();
+        size_t len = name.size();
+        name.erase(len - 9, 9); // we matched for "*.settings"
+        return name;
+    });
+
+    return ids;
+}
+
 rgb2lms store::load_rgb2lms(const display &display) const {
 
     // need to find the latest calibration that fits the display
@@ -244,5 +276,7 @@ std::string store::rgb2lms2yaml(const rgb2lms &rgb2lms) {
 
     return std::string(out.c_str());
 }
+
+
 } //iris::cfg::
 } //iris::

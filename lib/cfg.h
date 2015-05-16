@@ -116,6 +116,9 @@ public:
     std::string default_monitor() const;
     monitor load_monitor(const std::string &uid) const;
 
+    std::string latest_settings(const monitor &monitor) const;
+    std::vector<std::string> list_settings(const monitor &monitor) const;
+
     //calibration functions
     rgb2lms load_rgb2lms(const display &display) const;
 
