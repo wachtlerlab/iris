@@ -34,6 +34,24 @@ std::string iris::cfg::store::default_monitor() const {
     return target.name();
 }
 
+
+std::vector<std::string> store::list_monitors() const {
+    fs::file mdir = base.child("monitors");
+
+    std::vector<fs::file> res;
+    std::copy_if(mdir.children().begin(), mdir.children().end(), std::back_inserter(res), [](const fs::file &f){
+        fs::file mfile = f.child("/" + f.name() + ".monitor");
+        return mfile.exists();
+    });
+
+    std::vector<std::string> names(res.size());
+    std::transform(res.begin(), res.end(), names.begin(), [](const fs::file &f){
+        return f.name();
+    });
+
+    return names;
+}
+
 iris::cfg::monitor iris::cfg::store::load_monitor(const std::string &uid) const {
     fs::file mfs = base.child("monitors/" + uid + "/" + uid + ".monitor");
     std::cout << mfs.path() << std::endl;

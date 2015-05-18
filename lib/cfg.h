@@ -114,6 +114,7 @@ public:
 
     //monitor functions
     std::string default_monitor() const;
+    std::vector<std::string> list_monitors() const;
     monitor load_monitor(const std::string &uid) const;
 
     std::string latest_settings(const monitor &monitor) const;
