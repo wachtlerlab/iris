@@ -149,11 +149,8 @@ static iris::cfg::monitor::mode yaml2mode(const YAML::Node &node) {
 
 iris::cfg::monitor iris::cfg::store::yaml2monitor(const std::string &data) {
     YAML::Node root = YAML::Load(data);
-    std::cerr << root.Type() << std::endl;
 
     YAML::Node start = root["monitor"];
-    std::cerr << start.Type() << std::endl;
-
     monitor monitor(start["id"].as<std::string>());
 
     monitor.name = start["name"].as<std::string>();
