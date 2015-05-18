@@ -35,7 +35,8 @@ std::string iris::cfg::store::default_monitor() const {
 }
 
 iris::cfg::monitor iris::cfg::store::load_monitor(const std::string &uid) const {
-    fs::file mfs = base.child(uid + "/" + uid + ".monitor");
+    fs::file mfs = base.child("monitors/" + uid + "/" + uid + ".monitor");
+    std::cout << mfs.path() << std::endl;
     return yaml2monitor(mfs.read_all());
 }
 
