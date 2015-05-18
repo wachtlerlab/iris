@@ -8,7 +8,7 @@ namespace cfg {
 iris::cfg::store iris::cfg::store::default_store() {
 
     fs::file home = fs::file::home_directory();
-    fs::file base = home.child(".iris/config");
+    fs::file base = home.child(".config/iris");
 
     if (!base.exists()) {
         throw std::runtime_error("Could not initialize store");
