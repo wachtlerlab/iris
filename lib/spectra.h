@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include <fs.h>
 
 namespace iris {
 
@@ -81,8 +82,8 @@ class spectra {
 
 public:
 
-static spectra from_csv(const std::string &str);
-    void to_cvs(std::ostream &out) const;
+    static spectra from_csv(const std::string &str);
+    static spectra from_csv(const fs::file &path);
     void to_csv(std::ostream &out) const;
 
 public:

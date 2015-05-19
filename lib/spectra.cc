@@ -56,20 +56,29 @@ double spectrum::integrate() const {
 // spectra
 
 
+spectra spectra::from_csv(const fs::file &path) {
+    std::string data = path.read_all();
+    return spectra::from_csv(data);
+}
 
-spectra spectra::from_csv(const std::string &path) {
-
-    iris::csv_file csvfs(path);
+spectra spectra::from_csv(const std::string &data) {
+    typedef csv_iterator<std::string::const_iterator> csv_siterator;
 
     std::vector<uint16_t> lambda;
 
     typedef std::vector<float> fv_t;
     std::vector<fv_t> values;
     bool first_line = true;
-
     std::vector<std::string> header;
 
-    for (const auto &line : csvfs) {
+    for (auto iter = csv_siterator(data.begin(), data.end(), ',');
+         iter != csv_siterator();
+         ++iter) {
+        const auto &line = *iter;
+
+        if (line.is_comment()) {
+            continue;
+        }
 
         if (first_line) {
 
@@ -92,7 +101,7 @@ spectra spectra::from_csv(const std::string &path) {
 
         uint16_t la = static_cast<uint16_t>(std::stoi(line.fields()[0]));
         lambda.push_back(la);
-        
+
         for(size_t k = 0; k < values.size(); k++) {
             float tmp = std::stof(line.fields()[k + 1]);
             std::vector<float> &samples = values[k];

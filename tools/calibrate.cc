@@ -14,6 +14,7 @@
 #include <rgb.h>
 #include <fit.h>
 #include <dkl.h>
+#include <fs.h>
 
 static void dump_sepctra(const iris::spectra &spec) {
 
@@ -123,7 +124,7 @@ int main(int argc, char **argv) {
 
     sp.read(h5x::TypeId::Float, sp_size, spec.data());
 
-    spectra cf = iris::spectra::from_csv(cones);
+    spectra cf = iris::spectra::from_csv(fs::file(cones));
 
     std::vector<iris::rgb> stim(ps_size[0]);
     ps.read(h5x::TypeId::Float, ps_size, stim.data());
