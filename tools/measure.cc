@@ -443,6 +443,16 @@ std::vector<iris::rgb> read_color_list(std::string path) {
     return result;
 }
 
+static std::string make_timestr() {
+    std::time_t t = std::time(nullptr);
+    std::tm tm = *std::localtime(&t);
+
+    std::stringstream out;
+
+    out << std::put_time(&tm, "%Y%m%eT%H%M");
+    return out.str();
+}
+
 int main(int argc, char **argv)
 {
     namespace po = boost::program_options;
@@ -561,7 +571,8 @@ int main(int argc, char **argv)
 
     meter.stop();
     dump_stdout(bender);
-    save_data_h5("spectra.h5", bender, mtarget, gray_level);
+    const std::string fn = "spectra-" + make_timestr() + ".h5";
+    save_data_h5(fn, bender, mtarget, gray_level);
     bender.stop();
     bender = nullptr;
 
