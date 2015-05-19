@@ -136,7 +136,48 @@ spectra spectra::from_csv(const std::string &path) {
     }
 
     return sp;
+}
 
+void spectra::to_csv(std::ostream &out) const {
+
+    if (n_samples  == 0) {
+        std::cerr << "No data!" << std::endl;
+        return;
+    }
+
+    const std::string prefix = "# ";
+
+    if (!ids.empty()) {
+        out << prefix << " spectral data" << std::endl;
+        out << "lambda, ";
+
+        for(size_t i = 0; i < ids.size(); i++) {
+            out << ids[i];
+            if (i + 1 < ids.size()) {
+                out << ", ";
+            }
+        }
+
+        out << std::endl;
+    }
+
+    out << std::scientific;
+
+    for (size_t k = 0; k < n_samples; k++) {
+        out << wl_start + k*wl_step << ", ";
+
+        for (size_t i = 0; i < n_spectra; i++) {
+            const spectrum &s = this->operator[](i);
+            out << s[k];
+            if (i + 1 < n_spectra) {
+               out << ", ";
+            }
+        }
+
+        out << std::endl;
+    }
+
+    out.unsetf(std::ios_base::floatfield);
 }
 
 //****

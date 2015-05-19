@@ -82,6 +82,8 @@ class spectra {
 public:
 
 static spectra from_csv(const std::string &str);
+    void to_cvs(std::ostream &out) const;
+    void to_csv(std::ostream &out) const;
 
 public:
 
