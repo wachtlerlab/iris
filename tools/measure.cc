@@ -26,6 +26,7 @@
 
 #include <iomanip>
 #include <fstream>
+#include <cfg.h>
 
 static const char vs_simple[] = R"SHDR(
 #version 140
@@ -503,37 +504,31 @@ int main(int argc, char **argv)
 
     glfwSetErrorCallback(error_callback);
 
-    gl::monitor mtarget = gl::monitor::primary();
 
-    if (!mdev.empty()) {
 
-        std::vector<gl::monitor> mm = gl::monitor::monitors();
+    iris::cfg::store store = iris::cfg::store::default_store();
 
-        const char *cstr = mdev.c_str();
-        char *cend;
-        unsigned long k = strtoul(cstr, &cend, 10);
-        if (cstr != cend) {
-            if (k >= mm.size()) {
-                std::cerr << "monitor index out of range" << std::endl;
-                return -1;
-            }
-
-            mtarget = mm[k];
-        } else {
-            auto pos = std::find_if(mm.begin(), mm.end(), [mdev](const gl::monitor &m) {
-                return m.name() == mdev;
-            });
-
-            if (pos == mm.end()) {
-                std::cerr << "could not find monitor" << std::endl;
-                return 0;
-            }
-
-            mtarget = *pos;
-        }
+    if (mdev.empty()) {
+        mdev = store.default_monitor();
     }
 
-    std::cout << "Monitor: " << mtarget.name() << std::endl;
+    iris::cfg::monitor moni = store.load_monitor(mdev);
+    iris::cfg::monitor::mode mode = moni.default_mode;
+    iris::cfg::display display = store.make_display(moni, mode, "gl");
+
+    std::vector<gl::monitor> mm = gl::monitor::monitors();
+    auto mpos = std::find_if(mm.cbegin(), mm.cend(), [&display](const gl::monitor &cur) {
+        return cur.name() == display.link_id;
+    });
+
+    if (mpos == mm.cend()) {
+        std::cerr << "Could not find monitor with link " << display.monitor_id;
+        std::cerr << " " << display.link_id << std::endl;
+        return -1;
+    }
+
+    gl::monitor mtarget = *mpos;
+    std::cout << "Monitor: " << mtarget.name() << "[" << mdev << "]" << std::endl;
 
     // *****
 
