@@ -63,11 +63,15 @@ struct display {
     monitor::mode mode;
 };
 
+
 struct rgb2lms : public entity {
     using entity::entity;
 
     float width; //screen width in mm
     float height; //screen width in mm
+
+    //neutral gray that calibration was done with as bg
+    float gray_level;
 
     display dsy;
 
