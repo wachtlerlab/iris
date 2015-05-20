@@ -34,6 +34,7 @@ struct monitor : public entity {
     std::string name;
     std::string year;
     std::string notes;
+    std::string serial;
 
     struct mode {
         float width;  // in px

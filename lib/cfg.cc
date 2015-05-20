@@ -236,6 +236,7 @@ std::string iris::cfg::store::monitor2yaml(const iris::cfg::monitor &monitor) {
     out << "name" << monitor.name;
     out << "vendor" << monitor.vendor;
     out << "year" << monitor.year;
+    out << "serial" << monitor.serial;
 
     out << "preferred_mode";
     emit_mode(monitor.default_mode, out);
