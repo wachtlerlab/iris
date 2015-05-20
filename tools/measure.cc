@@ -27,6 +27,7 @@
 #include <iomanip>
 #include <fstream>
 #include <cfg.h>
+#include <misc.h>
 
 static const char vs_simple[] = R"SHDR(
 #version 140
@@ -365,7 +366,11 @@ void dump_stdout(const robot &r) {
     std::cout.unsetf(std::ios_base::floatfield);
 }
 
-void save_data_h5(const std::string &path, const robot &r, const iris::cfg::display &display, float gray_level) {
+void save_data_h5(const std::string &path,
+                  const robot &r,
+                  const iris::cfg::display &display,
+                  float gray_level,
+                  device::pr655 &meter) {
 
     const std::vector<iris::rgb> &stim = r.stimulation();
     const std::vector<spectral_data> &resp = r.spectra();
@@ -411,6 +416,7 @@ void save_data_h5(const std::string &path, const robot &r, const iris::cfg::disp
     fd.setAttr("display.monitor", display.monitor_id);
     fd.setAttr("display.link", display.link_id);
     fd.setAttr("display.settings", display.settings_id);
+    fd.setAttr("display.gfx", display.gfx);
     fd.setAttr("mode.height", display.mode.height);
     fd.setAttr("mode.width", display.mode.width);
     fd.setAttr("mode.refresh", display.mode.refresh);
@@ -418,6 +424,8 @@ void save_data_h5(const std::string &path, const robot &r, const iris::cfg::disp
     fd.setAttr("mode.depth.g", display.mode.g);
     fd.setAttr("mode.depth.b", display.mode.b);
     fd.setAttr("gray-level", gray_level);
+    fd.setAttr("meter.model", meter.model_number());
+    fd.setAttr("meter.serial", meter.serial_number());
 
     ds.close();
     fd.close();
@@ -449,16 +457,6 @@ std::vector<iris::rgb> read_color_list(std::string path) {
     }
 
     return result;
-}
-
-static std::string make_timestr() {
-    std::time_t t = std::time(nullptr);
-    std::tm tm = *std::localtime(&t);
-
-    std::stringstream out;
-
-    out << std::put_time(&tm, "%Y%m%eT%H%M");
-    return out.str();
 }
 
 int main(int argc, char **argv)
@@ -506,6 +504,7 @@ int main(int argc, char **argv)
 
         meter.start();
         std::cerr << meter.model_number();
+        std::cerr << " [" << meter.serial_number() << "]";
         std::cerr << " is ready!" << std::endl;
 
     } catch (const std::exception &e) {
@@ -577,10 +576,12 @@ int main(int argc, char **argv)
         glfwPollEvents();
     }
 
-    meter.stop();
+
     dump_stdout(bender);
-    const std::string fn = "spectra-" + make_timestr() + ".h5";
-    save_data_h5(fn, bender, display, gray_level);
+    const std::string fn = "spectra-" + iris::make_timestamp() + ".h5";
+    save_data_h5(fn, bender, display, gray_level, meter);
+
+    meter.stop();
     bender.stop();
     bender = nullptr;
 
