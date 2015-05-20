@@ -1,7 +1,7 @@
 
 
 #include <boost/program_options.hpp>
-#include <cfg.h>
+#include <data.h>
 
 #include <iostream>
 

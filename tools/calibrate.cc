@@ -15,7 +15,7 @@
 #include <fit.h>
 #include <dkl.h>
 #include <fs.h>
-#include <cfg.h>
+#include <data.h>
 #include <misc.h>
 
 static void dump_sepctra(const iris::spectra &spec) {

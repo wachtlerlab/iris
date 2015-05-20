@@ -26,7 +26,7 @@
 
 #include <iomanip>
 #include <fstream>
-#include <cfg.h>
+#include <data.h>
 #include <misc.h>
 
 static const char vs_simple[] = R"SHDR(
