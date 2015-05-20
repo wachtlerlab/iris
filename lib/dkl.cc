@@ -21,6 +21,7 @@
 #endif
 
 #include <cmath>
+#include <glue/text.h>
 #include "fs.h"
 
 namespace iris {
@@ -205,7 +206,18 @@ dkl::parameter dkl::parameter::from_csv_data(const std::string &data) {
     parameter res;
     parse_state state = parse_state::A_ZERO;
 
-    for (auto iter = csv_siterator(data.begin(), data.end(), ',');
+    std::vector<char> chars;
+    std::u32string utf32 = glue::u8to32(data);
+    std::vector<char32_t> ascii;
+    std::copy_if(utf32.begin(), utf32.end(), std::back_inserter(ascii), [](const char32_t ch){
+        return ch < 0x80;
+    });
+
+    std::transform(ascii.begin(), ascii.end(), std::back_inserter(chars), [](const char32_t ch){
+        return static_cast<char>(ch);
+    });
+
+    for (auto iter = csv_siterator(chars.begin(), chars.end(), ',');
          iter != csv_siterator();
          ++iter) {
         auto rec = *iter;
