@@ -28,6 +28,8 @@ T visual_angle_to_size(T angle, T distance) {
     return T(2) * distance * std::tan(agl_rad/T(2));
 }
 
+std::string make_timestamp();
+
 }
 
 #endif
