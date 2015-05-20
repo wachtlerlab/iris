@@ -16,7 +16,7 @@ namespace cfg {
 struct entity {
 
     entity() : my_id("") { }
-    entity(std::string the_id) : my_id(the_id) { }
+    explicit entity(std::string the_id) : my_id(the_id) { }
 
     virtual std::string identifier() const { return my_id; }
     virtual std::string qualified_id() const { return my_id; };
