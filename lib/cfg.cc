@@ -144,6 +144,7 @@ display store::make_display(const monitor       &monitor,
     dsp.monitor_id = monitor.identifier();
     dsp.settings_id = latest_settings(monitor);
     dsp.mode = mode;
+    dsp.gfx = gfx;
 
     return dsp;
 }
