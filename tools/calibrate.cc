@@ -15,6 +15,8 @@
 #include <fit.h>
 #include <dkl.h>
 #include <fs.h>
+#include <cfg.h>
+#include <misc.h>
 
 static void dump_sepctra(const iris::spectra &spec) {
 
@@ -68,6 +70,40 @@ std::vector<double> cmp_luminance(const h5x::File &fd, const iris::spectra &cf, 
 
     return res;
 
+}
+
+static void save_calibration_to_h5(h5x::File &fd,
+                                   std::vector<double> &x,
+                                   std::vector<double> &y,
+                                   size_t nspec,
+                                   const iris::dkl::parameter & dklp) {
+    h5x::Group cag = fd.openGroup("rgb2sml", true);
+
+    h5x::DataSet cai;
+    h5x::NDSize cai_dims = {3UL, 3UL, nspec};
+    if (cag.hasData("cone-activations")) {
+        cai = cag.openData("cone-activations");
+    } else {
+        cai = cag.createData("cone-activations", h5x::TypeId::Float, cai_dims);
+    }
+
+    cai.setExtent(cai_dims);
+    cai.write(h5x::TypeId::Double, cai_dims, y.data());
+
+    cai.setAttr("levels", x);
+
+    cag.setData("Azero", dklp.A_zero);
+    cag.setData("gamma", dklp.gamma);
+
+    h5x::DataSet caA;
+    h5x::NDSize caA_dims = {3, 3};
+    if (cag.hasData("A")) {
+        caA = cag.openData("A");
+    } else {
+        caA = cag.createData("A", h5x::TypeId::Double, caA_dims);
+    }
+
+    caA.write(h5x::TypeId::Double , caA_dims, dklp.A);
 }
 
 int main(int argc, char **argv) {
@@ -162,40 +198,30 @@ int main(int argc, char **argv) {
         }
     }
 
-    h5x::Group cag = fd.openGroup("rgb2sml", true);
-
-    h5x::DataSet cai;
-    h5x::NDSize cai_dims = {3UL, 3UL, nspec};
-    if (cag.hasData("cone-activations")) {
-        cai = cag.openData("cone-activations");
-    } else {
-        cai = cag.createData("cone-activations", h5x::TypeId::Float, cai_dims);
-    }
-
-    cai.setExtent(cai_dims);
-    cai.write(h5x::TypeId::Double, cai_dims, y.data());
-
-    cai.setAttr("levels", x);
 
     rgb2sml_fitter fitter(x, y, weight_exp);
     fitter();
 
     dkl::parameter dklp = fitter.rgb2sml();
 
-    dklp.print(std::cout);
+    cfg::rgb2lms rgb2lms(iris::make_timestamp());
+    rgb2lms.dkl_params = dklp;
 
-    cag.setData("Azero", dklp.A_zero);
-    cag.setData("gamma", dklp.gamma);
+    fd.getAttr("gray-level", rgb2lms.gray_level);
+    fd.getAttr("display.monitor", rgb2lms.dsy.monitor_id);
+    fd.getAttr("display.settings", rgb2lms.dsy.settings_id);
+    fd.getAttr("display.link", rgb2lms.dsy.link_id);
+    fd.getAttr("display.gfx", rgb2lms.dsy.gfx);
+    fd.getAttr("mode.height", rgb2lms.dsy.mode.height);
+    fd.getAttr("mode.width", rgb2lms.dsy.mode.width);
+    fd.getAttr("mode.refresh", rgb2lms.dsy.mode.refresh);
+    fd.getAttr("mode.depth.r", rgb2lms.dsy.mode.r);
+    fd.getAttr("mode.depth.g", rgb2lms.dsy.mode.g);
+    fd.getAttr("mode.depth.b", rgb2lms.dsy.mode.b);
 
-    h5x::DataSet caA;
-    h5x::NDSize caA_dims = {3, 3};
-    if (cag.hasData("A")) {
-        caA = cag.openData("A");
-    } else {
-        caA = cag.createData("A", h5x::TypeId::Double, caA_dims);
-    }
+    rgb2lms.dataset = input;
 
-    caA.write(h5x::TypeId::Double , caA_dims, dklp.A);
+    std::cout << cfg::store::rgb2lms2yaml(rgb2lms) << std::endl;
 
     if (check_lum) {
         std::cerr << "Luminance check: " << std::endl;
