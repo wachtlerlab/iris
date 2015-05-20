@@ -280,6 +280,8 @@ std::string store::rgb2lms2yaml(const rgb2lms &rgb2lms) {
     out << "width" << rgb2lms.width;
     out << "height" << rgb2lms.height;
     out << YAML::EndMap; // size
+    out << "gray-level" << rgb2lms.gray_level;
+    out << "dataset" << rgb2lms.dataset;
 
     out << "display";
     emit_display(rgb2lms.dsy, out);

@@ -76,6 +76,8 @@ struct rgb2lms : public entity {
     display dsy;
 
     dkl::parameter dkl_params;
+
+    std::string dataset;
 };
 
 // subject data
