@@ -114,6 +114,8 @@ int main(int argc, char **argv) {
     std::string cones;
     double weight_exp = 1.1;
     bool check_lum = false;
+    float dsp_width = -1;
+    float dsp_height = -1;
 
     po::options_description opts("calibration tool");
     opts.add_options()
@@ -121,6 +123,8 @@ int main(int argc, char **argv) {
             ("cone-fundamentals,c", po::value<std::string>(&cones)->required())
             ("weight-exponent,w", po::value<double>(&weight_exp))
             ("check-luminance", po::value<bool>(&check_lum))
+            ("width,W", po::value<float>(&dsp_width))
+            ("height,H", po::value<float>(&dsp_height))
             ("input", po::value<std::string>(&input)->required());
 
     po::positional_options_description pos;
@@ -140,6 +144,11 @@ int main(int argc, char **argv) {
     if (vm.count("help") > 0) {
         std::cout << opts << std::endl;
         return 0;
+    }
+
+    if (dsp_height < 0 || dsp_width < 0) {
+        std::cerr << "[E] Need height and width paramters";
+        return 2;
     }
 
     h5x::File fd = h5x::File::open(input, "r+");
@@ -220,6 +229,9 @@ int main(int argc, char **argv) {
     fd.getAttr("mode.depth.b", rgb2lms.dsy.mode.b);
 
     rgb2lms.dataset = input;
+
+    rgb2lms.height = dsp_height;
+    rgb2lms.width = dsp_width;
 
     std::cout << cfg::store::rgb2lms2yaml(rgb2lms) << std::endl;
 
