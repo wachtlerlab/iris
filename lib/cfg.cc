@@ -95,12 +95,11 @@ rgb2lms store::load_rgb2lms(const display &display) const {
 
     // need to find the latest calibration that fits the display
 
-    fs::file mdir = base.child(display.monitor_id);
-    std::cout << mdir.path() << std::endl;
-
+    fs::file mdir = base.child("monitors/" + display.monitor_id);
+    
     std::vector<fs::file> res;
     std::copy_if(mdir.children().begin(), mdir.children().end(),
-              std::back_inserter(res), fs::fn_matcher("*.rgb2sml"));
+              std::back_inserter(res), fs::fn_matcher("*.rgb2lms"));
 
     std::sort(res.begin(), res.end(), [](const fs::file &a, const fs::file &b) {
         return a.name() > b.name();
