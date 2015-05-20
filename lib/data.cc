@@ -1,6 +1,7 @@
-#include "data.h"
-
+#include <data.h>
 #include <yaml-cpp/yaml.h>
+
+#define CUR_VERSION "1.0"
 
 namespace iris {
 namespace data {
@@ -9,9 +10,20 @@ iris::data::store iris::data::store::default_store() {
 
     fs::file home = fs::file::home_directory();
     fs::file base = home.child(".config/iris");
+    fs::file fver = base.child("/version");
 
-    if (!base.exists()) {
+    if (!base.exists() || !fver.exists()) {
         throw std::runtime_error("Could not initialize store");
+    }
+
+    std::string sver = fver.read_all();
+    sver.erase(std::find_if(sver.begin(), sver.end(), [](const char c) {
+        return c == ' ' || c == '\n' || c == '\t';
+    }));
+
+    if (sver != CUR_VERSION) {
+        std::cerr << "[W] different store version: " ;
+        std::cerr << sver << " [" << CUR_VERSION << "]" << std::endl;
     }
 
     return data::store(base);
