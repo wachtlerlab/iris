@@ -106,11 +106,12 @@ struct subject {
 
 ///
 
-/* possible dir layout:
- *     / monitors / __ID__ / device.monitor (or __ID__.monitor)
+/* store dir layout:
+ *     / version
+ *     / monitors / __ID__ / __ID__.monitor (or __ID__.monitor)
  *                         / __DATETIME__.settings
  *                         / __DATETIME__.rgb2lms
- *               / default -> __ID __ [symlink]
+ *     / default.monitor -> /monitors/ __ID __ [symlink]
  *     / links.cfg
  */
 
