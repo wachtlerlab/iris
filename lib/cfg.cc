@@ -3,9 +3,9 @@
 #include <yaml-cpp/yaml.h>
 
 namespace iris {
-namespace cfg {
+namespace data {
 
-iris::cfg::store iris::cfg::store::default_store() {
+iris::data::store iris::data::store::default_store() {
 
     fs::file home = fs::file::home_directory();
     fs::file base = home.child(".config/iris");
@@ -14,15 +14,15 @@ iris::cfg::store iris::cfg::store::default_store() {
         throw std::runtime_error("Could not initialize store");
     }
 
-    return cfg::store(base);
+    return data::store(base);
 }
 
 
-iris::cfg::store::store(const fs::file &path) : base(path) {
+iris::data::store::store(const fs::file &path) : base(path) {
 
 }
 
-std::string iris::cfg::store::default_monitor() const {
+std::string iris::data::store::default_monitor() const {
 
     fs::file dm_link = base.child("default.monitor");
 
@@ -52,7 +52,7 @@ std::vector<std::string> store::list_monitors() const {
     return names;
 }
 
-iris::cfg::monitor iris::cfg::store::load_monitor(const std::string &uid) const {
+iris::data::monitor iris::data::store::load_monitor(const std::string &uid) const {
     fs::file mfs = base.child("monitors/" + uid + "/" + uid + ".monitor");
     std::cout << mfs.path() << std::endl;
     return yaml2monitor(mfs.read_all());
@@ -150,8 +150,8 @@ display store::make_display(const monitor       &monitor,
 
 // yaml stuff
 
-static iris::cfg::monitor::mode yaml2mode(const YAML::Node &node) {
-    iris::cfg::monitor::mode mode;
+static iris::data::monitor::mode yaml2mode(const YAML::Node &node) {
+    iris::data::monitor::mode mode;
 
     mode.width = node["width"].as<float>();
     mode.height = node["height"].as<float>();
@@ -165,7 +165,7 @@ static iris::cfg::monitor::mode yaml2mode(const YAML::Node &node) {
     return mode;
 }
 
-iris::cfg::monitor iris::cfg::store::yaml2monitor(const std::string &data) {
+iris::data::monitor iris::data::store::yaml2monitor(const std::string &data) {
     YAML::Node root = YAML::Load(data);
 
     YAML::Node start = root["monitor"];
@@ -224,7 +224,7 @@ static void emit_mode(const monitor::mode &mode, YAML::Emitter &out) {
     out << YAML::EndMap; //mode
 }
 
-std::string iris::cfg::store::monitor2yaml(const iris::cfg::monitor &monitor) {
+std::string iris::data::store::monitor2yaml(const iris::data::monitor &monitor) {
     YAML::Emitter out;
 
     out << YAML::BeginMap;

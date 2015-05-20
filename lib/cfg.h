@@ -11,7 +11,7 @@
 
 
 namespace iris {
-namespace cfg {
+namespace data {
 
 struct entity {
 
@@ -132,7 +132,6 @@ public:
 
 
     display make_display(const monitor &monitor, const monitor::mode &mode, const std::string &gfx) const;
-
 
     // yaml config IO
 

@@ -213,7 +213,7 @@ int main(int argc, char **argv) {
 
     dkl::parameter dklp = fitter.rgb2sml();
 
-    cfg::rgb2lms rgb2lms(iris::make_timestamp());
+    data::rgb2lms rgb2lms(iris::make_timestamp());
     rgb2lms.dkl_params = dklp;
 
     fd.getAttr("gray-level", rgb2lms.gray_level);
@@ -233,7 +233,7 @@ int main(int argc, char **argv) {
     rgb2lms.height = dsp_height;
     rgb2lms.width = dsp_width;
 
-    std::cout << cfg::store::rgb2lms2yaml(rgb2lms) << std::endl;
+    std::cout << data::store::rgb2lms2yaml(rgb2lms) << std::endl;
 
     if (check_lum) {
         std::cerr << "Luminance check: " << std::endl;

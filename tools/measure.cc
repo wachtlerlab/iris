@@ -368,7 +368,7 @@ void dump_stdout(const robot &r) {
 
 void save_data_h5(const std::string &path,
                   const robot &r,
-                  const iris::cfg::display &display,
+                  const iris::data::display &display,
                   float gray_level,
                   device::pr655 &meter) {
 
@@ -523,15 +523,15 @@ int main(int argc, char **argv)
 
 
 
-    iris::cfg::store store = iris::cfg::store::default_store();
+    iris::data::store store = iris::data::store::default_store();
 
     if (mdev.empty()) {
         mdev = store.default_monitor();
     }
 
-    iris::cfg::monitor moni = store.load_monitor(mdev);
-    iris::cfg::monitor::mode mode = moni.default_mode;
-    iris::cfg::display display = store.make_display(moni, mode, "gl");
+    iris::data::monitor moni = store.load_monitor(mdev);
+    iris::data::monitor::mode mode = moni.default_mode;
+    iris::data::display display = store.make_display(moni, mode, "gl");
 
     std::vector<gl::monitor> mm = gl::monitor::monitors();
     auto mpos = std::find_if(mm.cbegin(), mm.cend(), [&display](const gl::monitor &cur) {
