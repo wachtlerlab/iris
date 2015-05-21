@@ -12,10 +12,15 @@ std::string make_timestamp() {
     std::time_t t = std::time(nullptr);
     std::tm tm = *std::localtime(&t);
 
-    std::stringstream out;
+    char buffer[1024];
 
-    out << std::put_time(&tm, "%Y%m%eT%H%M");
-    return out.str();
+    size_t res = strftime(buffer, sizeof(buffer), "%Y%m%eT%H%M", &tm);
+
+    if (res == 0) {
+    	throw std::runtime_error("Could not format time string");
+    }
+
+    return std::string(buffer, res);
 }
 
 }
