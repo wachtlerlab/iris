@@ -1,4 +1,6 @@
 
+#include <glue/text.h>
+
 #include <dkl.h>
 #include <csv.h>
 
@@ -21,7 +23,7 @@
 #endif
 
 #include <cmath>
-#include <glue/text.h>
+
 #include "fs.h"
 
 namespace iris {
@@ -198,7 +200,7 @@ dkl::parameter dkl::parameter::make_inverse(const dkl::parameter &p) {
 }
 
 dkl::parameter dkl::parameter::from_csv_data(const std::string &data) {
-    typedef csv_iterator<std::string::const_iterator> csv_siterator;
+    typedef csv_iterator<std::vector<char>::const_iterator> csv_siterator;
     enum class parse_state : int {
         A_ZERO, A_MAT1, A_MAT2, A_MAT3, GAMMA, FIN
     };
@@ -217,7 +219,7 @@ dkl::parameter dkl::parameter::from_csv_data(const std::string &data) {
         return static_cast<char>(ch);
     });
 
-    for (auto iter = csv_siterator(chars.begin(), chars.end(), ',');
+    for (auto iter = csv_siterator(chars.cbegin(), chars.cend(), ',');
          iter != csv_siterator();
          ++iter) {
         auto rec = *iter;

@@ -5,6 +5,8 @@
 #include <iostream>
 #include <memory>
 #include <dirent.h>
+#include <cstddef>
+#include <cstring>
 
 namespace fs {
 

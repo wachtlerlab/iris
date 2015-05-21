@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <numeric>
+#include <mutex>
+#include <bitset>
 
 namespace glue {
 

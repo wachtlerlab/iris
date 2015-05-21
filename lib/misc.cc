@@ -2,6 +2,8 @@
 #include <misc.h>
 #include <iomanip>
 #include <sstream>
+#include <iomanip>
+#include <stdexcept>
 
 namespace iris {
 
