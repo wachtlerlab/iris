@@ -4,6 +4,10 @@
 #include <glue/basic.h>
 #include <glue/monitor.h>
 
+#ifdef HAVE_IRIS
+#include <data.h>
+#endif
+
 #include <string>
 
 namespace glue {
@@ -20,6 +24,10 @@ public:
     window() : wnd(nullptr) { }
     window(int height, int width, const std::string &title, monitor m = monitor{});
     window(const std::string &title, monitor m);
+
+#ifdef HAVE_IRIS
+    window(const iris::data::display &display, const std::string &title = "IRIS Experiment");
+#endif
 
     window(const window &) = delete;
     window& operator=(const window &) = delete;

@@ -97,6 +97,38 @@ window::window(const std::string &title, monitor m) {
     init();
 }
 
+#ifdef HAVE_IRIS
+window::window(const iris::data::display &display, const std::string &title) {
+
+    std::vector<monitor> mm = monitor::monitors();
+    auto mpos = std::find_if(mm.cbegin(), mm.cend(), [&display](const monitor &cur) {
+        return cur.name() == display.link_id;
+    });
+
+    if (mpos == mm.cend()) {
+        throw std::runtime_error("Could not find matching monitor for display");
+    }
+
+    monitor m = *mpos;
+
+    int height = static_cast<int>(display.mode.height);
+    int width = static_cast<int>(display.mode.width);
+
+    //todo:: check available modes of monitor and see if we can find the chosen mode
+
+    glfwWindowHint(GLFW_RED_BITS, display.mode.r);
+    glfwWindowHint(GLFW_GREEN_BITS, display.mode.g);
+    glfwWindowHint(GLFW_BLUE_BITS, display.mode.b);
+
+    glfwWindowHint(GLFW_REFRESH_RATE, static_cast<int>(display.mode.refresh));
+
+    wnd = make(height, width, title, m);
+
+    init();
+}
+#endif
+
+
 window::~window() {
     cleanup();
 }
