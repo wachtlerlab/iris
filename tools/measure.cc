@@ -179,8 +179,8 @@ static void check_gl_error(const std::string &prefix = "") {
 class robot : public looper, public gl::window {
 public:
 
-    robot(gl::monitor m, device::pr655 &meter, std::vector<iris::rgb> &stim, float gray_level)
-            : gl::window("iris - measure", m), meter(meter), stim(stim), gray_level(gray_level) {
+    robot(const iris::data::display &display, device::pr655 &meter, std::vector<iris::rgb> &stim, float gray_level)
+            : gl::window(display, "iris - measure"), meter(meter), stim(stim), gray_level(gray_level) {
         make_current_context();
         setup();
     }
@@ -549,7 +549,7 @@ int main(int argc, char **argv)
 
     // *****
 
-    robot bender(mtarget, meter, colors, gray_level);
+    robot bender(display, meter, colors, gray_level);
 
     // **
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
