@@ -66,7 +66,6 @@ std::vector<std::string> store::list_monitors() const {
 
 iris::data::monitor iris::data::store::load_monitor(const std::string &uid) const {
     fs::file mfs = base.child("monitors/" + uid + "/" + uid + ".monitor");
-    std::cout << mfs.path() << std::endl;
     return yaml2monitor(mfs.read_all());
 }
 
@@ -134,6 +133,12 @@ rgb2lms store::load_rgb2lms(const display &display) const {
     }
 
     throw std::runtime_error("Could not find any matching rgb2lms matrix");
+}
+
+
+subject store::load_subject(const std::string &uid) {
+    fs::file sfile = base.child("subjects/" + uid + "/" + uid + ".subject");
+    return yaml2subject(sfile.read_all());
 }
 
 display store::make_display(const monitor       &monitor,

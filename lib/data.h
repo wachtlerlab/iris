@@ -129,6 +129,8 @@ public:
     //calibration functions
     rgb2lms load_rgb2lms(const display &display) const;
 
+    //subject functions
+    subject load_subject(const std::string &uid);
 
     display make_display(const monitor &monitor, const monitor::mode &mode, const std::string &gfx) const;
 
