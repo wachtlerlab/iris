@@ -83,8 +83,15 @@ struct rgb2lms : public entity {
 
 // subject data
 
-struct isoslant {
-    std::string id;
+struct subject : entity {
+    using entity::entity;
+
+    std::string initials;
+    std::string name;
+};
+
+struct isoslant : entity {
+    using entity::entity;
 
     double dl;
     double phi;
@@ -93,14 +100,6 @@ struct isoslant {
     int64_t     timestamp;
     std::string monitor;
     int64_t     calib;
-};
-
-
-struct subject {
-    std::string id;
-
-    std::string initials;
-    std::string name;
 };
 
 
