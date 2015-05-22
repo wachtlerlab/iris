@@ -139,6 +139,8 @@ public:
     static std::string monitor2yaml(const monitor &monitor);
     static std::string display2yaml(const display &display);
     static std::string rgb2lms2yaml(const rgb2lms &rgb2lms);
+    static subject     yaml2subject(const std::string &data);
+    static std::string subject2yaml(const subject &subject);
 
 private:
     store(const fs::file &path);

@@ -311,5 +311,32 @@ std::string store::rgb2lms2yaml(const rgb2lms &rgb2lms) {
 }
 
 
+subject store::yaml2subject(const std::string &data) {
+    YAML::Node doc = YAML::Load(data);
+    YAML::Node root = doc["subject"];
+
+    subject subject(root["id"].as<std::string>());
+    subject.name = root["name"].as<std::string>();
+    subject.initials = root["initials"].as<std::string>();
+
+    return subject;
+}
+
+std::string store::subject2yaml(const subject &subject) {
+    YAML::Emitter out;
+
+    out << YAML::BeginMap;
+    out << "subject";
+    out << YAML::BeginMap;
+    out << "id" << subject.identifier();
+
+    out << "name" << subject.name;
+    out << "initials" << subject.initials;
+
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+
+    return std::string(out.c_str());
+}
 } //iris::cfg::
 } //iris::
