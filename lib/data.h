@@ -143,6 +143,9 @@ public:
     static std::string rgb2lms2yaml(const rgb2lms &rgb2lms);
     static subject     yaml2subject(const std::string &data);
     static std::string subject2yaml(const subject &subject);
+    static isoslant    yaml2isoslant(const std::string &data);
+    static std::string isoslant2yaml(const isoslant &iso);
+
 
 private:
     store(const fs::file &path);

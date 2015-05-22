@@ -343,5 +343,38 @@ std::string store::subject2yaml(const subject &subject) {
 
     return std::string(out.c_str());
 }
+
+isoslant store::yaml2isoslant(const std::string &data) {
+    YAML::Node doc = YAML::Load(data);
+    YAML::Node root = doc["isoslant"];
+
+    isoslant iso(root["id"].as<std::string>());
+    iso.dl = root["dl"].as<double>();
+    iso.phi = root["phi"].as<double>();
+
+    iso.display = yaml2display(root["display"]);
+    return iso;
+}
+
+std::string store::isoslant2yaml(const isoslant &iso) {
+    YAML::Emitter out;
+
+    out << YAML::BeginMap;
+    out << "isoslant";
+    out << YAML::BeginMap;
+    out << "id" << iso.identifier();
+
+    out << "dl" << iso.dl;
+    out << "phi" << iso.phi;
+
+    out << "display";
+    emit_display(iso.display, out);
+
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+
+    return std::string(out.c_str());
+}
+
 } //iris::cfg::
 } //iris::
