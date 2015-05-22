@@ -88,6 +88,7 @@ struct subject : entity {
 
     std::string initials;
     std::string name;
+
 };
 
 struct isoslant : entity {
@@ -96,10 +97,8 @@ struct isoslant : entity {
     double dl;
     double phi;
 
-    //metadata
-    int64_t     timestamp;
-    std::string monitor;
-    int64_t     calib;
+    //provenance metadata
+    data::display display;
 };
 
 
