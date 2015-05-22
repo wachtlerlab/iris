@@ -131,6 +131,7 @@ public:
 
     //subject functions
     subject load_subject(const std::string &uid);
+    isoslant load_isoslant(const subject &subject);
 
     display make_display(const monitor &monitor, const monitor::mode &mode, const std::string &gfx) const;
 

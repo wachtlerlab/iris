@@ -141,6 +141,26 @@ subject store::load_subject(const std::string &uid) {
     return yaml2subject(sfile.read_all());
 }
 
+
+isoslant store::load_isoslant(const subject &subject) {
+    fs::file sdir = base.child("subjects/" + subject.identifier());
+
+    std::vector<fs::file> res;
+    std::copy_if(sdir.children().begin(), sdir.children().end(),
+                 std::back_inserter(res), fs::fn_matcher("*.iso"));
+
+    std::sort(res.begin(), res.end(), [](const fs::file &a, const fs::file &b) {
+        return a.name() > b.name();
+    });
+
+    if (res.empty()) {
+        throw std::runtime_error("Could not find isoslant for subject");
+    }
+
+    fs::file sfile = res.front();
+    return yaml2isoslant(sfile.read_all());
+}
+
 display store::make_display(const monitor       &monitor,
                             const monitor::mode &mode,
                             const std::string   &gfx) const
