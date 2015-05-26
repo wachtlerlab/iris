@@ -36,6 +36,23 @@ std::vector<T> repvec(const std::vector<T> &input, size_t n) {
     return res;
 }
 
+
+template<typename Iterator, typename URNG>
+void block_shuffle(Iterator first, Iterator last, size_t blocksize, URNG &&g) {
+    typename std::iterator_traits<Iterator>::difference_type n;
+
+    n = last - first;
+    size_t nblocks = n / blocksize;
+    //todo: handle divison with reminder
+
+    for (size_t i = 0; i < nblocks; i++) {
+        Iterator start = first + i * blocksize;
+        Iterator finish = start + blocksize;
+        std::shuffle(start, finish, std::forward<URNG>(g));
+    }
+}
+
+
 template<typename T>
 T visual_angle_to_size(T angle, T distance) {
     T agl_rad = angle / T(180) * T(M_PI);
