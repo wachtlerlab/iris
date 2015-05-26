@@ -22,6 +22,10 @@ struct rgba {
     }
     #endif
 
+    static rgba gray(float level, float alpha = 1.0f) {
+        return rgba(level, level, level, alpha);
+    }
+
     float r;
     float g;
     float b;
