@@ -101,6 +101,11 @@ public:
         return wnd != nullptr;
     }
 
+    glue::monitor presenting_monitor() const {
+        GLFWmonitor *m = glfwGetWindowMonitor(wnd);
+        return glue::monitor(m);
+    }
+
 private:
     GLFWwindow *wnd;
 };
