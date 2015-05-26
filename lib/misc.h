@@ -22,6 +22,20 @@ std::vector<T> linspace(T start, T stop, size_t n) {
     return res;
 }
 
+
+template<typename T>
+std::vector<T> repvec(const std::vector<T> &input, size_t n) {
+    std::vector<T> res(n*input.size());
+
+    for(size_t i = 0; i < n; i++) {
+        auto output_iter = res.begin();
+        std::advance(output_iter, input.size()*i);
+        std::copy(input.cbegin(), input.cend(), output_iter);
+    }
+
+    return res;
+}
+
 template<typename T>
 T visual_angle_to_size(T angle, T distance) {
     T agl_rad = angle / T(180) * T(M_PI);
