@@ -133,6 +133,8 @@ target_link_libraries(iris-convert iris)
 add_executable(iris-cfg tools/cfg.cc)
 target_link_libraries(iris-cfg iris)
 
+add_executable(iris-isoslant tools/isoslant.cc)
+target_link_libraries(iris-isoslant iris)
 
 ########################################
 # playground
