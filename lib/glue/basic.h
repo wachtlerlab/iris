@@ -32,6 +32,17 @@ struct extent {
 };
 
 
+struct rect : public point, extent {
+    rect() : point(0.f, 0.f), extent(0.f, 0.f) {}
+    rect(float x, float y, float width, float height)
+            : point(x, y), extent(width, height) {}
+    rect(int x, int y, int width, int height)
+            : point(1.f*x, 1.f*y), extent(1.f*width, 1.f*height) { }
+
+};
+
+void glue_start();
+
 }
 
 #endif
