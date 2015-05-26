@@ -218,6 +218,7 @@ rgb2lms store::yaml2rgb2lms(const std::string &data) {
     rgb2lms calibration(root["id"].as<std::string>());
     std::tie(calibration.width, calibration.height) = yaml2size(root["size"]);
     calibration.dsy = yaml2display(root["display"]);
+    calibration.gray_level = root["gray-level"].as<float>();
 
     std::string csv = root["dkl"].as<std::string>();
     calibration.dkl_params = dkl::parameter::from_csv_data(csv);
