@@ -110,25 +110,6 @@ private:
     std::shared_ptr<atlas_map> atlases;
 };
 
-
-class text {
-public:
-    text() {}
-
-    static text make(tf_atlas &ch_atlas, const std::string &str);
-    void draw(glm::mat4 transform);
-
-private:
-    std::string body;
-
-    program prg;
-    buffer vbuffer;
-    vertex_array varray;
-
-    GLsizei ntriag;
-    tf_atlas atlas;
-};
-
 std::u32string u8to32(const std::string &istr);
 
 }

@@ -8,6 +8,7 @@
 #include <glue/shader.h>
 #include <glue/buffer.h>
 #include <glue/arrays.h>
+#include <glue/text.h>
 
 namespace iris {
 namespace scene {
@@ -41,6 +42,26 @@ private:
     glue::vertex_array va;
 };
 
+class label {
+public:
+    label() { }
+    label(const glue::tf_font &font, const std::string &str, size_t font_size);
+
+    void init();
+    void draw(const glm::mat4 &vp);
+
+
+private:
+    glue::tf_font font;
+    std::string str;
+    size_t fsize;
+
+    glue::program prg;
+    glue::buffer vbuffer;
+    glue::vertex_array varray;
+
+    GLsizei ntriag;
+};
 
 } //iris::scene::
 } //iris::

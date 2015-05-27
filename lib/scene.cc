@@ -98,7 +98,134 @@ void rectangle::draw(glm::mat4 vp) {
     prg.unuse();
 }
 
+// label
 
+static const char vs_text[] = R"SHDR(
+#version 140
+
+in vec4 coord;
+out vec2 texpos;
+uniform sampler2D tex;
+uniform mat4 transform;
+
+void main(void) {
+  gl_Position = transform * vec4(coord.xy, 0, 1);
+  texpos = coord.zw / textureSize(tex, 0);
+}
+)SHDR";
+
+static const char fs_text[] = R"SHDR(
+#version 140
+
+in vec2 texpos;
+uniform sampler2D tex;
+uniform vec4 color;
+
+out vec4 finalColor;
+
+void main(void) {
+  finalColor = vec4(1, 1, 1, texture(tex, texpos).r) * color;
+}
+)SHDR";
+
+
+label::label(const glue::tf_font &font, const std::string &str, size_t font_size)
+        : font(font), str(str), fsize(font_size) {
+
+}
+
+void label::init() {
+    std::u32string u32str = glue::u8to32(str);
+
+    struct coords_point {
+        float x;
+        float y;
+        float s;
+        float t;
+    };
+
+    prg = glue::program::make();
+
+    glue::shader vs = glue::shader::make(vs_text, GL_VERTEX_SHADER);
+    glue::shader fs = glue::shader::make(fs_text, GL_FRAGMENT_SHADER);
+
+    vs.compile();
+    fs.compile();
+
+    prg.attach({vs, fs});
+    prg.link();
+
+    prg.use();
+
+    glue::tf_atlas &ch_atlas = font.atlas_for_size(fsize);
+
+    ch_atlas.bind();
+
+    vbuffer = glue::buffer::make();
+    varray = glue::vertex_array::make();
+
+    vbuffer.bind();
+    varray.bind();
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+    float x = 0;
+    float y = 0;
+    std::vector<coords_point> coords(6*u32str.size());
+
+    int &c = ntriag = 0;
+    for (char32_t ch : u32str) {
+        const glue::glyph_tf ci = ch_atlas[ch];
+
+        float x2 = x + ci.left;
+        float y2 = -y - ci.top;
+
+        x += ci.ax;
+        y += ci.ay;
+
+        float w = ci.width;
+        float h = ci.height;
+
+        if (!w || !h)
+            continue;
+
+        coords[c++] = {x2,     -y2,       ci.u,     ci.v};
+        coords[c++] = {x2 + w, -y2,       ci.u + w, ci.v};
+        coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
+        coords[c++] = {x2 + w, -y2,       ci.u + w, ci.v};
+        coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
+        coords[c++] = {x2 + w, -y2 - h,   ci.u + w, ci.v + h};
+    }
+
+    vbuffer.data(coords);
+
+    varray.unbind();
+    vbuffer.unbind();
+
+    prg.unuse();
+}
+
+void label::draw(const glm::mat4 &vp) {
+
+    if (!prg) {
+        return;
+    }
+
+    prg.use();
+    varray.bind();
+
+    glue::tf_atlas &atlas = font.atlas_for_size(fsize);
+    atlas.bind();
+    prg.uniform("transform", vp);
+    prg.uniform("tex", 0); //texture unit
+    prg.uniform("color", glue::color::rgba(0.0f, 0.0f, 0.0f, 1.0f));
+
+    glDrawArrays(GL_TRIANGLES, 0, ntriag);
+
+    varray.unbind();
+    prg.unuse();
+}
 
 } // iris::scene::
 } // iris::
