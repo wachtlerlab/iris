@@ -22,6 +22,7 @@
 #include <misc.h>
 #include <random>
 #include <scene.h>
+#include <fit.h>
 
 namespace gl = glue;
 
@@ -45,6 +46,14 @@ public:
         fg.fg_color(fg_color);
     }
 
+    bool success() const {
+        return completed;
+    }
+
+    const std::vector<double>& response() const {
+        return resp;
+    }
+
 private:
     iris::dkl dkl;
     std::vector<double> phi;
@@ -60,6 +69,9 @@ private:
     gl::point cursor;
     float mouse_gain;
     double contrast;
+
+    bool completed;
+    std::vector<double> resp;
 };
 
 flicker_wnd::flicker_wnd(const iris::data::rgb2lms &rgb2lms, const std::vector<double> &stimuli)
@@ -93,6 +105,10 @@ flicker_wnd::flicker_wnd(const iris::data::rgb2lms &rgb2lms, const std::vector<d
     stim_index = 0;
     contrast = 0.2;
     mouse_gain = 0.00001;
+    completed = false;
+
+    resp.resize(phi.size());
+
     fg_angle(phi[stim_index]);
 }
 
@@ -129,14 +145,20 @@ void flicker_wnd::key_event(int key, int scancode, int action, int mods) {
 
     float gain = mods == GLFW_MOD_SHIFT ? .5f : 0.01f;
     if (key == GLFW_KEY_SPACE) {
+        const double phi_adjusted = dkl.reference_gray().r;
+        const double idx = stim_index++;
 
-        std::cout << phi[stim_index] << ", " << dkl.reference_gray().r << std::endl;
+        resp[idx] = phi_adjusted;
 
-        stim_index++;
+        std::cerr << phi[idx] << ", " << phi_adjusted << std::endl;
+
+        //reset reference point
         dkl.reference_gray(iris::rgb::gray(gray_level));
+
         if (stim_index < phi.size()) {
             fg_angle(phi[stim_index]);
         } else {
+            completed = true;
             should_close(true);
         }
 
@@ -214,6 +236,19 @@ int main(int argc, char **argv) {
 
         while (!wnd.should_close()) {
            wnd.render();
+        }
+
+        if (wnd.success()) {
+            const std::vector<double> y = wnd.response();
+            iris::sin_fitter fitter(stim, y, false);
+            bool res = fitter();
+
+            //todo: create and fill the isoslant data struct here
+
+            std::cerr << "success: " << res << std::endl;
+            std::cerr << fitter.p[0] << " " << fitter.p[1] << " " << fitter.p[2] << " ";
+            std::cerr << std::endl;
+
         }
 
     } catch (const std::exception &e) {
