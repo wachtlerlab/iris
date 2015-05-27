@@ -50,6 +50,9 @@ public:
     void init();
     void draw(const glm::mat4 &vp);
 
+    glue::extent size() const {
+        return mysize;
+    }
 
 private:
     glue::tf_font font;
@@ -61,6 +64,7 @@ private:
     glue::vertex_array varray;
 
     GLsizei ntriag;
+    glue::extent mysize;
 };
 
 } //iris::scene::

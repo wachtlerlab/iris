@@ -175,6 +175,8 @@ void label::init() {
     std::vector<coords_point> coords(6*u32str.size());
 
     int &c = ntriag = 0;
+    mysize = glue::extent(0.0f, 0.0f);
+
     for (char32_t ch : u32str) {
         const glue::glyph_tf ci = ch_atlas[ch];
 
@@ -190,6 +192,10 @@ void label::init() {
         if (!w || !h)
             continue;
 
+        //todo: fixme
+        mysize.width = std::max(mysize.width, x+w);
+        mysize.height = std::max(mysize.height, y+h);
+
         coords[c++] = {x2,     -y2,       ci.u,     ci.v};
         coords[c++] = {x2 + w, -y2,       ci.u + w, ci.v};
         coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
@@ -197,6 +203,8 @@ void label::init() {
         coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
         coords[c++] = {x2 + w, -y2 - h,   ci.u + w, ci.v + h};
     }
+
+
 
     vbuffer.data(coords);
 
