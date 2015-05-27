@@ -76,7 +76,7 @@ private:
 
 public:
     tf_font() : face(nullptr), atlases(nullptr) { }
-    tf_font(const tf_font &other) : face(other.face) {
+    tf_font(const tf_font &other) : face(other.face), atlases(other.atlases) {
         if (face) {
             FT_Reference_Face(face);
         }
