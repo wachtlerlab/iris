@@ -243,11 +243,19 @@ int main(int argc, char **argv) {
             iris::sin_fitter fitter(stim, y, false);
             bool res = fitter();
 
-            //todo: create and fill the isoslant data struct here
-
             std::cerr << "success: " << res << std::endl;
             std::cerr << fitter.p[0] << " " << fitter.p[1] << " " << fitter.p[2] << " ";
             std::cerr << std::endl;
+
+            if (res) {
+                std::string tstamp = iris::make_timestamp();
+                iris::data::isoslant iso(tstamp);
+                iso.dl = fitter.p[0];
+                iso.dl = fitter.p[1];
+                iso.display = display;
+
+                std::cout << store.isoslant2yaml(iso) << std::endl;
+            }
 
         }
 
