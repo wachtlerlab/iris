@@ -175,13 +175,12 @@ void label::init() {
     std::vector<coords_point> coords(6*u32str.size());
 
     int &c = ntriag = 0;
-    mysize = glue::extent(0.0f, 0.0f);
 
     for (char32_t ch : u32str) {
         const glue::glyph_tf ci = ch_atlas[ch];
 
         float x2 = x + ci.left;
-        float y2 = -y - ci.top;
+        float y2 = y - ci.top;
 
         x += ci.ax;
         y += ci.ay;
@@ -192,19 +191,33 @@ void label::init() {
         if (!w || !h)
             continue;
 
-        //todo: fixme
-        mysize.width = std::max(mysize.width, x+w);
-        mysize.height = std::max(mysize.height, y+h);
-
-        coords[c++] = {x2,     -y2,       ci.u,     ci.v};
-        coords[c++] = {x2 + w, -y2,       ci.u + w, ci.v};
-        coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
-        coords[c++] = {x2 + w, -y2,       ci.u + w, ci.v};
-        coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
-        coords[c++] = {x2 + w, -y2 - h,   ci.u + w, ci.v + h};
+        coords[c++] = {x2,     y2,       ci.u,     ci.v};
+        coords[c++] = {x2 + w, y2,       ci.u + w, ci.v};
+        coords[c++] = {x2,     y2 + h,   ci.u,     ci.v + h};
+        coords[c++] = {x2 + w, y2,       ci.u + w, ci.v};
+        coords[c++] = {x2,     y2 + h,   ci.u,     ci.v + h};
+        coords[c++] = {x2 + w, y2 + h,   ci.u + w, ci.v + h};
     }
 
+    mysize = glue::extent(0.0f, 0.0f);
+    float y_min, y_max, x_min, x_max;
+    y_min = y_max = x_min = x_max = 0.0f;
 
+    for (coords_point p : coords) {
+        mysize.width = std::max(mysize.width, p.x);
+        y_min = std::min(y_min, p.y);
+        y_max = std::max(y_max, p.y);
+        x_min = std::min(x_min, p.x);
+        x_max = std::max(x_max, p.x);
+    }
+
+    mysize.height = y_max + -y_min;
+    mysize.width = x_max - x_min;
+
+    for (coords_point &p : coords) {
+        p.x -= x_min;
+        p.y -= y_min;
+    }
 
     vbuffer.data(coords);
 
