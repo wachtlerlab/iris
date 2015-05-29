@@ -112,7 +112,13 @@ file file::readlink() const {
         throw std::runtime_error("Could not read the link");
     }
 
-    return file(std::string(buffer.data()));
+    std::string p = std::string(buffer.data());
+
+    if (!p.empty() && p[0] != '/') {
+        return parent().child(p);
+    }
+
+    return file(p);
 }
 
 
