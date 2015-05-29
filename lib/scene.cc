@@ -135,15 +135,6 @@ label::label(const glue::tf_font &font, const std::string &str, size_t font_size
 }
 
 void label::init() {
-    std::u32string u32str = glue::u8to32(str);
-
-    struct coords_point {
-        float x;
-        float y;
-        float s;
-        float t;
-    };
-
     prg = glue::program::make();
 
     glue::shader vs = glue::shader::make(vs_text, GL_VERTEX_SHADER);
@@ -170,11 +161,31 @@ void label::init() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
+    vbuffer.unbind();
+    varray.unbind();
+    prg.unuse();
+
+    text(str);
+
+}
+
+
+void label::text(const std::string str) {
+    std::u32string u32str = glue::u8to32(str);
+
+    struct coords_point {
+        float x;
+        float y;
+        float s;
+        float t;
+    };
+
     float x = 0;
     float y = 0;
     std::vector<coords_point> coords(6*u32str.size());
 
     int &c = ntriag = 0;
+    glue::tf_atlas &ch_atlas = font.atlas_for_size(fsize);
 
     for (char32_t ch : u32str) {
         const glue::glyph_tf ci = ch_atlas[ch];
@@ -219,12 +230,9 @@ void label::init() {
         p.y -= y_min;
     }
 
+    vbuffer.bind();
     vbuffer.data(coords);
-
-    varray.unbind();
     vbuffer.unbind();
-
-    prg.unuse();
 }
 
 void label::draw(const glm::mat4 &vp) {
