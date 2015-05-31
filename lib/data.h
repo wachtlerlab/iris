@@ -130,6 +130,8 @@ public:
 
     static store default_store();
 
+    fs::file location() const { return base; }
+
     //monitor functions
     std::string default_monitor() const;
     std::vector<std::string> list_monitors() const;

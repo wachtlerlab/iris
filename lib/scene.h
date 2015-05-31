@@ -54,6 +54,8 @@ public:
         return mysize;
     }
 
+    void text(const std::string str);
+
 private:
     glue::tf_font font;
     std::string str;

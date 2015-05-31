@@ -135,15 +135,6 @@ label::label(const glue::tf_font &font, const std::string &str, size_t font_size
 }
 
 void label::init() {
-    std::u32string u32str = glue::u8to32(str);
-
-    struct coords_point {
-        float x;
-        float y;
-        float s;
-        float t;
-    };
-
     prg = glue::program::make();
 
     glue::shader vs = glue::shader::make(vs_text, GL_VERTEX_SHADER);
@@ -170,18 +161,37 @@ void label::init() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
+    vbuffer.unbind();
+    varray.unbind();
+    prg.unuse();
+
+    text(str);
+
+}
+
+
+void label::text(const std::string str) {
+    std::u32string u32str = glue::u8to32(str);
+
+    struct coords_point {
+        float x;
+        float y;
+        float s;
+        float t;
+    };
+
     float x = 0;
     float y = 0;
     std::vector<coords_point> coords(6*u32str.size());
 
     int &c = ntriag = 0;
-    mysize = glue::extent(0.0f, 0.0f);
+    glue::tf_atlas &ch_atlas = font.atlas_for_size(fsize);
 
     for (char32_t ch : u32str) {
         const glue::glyph_tf ci = ch_atlas[ch];
 
         float x2 = x + ci.left;
-        float y2 = -y - ci.top;
+        float y2 = y - ci.top;
 
         x += ci.ax;
         y += ci.ay;
@@ -192,26 +202,37 @@ void label::init() {
         if (!w || !h)
             continue;
 
-        //todo: fixme
-        mysize.width = std::max(mysize.width, x+w);
-        mysize.height = std::max(mysize.height, y+h);
-
-        coords[c++] = {x2,     -y2,       ci.u,     ci.v};
-        coords[c++] = {x2 + w, -y2,       ci.u + w, ci.v};
-        coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
-        coords[c++] = {x2 + w, -y2,       ci.u + w, ci.v};
-        coords[c++] = {x2,     -y2 - h,   ci.u,     ci.v + h};
-        coords[c++] = {x2 + w, -y2 - h,   ci.u + w, ci.v + h};
+        coords[c++] = {x2,     y2,       ci.u,     ci.v};
+        coords[c++] = {x2 + w, y2,       ci.u + w, ci.v};
+        coords[c++] = {x2,     y2 + h,   ci.u,     ci.v + h};
+        coords[c++] = {x2 + w, y2,       ci.u + w, ci.v};
+        coords[c++] = {x2,     y2 + h,   ci.u,     ci.v + h};
+        coords[c++] = {x2 + w, y2 + h,   ci.u + w, ci.v + h};
     }
 
+    mysize = glue::extent(0.0f, 0.0f);
+    float y_min, y_max, x_min, x_max;
+    y_min = y_max = x_min = x_max = 0.0f;
 
+    for (coords_point p : coords) {
+        mysize.width = std::max(mysize.width, p.x);
+        y_min = std::min(y_min, p.y);
+        y_max = std::max(y_max, p.y);
+        x_min = std::min(x_min, p.x);
+        x_max = std::max(x_max, p.x);
+    }
 
+    mysize.height = y_max + -y_min;
+    mysize.width = x_max - x_min;
+
+    for (coords_point &p : coords) {
+        p.x -= x_min;
+        p.y -= y_min;
+    }
+
+    vbuffer.bind();
     vbuffer.data(coords);
-
-    varray.unbind();
     vbuffer.unbind();
-
-    prg.unuse();
 }
 
 void label::draw(const glm::mat4 &vp) {

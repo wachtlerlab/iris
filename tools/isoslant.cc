@@ -54,6 +54,8 @@ public:
         return resp;
     }
 
+    void update_label();
+
 private:
     iris::dkl dkl;
     std::vector<double> phi;
@@ -62,6 +64,9 @@ private:
     glm::mat4 vp;
     iris::scene::rectangle fg;
     float gray_level = 0.7;
+
+    iris::scene::label progress;
+    glm::mat4 px2gl;
 
     double clock;
     bool draw_stim;
@@ -110,8 +115,30 @@ flicker_wnd::flicker_wnd(const iris::data::rgb2lms &rgb2lms, const std::vector<d
     resp.resize(phi.size());
 
     fg_angle(phi[stim_index]);
+
+    //setup the label
+    iris::data::store store = iris::data::store::default_store();
+    fs::file base = store.location();
+    fs::file default_font = base.child("default.font").readlink();
+    std::cerr << default_font.path() << " " << default_font.exists() << std::endl;
+    if (default_font.exists()) {
+        std::cout << "having the label" << std::endl;
+        gl::tf_font font = gl::tf_font::make(default_font.path());
+        gl::extent wsize = framebuffer_size();
+        px2gl = glm::ortho(0.f, wsize.width, wsize.height, 0.f);
+        progress = iris::scene::label(font, "isoslant", 16);
+        progress.init();
+        update_label();
+    }
+
 }
 
+
+void flicker_wnd::update_label() {
+    std::stringstream sstr;
+    sstr << stim_index + 1 << " of " << phi.size();
+    progress.text(sstr.str());
+}
 
 void flicker_wnd::render() {
     double now = glfwGetTime();
@@ -128,6 +155,8 @@ void flicker_wnd::render() {
         if (draw_stim) {
             fg.draw(vp);
         }
+
+        progress.draw(px2gl);
 
         swap_buffers();
     }
@@ -161,6 +190,8 @@ void flicker_wnd::key_event(int key, int scancode, int action, int mods) {
             completed = true;
             should_close(true);
         }
+
+        update_label();
 
     } else if (key == GLFW_KEY_RIGHT) {
         lum_change(.1f, gain);
