@@ -91,6 +91,18 @@ struct subject : entity {
 
 };
 
+struct isodata : entity {
+    using entity::entity;
+
+    typedef std::pair<float, float> sample;
+
+    std::vector<sample> samples;
+
+    //provenance metadata
+    data::display display;
+
+};
+
 struct isoslant : entity {
     using entity::entity;
 
