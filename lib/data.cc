@@ -81,7 +81,7 @@ std::string store::latest_settings(const monitor &monitor) const {
 
 std::vector<std::string> store::list_settings(const monitor &monitor) const {
 
-    fs::file mdir = base.child(monitor.qualified_id());
+    fs::file mdir = base.child("monitors/" + monitor.qualified_id());
 
     std::vector<fs::file> res;
     std::copy_if(mdir.children().begin(), mdir.children().end(),
