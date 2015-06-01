@@ -132,7 +132,9 @@ rgb2lms store::load_rgb2lms(const display &display) const {
         }
     }
 
-    throw std::runtime_error("Could not find any matching rgb2lms matrix");
+    throw std::runtime_error("Could not find any matching rgb2lms matrix ["
+                             + display.monitor_id + ", " + display.settings_id + ", "
+                             + display.link_id + ", " + display.gfx + "]");
 }
 
 
