@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <csv.h>
 #include <fit.h>
+#include <data.h>
+#include <fs.h>
 
 int main(int argc, char **argv) {
 
@@ -44,24 +46,21 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    fs::file fd(infile_path);
+    std::string raw = fd.read_all();
+    iris::data::isodata input = iris::data::store::yaml2isodata(raw);
 
-    iris::csv_file fd(infile_path);
+    std::vector<double> x(input.samples.size());
+    std::vector<double> y(input.samples.size());
+    std::transform(input.samples.cbegin(), input.samples.cend(), x.begin(),
+                   [](const iris::data::isodata::sample &s) {
+                       return s.stimulus;
+                   });
 
-    std::vector<double> x;
-    std::vector<double> y;
-    for(const auto &rec : fd) {
-        if (rec.is_empty() || rec.is_comment()) {
-            continue;
-        }
-
-        if (rec.nfields() != 2) {
-            std::cerr << "wrong csv file" << std::endl;
-            return -1;
-        }
-
-        x.push_back(rec.get_double(0));
-        y.push_back(rec.get_double(1));
-    }
+    std::transform(input.samples.cbegin(), input.samples.cend(), y.begin(),
+                   [](const iris::data::isodata::sample &s) {
+                       return s.response;
+                   });
 
     iris::sin_fitter fitter(x, y, fit_freq);
     bool res = fitter();
@@ -72,6 +71,16 @@ int main(int argc, char **argv) {
         std::cout << fitter.p[3];
     }
     std::cout << std::endl;
+
+    if (res) {
+        std::string tstamp = iris::make_timestamp();
+        iris::data::isoslant iso(tstamp);
+        iso.dl = fitter.p[0];
+        iso.phi = fitter.p[1];
+        iso.display = input.display;
+
+        std::cout << iris::data::store::isoslant2yaml(iso) << std::endl;
+    }
 
     return res ? 0 : -1;
 }
