@@ -271,23 +271,18 @@ int main(int argc, char **argv) {
 
         if (wnd.success()) {
             const std::vector<double> y = wnd.response();
-            iris::sin_fitter fitter(stim, y, false);
-            bool res = fitter();
 
-            std::cerr << "success: " << res << std::endl;
-            std::cerr << fitter.p[0] << " " << fitter.p[1] << " " << fitter.p[2] << " ";
-            std::cerr << std::endl;
+            std::string tstamp = iris::make_timestamp();
+            iris::data::isodata iso(iris::make_timestamp());
+            iso.samples.resize(y.size());
 
-            if (res) {
-                std::string tstamp = iris::make_timestamp();
-                iris::data::isoslant iso(tstamp);
-                iso.dl = fitter.p[0];
-                iso.dl = fitter.p[1];
-                iso.display = display;
-
-                std::cout << store.isoslant2yaml(iso) << std::endl;
+            for (size_t i = 0; i < y.size(); i++) {
+                iso.samples[i].stimulus = static_cast<float>(stim[i]);
+                iso.samples[i].response = static_cast<float>(y[i]);
             }
 
+            iso.display = display;
+            std::cout << store.isodata2yaml(iso) << std::endl;
         }
 
     } catch (const std::exception &e) {
