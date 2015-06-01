@@ -406,7 +406,7 @@ isodata store::yaml2isodata(const std::string &str) {
     typedef csv_iterator<std::string::const_iterator> csv_siterator;
 
     YAML::Node doc = YAML::Load(str);
-    YAML::Node root = doc["isosdata"];
+    YAML::Node root = doc["isodata"];
 
     isodata d(root["id"].as<std::string>());
     d.display = yaml2display(root["display"]);
@@ -445,7 +445,7 @@ std::string store::isodata2yaml(const isodata &data) {
     YAML::Emitter out;
 
     out << YAML::BeginMap;
-    out << "isosdata";
+    out << "isodata";
     out << YAML::BeginMap;
     out << "id" << data.identifier();
 
