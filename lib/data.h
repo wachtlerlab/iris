@@ -94,7 +94,12 @@ struct subject : entity {
 struct isodata : entity {
     using entity::entity;
 
-    typedef std::pair<float, float> sample;
+    struct sample {
+        sample(float s, float r) : stimulus(s), response(r) {}
+        sample() : stimulus(-1.0f), response(-1.0f) {}
+        float stimulus;
+        float response;
+    };
 
     std::vector<sample> samples;
 
