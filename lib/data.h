@@ -166,6 +166,8 @@ public:
     static isoslant    yaml2isoslant(const std::string &data);
     static std::string isoslant2yaml(const isoslant &iso);
 
+    static isodata     yaml2isodata(const std::string &data);
+    static std::string isodata2yaml(const isodata &data);
 
 private:
     store(const fs::file &path);

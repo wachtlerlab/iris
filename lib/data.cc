@@ -1,5 +1,7 @@
 #include <data.h>
 #include <yaml-cpp/yaml.h>
+#include <csv.h>
+#include <misc.h>
 
 #define CUR_VERSION "1.0"
 
@@ -107,7 +109,7 @@ rgb2lms store::load_rgb2lms(const display &display) const {
     // need to find the latest calibration that fits the display
 
     fs::file mdir = base.child("monitors/" + display.monitor_id);
-    
+
     std::vector<fs::file> res;
     std::copy_if(mdir.children().begin(), mdir.children().end(),
               std::back_inserter(res), fs::fn_matcher("*.rgb2lms"));
@@ -188,6 +190,7 @@ display store::make_display(const monitor       &monitor,
 }
 
 // yaml stuff
+
 
 static iris::data::monitor::mode yaml2mode(const YAML::Node &node) {
     iris::data::monitor::mode mode;
@@ -398,5 +401,72 @@ std::string store::isoslant2yaml(const isoslant &iso) {
     return std::string(out.c_str());
 }
 
+
+isodata store::yaml2isodata(const std::string &str) {
+    typedef csv_iterator<std::string::const_iterator> csv_siterator;
+
+    YAML::Node doc = YAML::Load(str);
+    YAML::Node root = doc["isosdata"];
+
+    isodata d(root["id"].as<std::string>());
+    d.display = yaml2display(root["display"]);
+
+    std::string cd = root["data"].as<std::string>();
+
+    bool is_header = true;
+    for (auto iter = csv_siterator(cd.cbegin(), cd.cend(), ',');
+         iter != csv_siterator();
+         ++iter) {
+        auto rec = *iter;
+
+        if (rec.is_comment() || rec.is_empty()) {
+            continue;
+        }
+
+        if (is_header) {
+            is_header = false;
+            continue;
+        }
+
+        if (rec.nfields() != 2) {
+            throw std::runtime_error("Invalid CSV data for isodata::data");
+        }
+
+        float stimulus = rec.get_float(0);
+        float response = rec.get_float(1);
+
+        d.samples.emplace_back(stimulus, response);
+    }
+
+    return d;
+}
+
+std::string store::isodata2yaml(const isodata &data) {
+    YAML::Emitter out;
+
+    out << YAML::BeginMap;
+    out << "isosdata";
+    out << YAML::BeginMap;
+    out << "id" << data.identifier();
+
+    out << "display";
+    emit_display(data.display, out);
+
+    out << "data" << YAML::Literal;
+
+    std::stringstream cd;
+
+    cd << "stimulus, response";
+    for (const isodata::sample &s : data.samples) {
+        cd << std::endl;
+        cd << s.stimulus << ", " << s.response;
+    }
+    out << cd.str();
+
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+
+    return std::string(out.c_str());
+}
 } //iris::cfg::
 } //iris::
