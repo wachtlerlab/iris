@@ -86,6 +86,8 @@ public:
 
     bool exists();
 
+    bool is_directory() const;
+
     file readlink() const;
 
     // IO

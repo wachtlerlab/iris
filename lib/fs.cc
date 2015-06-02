@@ -91,6 +91,13 @@ bool file::exists() {
     return res == 0;
 }
 
+
+bool file::is_directory() const {
+    struct stat buf;
+    int res = stat(loc.c_str(), &buf);
+    return res == 0 && S_ISDIR(buf.st_mode);
+}
+
 file file::readlink() const {
 
     std::vector<char> buffer(1024, 0);
