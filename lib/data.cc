@@ -185,7 +185,7 @@ isoslant store::load_isoslant(const subject &subject) {
 
     std::vector<fs::file> res;
     std::copy_if(sdir.children().begin(), sdir.children().end(),
-                 std::back_inserter(res), fs::fn_matcher("*.iso"));
+                 std::back_inserter(res), fs::fn_matcher("*.isoslant"));
 
     std::sort(res.begin(), res.end(), [](const fs::file &a, const fs::file &b) {
         return a.name() > b.name();
