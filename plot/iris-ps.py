@@ -11,22 +11,34 @@ import argparse
 import yaml
 import csv
 import StringIO
+import os
 
 def main():
     parser = argparse.ArgumentParser(description='CI - Plot ISO fit')
     parser.add_argument('--freq', dest='freq', type=float, default=1.0)
     parser.add_argument('--offset', type=float, default=0.667)
     parser.add_argument('data', type=str)
-    parser.add_argument('--iso', type=str, default=None)
 
     args = parser.parse_args()
-    f = open(args.data)
+
+    fn = args.data
+    if "." in fn:
+        fn, ext = os.path.splitext(fn)
+
+    slant_fn = fn + ".isoslant"
+    data_fn = fn + ".isodata"
+
+    if not os.path.exists(data_fn):
+        sys.stderr.write("No data\n")
+        sys.exit(-1)
+
+    f = open(data_fn)
     data = yaml.safe_load(f)
     f.close()
 
     iso = None
-    if args.iso is not None:
-        f = open(args.iso)
+    if os.path.exists(slant_fn):
+        f = open(slant_fn)
         iso = yaml.safe_load(f)
         f.close()
 
