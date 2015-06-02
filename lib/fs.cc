@@ -66,8 +66,10 @@ file file::parent() const {
         return fs::file();
     }
 
+    std::string fn(n);
     free(p);
-    return fs::file(n);
+
+    return fs::file(fn);
 }
 
 file file::make_dir(const std::string &path) {
