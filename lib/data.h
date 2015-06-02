@@ -151,6 +151,7 @@ public:
     //subject functions
     subject load_subject(const std::string &uid);
     isoslant load_isoslant(const subject &subject);
+    std::vector<iris::data::subject> find_subjects(const std::string &pharse);
 
     display make_display(const monitor &monitor, const monitor::mode &mode, const std::string &gfx) const;
 

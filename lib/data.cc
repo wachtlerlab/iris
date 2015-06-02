@@ -146,6 +146,40 @@ subject store::load_subject(const std::string &uid) {
 }
 
 
+std::vector<iris::data::subject> store::find_subjects(const std::string &phrase) {
+    fs::file sdir = base.child("subjects");
+
+    std::vector<fs::file> res;
+    std::copy_if(sdir.children().begin(), sdir.children().end(),
+                 std::back_inserter(res),
+                 [](const fs::file &f) {
+                     const std::string &n = f.name();
+                     if (n == "." || n == ".." || ! f.is_directory()) {
+                         return false;
+                     }
+
+                     fs::file sf = f.child(n + ".subject");
+                     return sf.exists();
+                 });
+
+    std::vector<subject> subjects;
+    std::transform(res.cbegin(), res.cend(), std::back_inserter(subjects),
+                   [this](const fs::file &f) {
+                       return load_subject(f.name());
+                   });
+
+    std::vector<subject> hits;
+    std::copy_if(subjects.cbegin(), subjects.cend(), std::back_inserter(hits),
+                 [&phrase](const subject &s) {
+                     return s.name == phrase ||
+                            s.initials == phrase ||
+                            s.identifier() == phrase ||
+                            s.qualified_id() == phrase;
+                 });
+
+    return hits;
+}
+
 isoslant store::load_isoslant(const subject &subject) {
     fs::file sdir = base.child("subjects/" + subject.identifier());
 
