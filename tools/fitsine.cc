@@ -79,6 +79,7 @@ int main(int argc, char **argv) {
         iris::data::isoslant iso(input.identifier());
         iso.dl = fitter.p[0];
         iso.phi = fitter.p[1];
+        iso.subject = input.subject;
         iso.display = input.display;
 
         std::string outdata = iris::data::store::isoslant2yaml(iso);
