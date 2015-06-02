@@ -171,6 +171,10 @@ void label::init() {
 
 
 void label::text(const std::string str) {
+    if (!prg) {
+        return;
+    }
+
     std::u32string u32str = glue::u8to32(str);
 
     struct coords_point {
