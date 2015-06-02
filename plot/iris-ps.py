@@ -33,6 +33,7 @@ def main():
     raw = data['isodata']['data']
     print(raw)
     reader = csv.reader(StringIO.StringIO(raw), delimiter=',', quotechar='#')
+    next(reader) # ignore the header
     x, y = zip(*[(float(r[0]), float(r[1])) for r in reader])
     print(x, y)
 
