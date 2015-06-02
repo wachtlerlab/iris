@@ -408,6 +408,7 @@ isoslant store::yaml2isoslant(const std::string &data) {
     YAML::Node root = doc["isoslant"];
 
     isoslant iso(root["id"].as<std::string>());
+    iso.subject = root["subject"].as<std::string>();
     iso.dl = root["dl"].as<double>();
     iso.phi = root["phi"].as<double>();
 
@@ -423,6 +424,7 @@ std::string store::isoslant2yaml(const isoslant &iso) {
     out << YAML::BeginMap;
     out << "id" << iso.identifier();
 
+    out << "subject" << iso.subject;
     out << "dl" << iso.dl;
     out << "phi" << iso.phi;
 
@@ -443,6 +445,7 @@ isodata store::yaml2isodata(const std::string &str) {
     YAML::Node root = doc["isodata"];
 
     isodata d(root["id"].as<std::string>());
+    d.subject = root["subject"].as<std::string>();
     d.display = yaml2display(root["display"]);
 
     std::string cd = root["data"].as<std::string>();
@@ -482,6 +485,7 @@ std::string store::isodata2yaml(const isodata &data) {
     out << "isodata";
     out << YAML::BeginMap;
     out << "id" << data.identifier();
+    out << "subject" << data.subject;
 
     out << "display";
     emit_display(data.display, out);

@@ -101,6 +101,8 @@ struct isodata : entity {
         float response;
     };
 
+    std::string subject; //the id
+
     std::vector<sample> samples;
 
     //provenance metadata
@@ -110,6 +112,8 @@ struct isodata : entity {
 
 struct isoslant : entity {
     using entity::entity;
+
+    std::string subject; //the id
 
     double dl;
     double phi;
