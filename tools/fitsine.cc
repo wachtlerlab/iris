@@ -21,12 +21,14 @@ int main(int argc, char **argv) {
 
     std::string infile_path;
     bool fit_freq = false;
+    bool only_stdout = false;
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
             ("fit-frequency", po::value<bool>(&fit_freq), "also fit sin frequency [default=false]")
-            ("file", po::value<std::string>(&infile_path)->required());
+            ("file", po::value<std::string>(&infile_path)->required())
+            ("stdout", po::value<bool>(&only_stdout));
 
     po::positional_options_description pos;
     pos.add("file", 1);
@@ -74,12 +76,18 @@ int main(int argc, char **argv) {
 
     if (res) {
         std::string tstamp = iris::make_timestamp();
-        iris::data::isoslant iso(tstamp);
+        iris::data::isoslant iso(input.identifier());
         iso.dl = fitter.p[0];
         iso.phi = fitter.p[1];
         iso.display = input.display;
 
-        std::cout << iris::data::store::isoslant2yaml(iso) << std::endl;
+        std::string outdata = iris::data::store::isoslant2yaml(iso);
+        if (only_stdout) {
+            std::cout << outdata << std::endl;
+        } else {
+            fs::file outfile(iso.identifier() + ".isoslant");
+            outfile.write_all(outdata);
+        }
     }
 
     return res ? 0 : -1;

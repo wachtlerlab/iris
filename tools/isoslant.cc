@@ -122,7 +122,6 @@ flicker_wnd::flicker_wnd(const iris::data::rgb2lms &rgb2lms, const std::vector<d
     fs::file default_font = base.child("default.font").readlink();
     std::cerr << default_font.path() << " " << default_font.exists() << std::endl;
     if (default_font.exists()) {
-        std::cout << "having the label" << std::endl;
         gl::tf_font font = gl::tf_font::make(default_font.path());
         gl::extent wsize = framebuffer_size();
         px2gl = glm::ortho(0.f, wsize.width, wsize.height, 0.f);
@@ -219,13 +218,15 @@ int main(int argc, char **argv) {
         double contrast = 0.16;
         float width = 0.0f;
         float height = 0.0f;
+        bool use_stdout = false;
 
         po::options_description opts("colortilt experiment");
         opts.add_options()
                 ("help", "produce help message")
                 ("number,n", po::value<size_t>(&N), "number of colors to sample [default=16")
                 ("repetition,r", po::value<size_t>(&R), "number of repetitions [default=4]")
-                ("contrast,c", po::value<double>(&contrast)->required());
+                ("contrast,c", po::value<double>(&contrast)->required())
+                ("stdout", po::value<bool>(&use_stdout));
 
         po::positional_options_description pos;
         po::variables_map vm;
@@ -263,7 +264,7 @@ int main(int argc, char **argv) {
         glEnable(GL_MULTISAMPLE);
 
         const float gray_level = rgb2lms.gray_level;
-        std::cout << store.rgb2lms2yaml(rgb2lms) << std::endl;
+        std::cerr << store.rgb2lms2yaml(rgb2lms) << std::endl;
 
         while (!wnd.should_close()) {
            wnd.render();
@@ -282,7 +283,14 @@ int main(int argc, char **argv) {
             }
 
             iso.display = display;
-            std::cout << store.isodata2yaml(iso) << std::endl;
+
+            std::string outstr = store.isodata2yaml(iso);
+            if (use_stdout) {
+                std::cout << outstr << std::endl;
+            } else {
+                fs::file outfile(iso.identifier() + ".isodata");
+                outfile.write_all(outstr);
+            }
         }
 
     } catch (const std::exception &e) {
