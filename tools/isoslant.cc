@@ -219,6 +219,7 @@ int main(int argc, char **argv) {
         float width = 0.0f;
         float height = 0.0f;
         bool use_stdout = false;
+        std::string sid;
 
         po::options_description opts("colortilt experiment");
         opts.add_options()
@@ -226,7 +227,8 @@ int main(int argc, char **argv) {
                 ("number,n", po::value<size_t>(&N), "number of colors to sample [default=16")
                 ("repetition,r", po::value<size_t>(&R), "number of repetitions [default=4]")
                 ("contrast,c", po::value<double>(&contrast)->required())
-                ("stdout", po::value<bool>(&use_stdout));
+                ("stdout", po::value<bool>(&use_stdout))
+                ("subject,S", po::value<std::string>(&sid)->required());
 
         po::positional_options_description pos;
         po::variables_map vm;
@@ -248,6 +250,19 @@ int main(int argc, char **argv) {
         iris::data::monitor::mode mode = moni.default_mode;
         iris::data::display display = store.make_display(moni, mode, "gl");
         iris::data::rgb2lms rgb2lms = store.load_rgb2lms(display);
+
+        //find the subject
+        std::vector<iris::data::subject> hits = store.find_subjects(sid);
+        if (hits.empty()) {
+            std::cerr << "Coud not find subject [" << sid << "]" << std::endl;
+        } else if (hits.size() > 1) {
+            std::cerr << "Ambigous subject string (> 1 hits): " << std::endl;
+            for (const auto &s : hits) {
+                std::cerr << "\t" << s.initials << std::endl;
+            }
+        }
+
+        const iris::data::subject subject = hits.front(); // size() == 1 asserted
 
         std::vector<double> phi = iris::linspace(0.0, 2 * M_PI, N);
         std::vector<double> stim = iris::repvec(phi, R);
@@ -275,6 +290,7 @@ int main(int argc, char **argv) {
 
             std::string tstamp = iris::make_timestamp();
             iris::data::isodata iso(iris::make_timestamp());
+            iso.subject = subject.qualified_id();
             iso.samples.resize(y.size());
 
             for (size_t i = 0; i < y.size(); i++) {
