@@ -14,7 +14,7 @@ std::string make_timestamp() {
 
     char buffer[1024];
 
-    size_t res = strftime(buffer, sizeof(buffer), "%Y%m%eT%H%M", &tm);
+    size_t res = strftime(buffer, sizeof(buffer), "%Y%m%dT%H%M", &tm);
 
     if (res == 0) {
     	throw std::runtime_error("Could not format time string");
