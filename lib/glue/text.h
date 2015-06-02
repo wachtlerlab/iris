@@ -82,6 +82,19 @@ public:
         }
     }
 
+    tf_font(tf_font &&o) : face(o.face), atlases(std::move(o.atlases)) {
+        o.face = nullptr;
+    }
+
+    tf_font& operator=(tf_font other) {
+        using std::swap;
+
+        swap(this->face, other.face);
+        swap(this->atlases, other.atlases);
+
+        return *this;
+    }
+
     static tf_font make(const std::string &path) {
         FT_Face face;
         if (FT_New_Face(ft_library(), path.c_str(), 0, &face)) {
