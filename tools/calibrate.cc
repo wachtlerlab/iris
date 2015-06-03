@@ -117,6 +117,8 @@ int main(int argc, char **argv) {
     float dsp_width = -1;
     float dsp_height = -1;
 
+    bool only_stdout = false;
+
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
@@ -125,7 +127,8 @@ int main(int argc, char **argv) {
             ("check-luminance", po::value<bool>(&check_lum))
             ("width,W", po::value<float>(&dsp_width))
             ("height,H", po::value<float>(&dsp_height))
-            ("input", po::value<std::string>(&input)->required());
+            ("input", po::value<std::string>(&input)->required())
+            ("stdout", po::value<bool>(&only_stdout));
 
     po::positional_options_description pos;
     pos.add("input", 1);
@@ -213,7 +216,8 @@ int main(int argc, char **argv) {
 
     dkl::parameter dklp = fitter.rgb2sml();
 
-    data::rgb2lms rgb2lms(iris::make_timestamp());
+    std::string tstamp = iris::make_timestamp();
+    data::rgb2lms rgb2lms(tstamp);
     rgb2lms.dkl_params = dklp;
 
     fd.getAttr("gray-level", rgb2lms.gray_level);
@@ -233,7 +237,14 @@ int main(int argc, char **argv) {
     rgb2lms.height = dsp_height;
     rgb2lms.width = dsp_width;
 
-    std::cout << data::store::rgb2lms2yaml(rgb2lms) << std::endl;
+    std::string outdata =  data::store::rgb2lms2yaml(rgb2lms);
+
+    if (only_stdout) {
+        std::cout << outdata << std::endl;
+    } else {
+        fs::file outfile(rgb2lms.identifier() + ".rgb2lms");
+        outfile.write_all(outdata);
+    }
 
     if (check_lum) {
         std::cerr << "Luminance check: " << std::endl;
@@ -241,5 +252,10 @@ int main(int argc, char **argv) {
     }
 
     fd.close();
+
+    h5x::File caf = h5x::File::open(tstamp + ".cac", "w+");
+    save_calibration_to_h5(caf, x, y, nspec, dklp);
+    caf.close();
+
     return 0;
 }
