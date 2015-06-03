@@ -132,6 +132,9 @@ public:
 
         the_box.init();
         debug = false;
+
+        std::tie(iso_dl, iso_phi) = cspace.iso_slant();
+        use_isoslant = true;
     }
 
     void update_colors() {
@@ -161,11 +164,14 @@ public:
     double phi = 0.0;
     double c = 0.1;
 
+    double iso_dl, iso_phi;
+
     std::vector<double> circ_phi;
     std::vector<iris::rgb> circ_rgb;
 
     box the_box;
     bool debug;
+    bool use_isoslant;
 };
 
 
@@ -208,6 +214,16 @@ void colorcircle::key_event(int key, int scancode, int action, int mods) {
         stimsize *= 2.0f;
     } else if (key == GLFW_KEY_C && action == GLFW_PRESS) {
         debug = true;
+    } else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+
+        use_isoslant = !use_isoslant;
+        if (use_isoslant) {
+            colorspace.iso_slant(iso_dl, iso_phi);
+        } else {
+            colorspace.iso_slant(0.0, M_PI);
+        }
+
+        std::cout << "iso slant correction: " << std::boolalpha << use_isoslant << std::endl;
     }
 }
 
