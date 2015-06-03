@@ -2,6 +2,7 @@
 #define IRIS_DKL_H
 
 #include <vector>
+#include <tuple>
 #include <rgb.h>
 
 namespace iris {
@@ -74,10 +75,13 @@ public:
         iso_phi = phase;
     }
 
+    std::pair<double, double> iso_slant() const {
+        return std::make_pair(iso_dl, iso_phi);
+    }
+
 private:
     rgb       ref_gray;
     parameter params;
-    parameter params_rgb2sml;
     parameter params_sml2rgb;
 
     double iso_dl;
