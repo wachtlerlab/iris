@@ -121,8 +121,8 @@ target_link_libraries(iris-calibrate iris)
 add_executable(iris-colorcircle tools/colorcircle.cc)
 target_link_libraries(iris-colorcircle iris)
 
-add_executable(iris-fitsine tools/fitsine.cc)
-target_link_libraries(iris-fitsine iris)
+add_executable(iris-fitiso tools/fitiso.cc)
+target_link_libraries(iris-fitiso iris)
 
 add_executable(iris-board tools/board.cc)
 target_link_libraries(iris-board iris)
