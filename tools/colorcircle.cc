@@ -302,12 +302,12 @@ int main(int argc, char **argv) {
     iris::data::display display = store.make_display(moni, mode, "gl");
     iris::data::rgb2lms rgb2lms = store.load_rgb2lms(display);
 
-
     iris::dkl::parameter params = rgb2lms.dkl_params;
-    std::cerr << "Using rgb2sml calibration:" << std::endl;
+    std::cerr << "[I] rgb2sml calibration:" << std::endl;
     params.print(std::cerr);
 
-    iris::rgb refpoint(0.65f, 0.65f, 0.65f);
+    std::cerr << "[I] gray level: " << rgb2lms.gray_level << std::endl;
+    iris::rgb refpoint = iris::rgb::gray(rgb2lms.gray_level);
     iris::dkl cspace(params, refpoint);
 
     if (vm.count("subject")) {
