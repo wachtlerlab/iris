@@ -110,8 +110,8 @@ private:
 
 class board : public gl::window {
 public:
-    board(gl::monitor m, iris::dkl &cspace)
-            : window("IRIS Board", m), colorspace(cspace),
+    board(const iris::data::display &display, iris::dkl &cspace)
+            : window(display, "IRIS Board"), colorspace(cspace),
               rd(), gen(rd()), dis(0, 15)  {
         make_current_context();
         glfwSwapInterval(1);
@@ -234,14 +234,11 @@ void board::render() {
 int main(int argc, char **argv) {
     namespace po = boost::program_options;
 
-    std::string ca_path;
-
     bool grab_mouse = false;
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
-            ("calibration,c", po::value<std::string>(&ca_path)->required())
             ("grab-mouse,m", po::value<bool>(&grab_mouse));
 
     po::positional_options_description pos;
@@ -261,20 +258,26 @@ int main(int argc, char **argv) {
         std::cout << opts << std::endl;
         return 0;
     }
+    iris::data::store store = iris::data::store::default_store();
+    std::string mdev = store.default_monitor();
 
-    iris::dkl::parameter params = iris::dkl::parameter::from_csv(ca_path);
+    iris::data::monitor moni = store.load_monitor(mdev);
+    iris::data::monitor::mode mode = moni.default_mode;
+    iris::data::display display = store.make_display(moni, mode, "gl");
+    iris::data::rgb2lms rgb2lms = store.load_rgb2lms(display);
+
+    iris::dkl::parameter params = rgb2lms.dkl_params;
     std::cerr << "Using rgb2sml calibration:" << std::endl;
     params.print(std::cerr);
 
-    iris::rgb refpoint(0.65f, 0.65f, 0.65f);
+    std::cerr << "[I] gray level: " << rgb2lms.gray_level << std::endl;
+    iris::rgb refpoint = iris::rgb::gray(rgb2lms.gray_level);
+
     iris::dkl cspace(params, refpoint);
 
-    if (!glfwInit()) {
-        return -1;
-    }
+    gl::glue_start();
 
-    gl::monitor m = gl::monitor::primary();
-    board wnd(m, cspace);
+    board wnd(display, cspace);
 
     if (grab_mouse) {
         wnd.disable_cursor();
