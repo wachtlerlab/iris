@@ -263,27 +263,18 @@ void colorcircle::render() {
 int main(int argc, char **argv) {
     namespace po = boost::program_options;
 
-    std::string ca_path;
-
-    double iso_dl = 0.0;
-    double iso_phi = 0.0;
-
+    std::string sid;
     bool grab_mouse = false;
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
-            ("is-dl", po::value<double>(&iso_dl))
-            ("is-phi", po::value<double>(&iso_phi))
-            ("calibration,c", po::value<std::string>(&ca_path)->required())
+            ("subject,S", po::value<std::string>(&sid))
             ("grab-mouse,m", po::value<bool>(&grab_mouse));
-
-    po::positional_options_description pos;
-    pos.add("cone-fundamentals", 1);
 
     po::variables_map vm;
     try {
-        po::store(po::command_line_parser(argc, argv).options(opts).positional(pos).run(), vm);
+        po::store(po::command_line_parser(argc, argv).options(opts).run(), vm);
         po::notify(vm);
 
         if (vm.count("is-dl") != vm.count("is-phi")) {
@@ -301,15 +292,38 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    iris::dkl::parameter params = iris::dkl::parameter::from_csv(ca_path);
+    // if we are running in windowed mode with > 1 monitors
+    // attached this is all not right ...
+    iris::data::store store = iris::data::store::default_store();
+    std::string mdev = store.default_monitor();
+
+    iris::data::monitor moni = store.load_monitor(mdev);
+    iris::data::monitor::mode mode = moni.default_mode;
+    iris::data::display display = store.make_display(moni, mode, "gl");
+    iris::data::rgb2lms rgb2lms = store.load_rgb2lms(display);
+
+
+    iris::dkl::parameter params = rgb2lms.dkl_params;
     std::cerr << "Using rgb2sml calibration:" << std::endl;
     params.print(std::cerr);
 
     iris::rgb refpoint(0.65f, 0.65f, 0.65f);
     iris::dkl cspace(params, refpoint);
 
-    if (vm.count("is-dl")) {
-        cspace.iso_slant(iso_dl, iso_phi);
+    if (vm.count("subject")) {
+        std::vector<iris::data::subject> hits = store.find_subjects(sid);
+        if (hits.empty()) {
+            std::cerr << "Coud not find subject [" << sid << "]" << std::endl;
+        } else if (hits.size() > 1) {
+            std::cerr << "Ambigous subject string (> 1 hits): " << std::endl;
+            for (const auto &s : hits) {
+                std::cerr << "\t" << s.initials << std::endl;
+            }
+        }
+
+        const iris::data::subject subject = hits.front(); // size() == 1 asserted
+        iris::data::isoslant iso = store.load_isoslant(subject);
+        cspace.iso_slant(iso.dl, iso.phi);
     }
 
     if (!glfwInit()) {
