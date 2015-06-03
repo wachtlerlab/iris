@@ -7,21 +7,39 @@ import h5py as h5
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import StringIO
+import yaml
 
 def G(azero, a, gamma, x):
     return [azero + a * i**gamma for i in x]
 
+def load_rgb2lms(path):
+    f = open(path)
+    data = yaml.safe_load(f)
+    f.close()
+
+    dkl = data['rgb2lms']['dkl']
+    m = [l for l in dkl.split('\n') if len(l) > 0 and not l.startswith('#')]
+    allm = np.genfromtxt(StringIO.StringIO(u'\n'.join(m)), dtype='f8', delimiter=',')
+    Azero = allm[0, :]
+    A = allm[[1,2,3], :]
+    gamma = allm[4, :]
+
+    return Azero, A, gamma
+
 def main():
-    fd = h5.File(sys.argv[1], 'r')
+
+    cac_file = sys.argv[1] + '.cac'
+    rgb2lms_file = sys.argv[1] + '.rgb2lms'
+
+    fd = h5.File(cac_file, 'r')
     g = fd['/rgb2sml']
     ds = g['cone-activations']
 
     spectra = np.array(ds)
     x = np.array(ds.attrs['levels'])
 
-    Azero = np.array(g['Azero'])
-    A = np.array(g['A'])
-    gamma = np.array(g['gamma'])
+    Azero, A, gamma = load_rgb2lms(rgb2lms_file)
 
     print(Azero)
     print(A)
