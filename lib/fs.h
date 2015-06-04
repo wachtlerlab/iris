@@ -99,13 +99,15 @@ public:
 
     static file current_directory();
     static file home_directory();
-    //
 
 
     // *******************
     // directory functions
 
     bool mkdir();
+    bool mkdir_with_parents();
+
+
     struct dir_enum {
 
         dir_enum(const std::string &path) : path(path) { }

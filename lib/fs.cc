@@ -246,6 +246,24 @@ bool file::mkdir() {
 
     return !have_error;
 }
+
+bool file::mkdir_with_parents() {
+    std::vector<fs::file> parents;
+    fs::file iter = parent();
+    while (! iter.loc.empty()) {
+        parents.push_back(iter);
+        iter = iter.parent();
+    }
+
+    for (fs::file cf : parents) {
+        if (!cf.exists()) {
+            cf.mkdir();
+        }
+    }
+
+    return mkdir();
+}
+
 bool file::path_is_absolute(const std::string &path) {
     return !path.empty() && path[0] == '/';
 }
