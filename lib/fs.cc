@@ -59,6 +59,11 @@ std::string file::name() const {
 
 
 file file::parent() const {
+
+    if (loc.size() == 1 && loc[0] == '/') {
+        return fs::file();
+    }
+
     char *p = strdup(loc.c_str());
     char *n = dirname(p);
 
