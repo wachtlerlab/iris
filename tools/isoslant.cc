@@ -216,8 +216,6 @@ int main(int argc, char **argv) {
         size_t N = 16;
         size_t R = 4;
         double contrast = 0.16;
-        float width = 0.0f;
-        float height = 0.0f;
         bool use_stdout = false;
         std::string sid;
 
@@ -279,6 +277,7 @@ int main(int argc, char **argv) {
         glEnable(GL_MULTISAMPLE);
 
         const float gray_level = rgb2lms.gray_level;
+        std::cerr << "[I] gray-level: " << gray_level << std::endl;
         std::cerr << store.rgb2lms2yaml(rgb2lms) << std::endl;
 
         while (!wnd.should_close()) {
