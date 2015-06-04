@@ -105,6 +105,7 @@ public:
     // *******************
     // directory functions
 
+    bool mkdir();
     struct dir_enum {
 
         dir_enum(const std::string &path) : path(path) { }

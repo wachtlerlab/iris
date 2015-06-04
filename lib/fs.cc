@@ -74,7 +74,7 @@ file file::parent() const {
 
 file file::make_dir(const std::string &path) {
 
-    int res = mkdir(path.c_str(), 0777);
+    int res = ::mkdir(path.c_str(), 0777);
 
     if (res) {
         throw std::runtime_error("Could not create directory");
@@ -231,6 +231,16 @@ file file::home_directory() {
 }
 
 
+bool file::mkdir() {
+    int res = ::mkdir(loc.c_str(), S_IRWXU);
+    bool have_error = res != 0;
+
+    if (have_error && errno != EEXIST) {
+        throw std::runtime_error("Could not create directory");
+    }
+
+    return !have_error;
+}
 bool file::path_is_absolute(const std::string &path) {
     return !path.empty() && path[0] == '/';
 }
