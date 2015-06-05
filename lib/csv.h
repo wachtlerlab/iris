@@ -65,6 +65,10 @@ public:
         return f[0];
     }
 
+    size_t get_size_t(const size_t n) const {
+        return std::stoull(data[n]);
+    }
+
     std::vector<std::string> data;
     bool comment = false;
 };
