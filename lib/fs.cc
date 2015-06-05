@@ -39,7 +39,17 @@ void dir_iterator::next() {
 /// file
 
 file::file(const std::string &path) : loc(path) {
-    if (!path_is_absolute(loc)) {
+    if (loc.empty() || path_is_absolute(loc)) {
+        return;
+    }
+
+    // path is not absolute, and not empty
+
+    if (loc[0] == '~') {
+        file home = home_directory();
+        file child = home.child(loc);
+        loc = child.path();
+    } else {
         file cwd = current_directory();
         file child = cwd.child(loc);
         loc = child.path();
