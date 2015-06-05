@@ -11,6 +11,7 @@
 #include <numeric>
 #include <algorithm>
 #include <fs.h>
+#include <stdlib.h>
 
 bool do_debug = true;
 
@@ -27,10 +28,35 @@ bool mod_constraints_ok(const std::vector<size_t> &numbers, size_t mc) {
     bool ok = pos == numbers.cend();
 
     if (! ok) {
-        size_t npos = std::distance(numbers.begin(), pos);
-        std::cerr << "[D] reroll: ";
+        auto npos = std::distance(numbers.cbegin(), pos);
+        std::cerr << "[D] mod reroll: ";
         std::cerr << *pos++ << ", " << *pos;
         std::cerr << npos;
+        std::cerr << std::endl;
+    }
+
+    return ok;
+}
+
+bool mod_divisor_ok(const std::vector<size_t> &numbers, size_t md) {
+    if (md == 0) {
+        return true;
+    }
+
+    auto pos = std::adjacent_find(numbers.cbegin(), numbers.cend(),
+                                  [md](const size_t a, const size_t b) {
+                                      const auto ad = std::lldiv(a, md);
+                                      const auto bd = std::lldiv(b, md);
+                                      return ad.quot == bd.quot;
+                                  });
+
+    bool ok = pos == numbers.cend();
+
+    if (! ok) {
+        auto npos = std::distance(numbers.cbegin(), pos);
+        std::cerr << "[D] div reroll: ";
+        std::cerr << *pos++ << ", " << *pos;
+        std::cerr << " @ " << npos;
         std::cerr << std::endl;
     }
 
@@ -43,12 +69,14 @@ int main(int argc, char **argv)
 
     size_t N = 0;
     size_t mod_constraint = 0;
+    size_t mod_divisor = 0;
     std::string outfile = "";
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
             ("c-mod", po::value<size_t>(&mod_constraint))
+            ("c-div", po::value<size_t>(&mod_divisor))
             ("file,F", po::value<std::string>(&outfile))
             ("number,N", po::value<size_t>(&N)->required());
 
@@ -80,7 +108,8 @@ int main(int argc, char **argv)
     do {
         counter++;
         std::shuffle(numbers.begin(), numbers.end(), rnd_gen);
-    } while(!mod_constraints_ok(numbers, mod_constraint));
+    } while(!mod_constraints_ok(numbers, mod_constraint) ||
+            ! mod_divisor_ok(numbers, mod_divisor));
 
     if (do_debug) {
         std::cerr << "[D] " << counter <<  "# of rerolls" << std::endl;
