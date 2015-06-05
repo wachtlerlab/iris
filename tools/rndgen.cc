@@ -104,6 +104,10 @@ int main(int argc, char **argv)
     std::random_device rnd_dev;
     std::mt19937 rnd_gen(rnd_dev());
 
+    if (do_debug) {
+        std::cerr << "#mt-state:  " << rnd_gen << std::endl;
+    }
+
     size_t counter = 0;
     do {
         counter++;
@@ -116,7 +120,6 @@ int main(int argc, char **argv)
     }
 
     std::stringstream outstr;
-    //outstr << "#mt-state:  " << rnd_gen << std::endl;
     outstr << "rnd";
 
     for (const size_t n : numbers) {
@@ -129,5 +132,7 @@ int main(int argc, char **argv)
         fs::file outfd(outfile);
         outfd.write_all(outstr.str());
     }
+
+
     return 0;
 }
