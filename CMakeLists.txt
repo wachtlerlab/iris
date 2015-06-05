@@ -136,6 +136,9 @@ target_link_libraries(iris-cfg iris)
 add_executable(iris-isoslant tools/isoslant.cc)
 target_link_libraries(iris-isoslant iris)
 
+add_executable(iris-rndgen tools/rndgen.cc)
+target_link_libraries(iris-rndgen iris)
+
 ########################################
 # playground
 
