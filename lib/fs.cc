@@ -45,9 +45,10 @@ file::file(const std::string &path) : loc(path) {
 
     // path is not absolute, and not empty
 
-    if (loc[0] == '~') {
+    if (loc.size() > 1 && loc[0] == '~' && loc[1] == '/') {
         file home = home_directory();
-        file child = home.child(loc);
+        const char *p = loc.c_str() + 2;
+        file child = home.child(p);
         loc = child.path();
     } else {
         file cwd = current_directory();
