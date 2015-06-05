@@ -84,6 +84,7 @@ public:
 
     tf_font(tf_font &&o) : face(o.face), atlases(std::move(o.atlases)) {
         o.face = nullptr;
+        o.atlases = nullptr;
     }
 
     tf_font& operator=(tf_font other) {
@@ -113,6 +114,10 @@ public:
     tf_atlas& atlas_for_size(size_t size);
 
     std::vector<glyph_bmp> glyphs_for(size_t size, const std::string &u8str);
+
+    bool is_valid() const {
+        return face != nullptr;
+    }
 
 private:
     static FT_Library ft_library();
