@@ -60,7 +60,7 @@ public:
     rgb sml2rgb(const sml &input) const;
     sml rgb2sml(const rgb &input) const;
 
-    rgb iso_lum(double phi, double c) const;
+    rgb iso_lum(double phi, double c, bool phi_in_degree = false) const;
 
     rgb reference_gray() const {
         return ref_gray;

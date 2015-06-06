@@ -320,7 +320,11 @@ double dist(double a, double b, bool euclidean=true) {
     }
 }
 
-rgb dkl::iso_lum(double phi, double c) const {
+rgb dkl::iso_lum(double phi, double c, bool phi_in_degree) const {
+
+    if (phi_in_degree) {
+        phi = phi / 180.0 * M_PI;
+    }
 
     double ldelta = iso_dl *
             (std::cos(phi) * std::cos(iso_phi) +
