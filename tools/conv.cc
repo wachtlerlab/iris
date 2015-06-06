@@ -10,13 +10,14 @@
 #include <algorithm>
 #include <csv.h>
 #include <fit.h>
+#include <data.h>
 
 
 int main(int argc, char **argv) {
 
     namespace po = boost::program_options;
 
-    std::string ca_path;
+    std::string mdev;
     std::string infile_path;
 
     double iso_dl = 0.0;
@@ -28,7 +29,7 @@ int main(int argc, char **argv) {
             ("help", "produce help message")
             ("is-dl", po::value<double>(&iso_dl))
             ("is-phi", po::value<double>(&iso_phi))
-            ("calibration,c", po::value<std::string>(&ca_path)->required())
+            ("monitor", po::value<std::string>(&mdev))
             ("file", po::value<std::string>(&infile_path)->required());
 
     po::positional_options_description pos;
@@ -54,12 +55,28 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    iris::dkl::parameter params = iris::dkl::parameter::from_csv(ca_path);
-    std::cerr << "Using rgb2sml calibration:" << std::endl;
+    iris::data::store store = iris::data::store::default_store();
+
+    if (mdev.empty()) {
+        mdev = store.default_monitor();
+    }
+
+    iris::data::monitor moni = store.load_monitor(mdev);
+    iris::data::monitor::mode mode = moni.default_mode;
+    iris::data::display display = store.make_display(moni, mode, "gl");
+    iris::data::rgb2lms rgb2lms = store.load_rgb2lms(display);
+
+
+    std::cout << "[I] Monitor: " << moni.name << " [" << mdev << "]" << std::endl;
+
+    iris::dkl::parameter params = rgb2lms.dkl_params;
+    std::cerr << "[I] rgb2sml calibration:" << std::endl;
     params.print(std::cerr);
 
-    iris::rgb refpoint(0.666f, 0.666f, 0.666f);
+    std::cerr << "[I] gray level: " << rgb2lms.gray_level << std::endl;
+    iris::rgb refpoint = iris::rgb::gray(rgb2lms.gray_level);
     iris::dkl cspace(params, refpoint);
+
 
     if (vm.count("is-dl")) {
         cspace.iso_slant(iso_dl, iso_phi);
