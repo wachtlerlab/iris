@@ -94,6 +94,7 @@ int main(int argc, char **argv) {
     std::cerr << "[I] contrast: " << contrast << std::endl;
 
     iris::csv_file fd(infile_path);
+    std::cout << "angle, r, g, b";
     for(const auto &rec : fd) {
         if (rec.is_empty() || rec.is_comment()) {
             continue;
@@ -106,7 +107,7 @@ int main(int argc, char **argv) {
 
         double x = rec.get_double(0);
         iris::rgb c = cspace.iso_lum(x, contrast);
-        std::cout << x << ", " << c << std::endl;
+        std::cout << std::endl << x << ", " << c;
     }
 
     return 0;
