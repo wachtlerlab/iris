@@ -19,17 +19,15 @@ int main(int argc, char **argv) {
 
     std::string mdev;
     std::string infile_path;
+    std::string sid;
 
-    double iso_dl = 0.0;
-    double iso_phi = 0.0;
     double contrast = 0.17;
 
     po::options_description opts("IRIS conversion tool");
     opts.add_options()
             ("help", "produce help message")
-            ("is-dl", po::value<double>(&iso_dl))
-            ("is-phi", po::value<double>(&iso_phi))
             ("monitor", po::value<std::string>(&mdev))
+            ("subject,S", po::value<std::string>(&sid))
             ("file", po::value<std::string>(&infile_path)->required());
 
     po::positional_options_description pos;
@@ -77,10 +75,23 @@ int main(int argc, char **argv) {
     iris::rgb refpoint = iris::rgb::gray(rgb2lms.gray_level);
     iris::dkl cspace(params, refpoint);
 
+    if (vm.count("subject")) {
+        std::vector<iris::data::subject> hits = store.find_subjects(sid);
+        if (hits.empty()) {
+            std::cerr << "Coud not find subject [" << sid << "]" << std::endl;
+        } else if (hits.size() > 1) {
+            std::cerr << "Ambigous subject string (> 1 hits): " << std::endl;
+            for (const auto &s : hits) {
+                std::cerr << "\t" << s.initials << std::endl;
+            }
+        }
 
-    if (vm.count("is-dl")) {
-        cspace.iso_slant(iso_dl, iso_phi);
+        const iris::data::subject subject = hits.front(); // size() == 1 asserted
+        iris::data::isoslant iso = store.load_isoslant(subject);
+        cspace.iso_slant(iso.dl, iso.phi);
     }
+
+    std::cerr << "[I] contrast: " << contrast << std::endl;
 
     iris::csv_file fd(infile_path);
     for(const auto &rec : fd) {
