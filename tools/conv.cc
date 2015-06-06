@@ -22,12 +22,14 @@ int main(int argc, char **argv) {
     std::string sid;
 
     double contrast = 0.17;
+    bool in_degree = false;
 
     po::options_description opts("IRIS conversion tool");
     opts.add_options()
             ("help", "produce help message")
             ("monitor", po::value<std::string>(&mdev))
             ("subject,S", po::value<std::string>(&sid))
+            ("degree", po::value<bool>(&in_degree))
             ("file", po::value<std::string>(&infile_path)->required());
 
     po::positional_options_description pos;
@@ -106,7 +108,7 @@ int main(int argc, char **argv) {
         }
 
         double x = rec.get_double(0);
-        iris::rgb c = cspace.iso_lum(x, contrast);
+        iris::rgb c = cspace.iso_lum(x, contrast, in_degree);
         std::cout << std::endl << x << ", " << c;
     }
 
