@@ -16,7 +16,7 @@ import os
 def main():
     parser = argparse.ArgumentParser(description='CI - Plot ISO fit')
     parser.add_argument('--freq', dest='freq', type=float, default=1.0)
-    parser.add_argument('--offset', type=float, default=0.667)
+    parser.add_argument('--offset', type=float, default=0.66)
     parser.add_argument('data', type=str)
 
     args = parser.parse_args()
