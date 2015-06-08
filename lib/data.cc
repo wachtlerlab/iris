@@ -434,6 +434,7 @@ isoslant store::yaml2isoslant(const std::string &data) {
     iso.subject = root["subject"].as<std::string>();
     iso.dl = root["dl"].as<double>();
     iso.phi = root["phi"].as<double>();
+    iso.rgb2lms = root["rgb2lms"].as<std::string>();
 
     iso.display = yaml2display(root["display"]);
     return iso;
@@ -453,6 +454,7 @@ std::string store::isoslant2yaml(const isoslant &iso) {
 
     out << "display";
     emit_display(iso.display, out);
+    out << "rgb2lms" << iso.rgb2lms;
 
     out << YAML::EndMap;
     out << YAML::EndMap;
@@ -470,6 +472,7 @@ isodata store::yaml2isodata(const std::string &str) {
     isodata d(root["id"].as<std::string>());
     d.subject = root["subject"].as<std::string>();
     d.display = yaml2display(root["display"]);
+    d.rgb2lms = root["rgb2lms"].as<std::string>();
 
     std::string cd = root["data"].as<std::string>();
 
@@ -512,6 +515,7 @@ std::string store::isodata2yaml(const isodata &data) {
 
     out << "display";
     emit_display(data.display, out);
+    out << "rgb2lms" << data.rgb2lms;
 
     out << "data" << YAML::Literal;
 

@@ -107,7 +107,7 @@ struct isodata : entity {
 
     //provenance metadata
     data::display display;
-
+    std::string rgb2lms;
 };
 
 struct isoslant : entity {
@@ -120,6 +120,7 @@ struct isoslant : entity {
 
     //provenance metadata
     data::display display;
+    std::string rgb2lms;
 };
 
 
