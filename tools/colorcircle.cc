@@ -319,6 +319,7 @@ int main(int argc, char **argv) {
     iris::data::rgb2lms rgb2lms = store.load_rgb2lms(display);
 
     iris::dkl::parameter params = rgb2lms.dkl_params;
+    std::cerr << "[I] caliberation: " << rgb2lms.identifier() << std::endl;
     std::cerr << "[I] rgb2sml calibration:" << std::endl;
     params.print(std::cerr);
 
