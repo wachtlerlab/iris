@@ -148,6 +148,23 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/play.cc")
 endif()
 
 ########################################
+# install
+
+install(TARGETS iris
+        FRAMEWORK DESTINATION "/Library/Frameworks"
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+
+install(TARGETS pr655 iris-info iris-measure iris-cgen iris-calibrate iris-colorcircle iris-fitiso iris-board iris-convert iris-isoslant iris-rndgen
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+        COMPONENT applications)
+
+install(DIRECTORY lib/ DESTINATION include/iris
+        FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+
+
+########################################
 # Status
 MESSAGE("===============================")
 MESSAGE("Configuration:")
