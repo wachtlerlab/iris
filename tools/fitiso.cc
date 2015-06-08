@@ -82,6 +82,8 @@ int main(int argc, char **argv) {
         iso.subject = input.subject;
         iso.display = input.display;
         iso.rgb2lms = input.rgb2lms;
+        std::cerr << "[I] subject: " << iso.subject << std::endl;
+        std::cerr << "[I] rgb2lms: " << iso.rgb2lms << std::endl;
 
         std::string outdata = iris::data::store::isoslant2yaml(iso);
         if (only_stdout) {
