@@ -298,6 +298,7 @@ int main(int argc, char **argv) {
             }
 
             iso.display = display;
+            iso.rgb2lms = rgb2lms.identifier();
 
             std::string outstr = store.isodata2yaml(iso);
             if (use_stdout) {

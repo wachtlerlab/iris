@@ -81,6 +81,7 @@ int main(int argc, char **argv) {
         iso.phi = fitter.p[1];
         iso.subject = input.subject;
         iso.display = input.display;
+        iso.rgb2lms = input.rgb2lms;
 
         std::string outdata = iris::data::store::isoslant2yaml(iso);
         if (only_stdout) {
