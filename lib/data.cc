@@ -8,10 +8,33 @@
 namespace iris {
 namespace data {
 
+static fs::file find_default_location() {
+
+    static std::vector<fs::file> known_files = {
+            fs::file("/etc/iris"),
+            fs::file("~/.config/iris"),
+            fs::file("~/experiments/config"),
+            fs::file("~/experiments/iris")
+    };
+
+    //std::cerr << "[D] Looking for iris file in: " << std::endl;
+    for (fs::file &f : known_files) {
+        std::cerr << f.path() << std::endl;
+        fs::file fver = f.child("/version");
+        if (f.exists() && fver.exists()) {
+            return f;
+        }
+    }
+
+    return fs::file();
+}
+
+
 iris::data::store iris::data::store::default_store() {
 
-    fs::file home = fs::file::home_directory();
-    fs::file base = home.child(".config/iris");
+    fs::file base = find_default_location();
+    std::cerr << "[I] iris root: " << base.path() << std::endl;
+
     fs::file fver = base.child("/version");
 
     if (!base.exists() || !fver.exists()) {
