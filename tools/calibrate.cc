@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
-            ("cone-fundamentals,c", po::value<std::string>(&cones)->required())
+            ("cone-fundamentals,c", po::value<std::string>(&cones))
             ("weight-exponent,w", po::value<double>(&weight_exp))
             ("check-luminance", po::value<bool>(&check_lum))
             ("width,W", po::value<float>(&dsp_width))
@@ -172,7 +172,17 @@ int main(int argc, char **argv) {
 
     sp.read(h5x::TypeId::Float, sp_size, spec.data());
 
-    spectra cf = iris::spectra::from_csv(fs::file(cones));
+    fs::file cff;
+    if (cones.empty()) {
+        iris::data::store store = iris::data::store::default_store();
+        cff = store.cone_fundamentals(4);
+    } else {
+        cff = fs::file(cones);
+    }
+
+    std::cerr << "[I] Using cone fundamentals: " << cff.path() << std::endl;
+
+    spectra cf = iris::spectra::from_csv(cff);
 
     std::vector<iris::rgb> stim(ps_size[0]);
     ps.read(h5x::TypeId::Float, ps_size, stim.data());

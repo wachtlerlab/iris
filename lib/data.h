@@ -160,6 +160,9 @@ public:
 
     display make_display(const monitor &monitor, const monitor::mode &mode, const std::string &gfx) const;
 
+    // cone fundamentals for calibration
+    fs::file cone_fundamentals(size_t spacing = 4) const;
+
     // yaml config IO
 
     static monitor yaml2monitor(const std::string &data);

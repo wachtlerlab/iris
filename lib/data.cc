@@ -246,8 +246,15 @@ display store::make_display(const monitor       &monitor,
     return dsp;
 }
 
+
+
 // yaml stuff
 
+fs::file store::cone_fundamentals(size_t spacing) const {
+    std::stringstream fn;
+    fn << "cones/sml_380@" << spacing << ".csv";
+    return base.child(fn.str());
+}
 
 static iris::data::monitor::mode yaml2mode(const YAML::Node &node) {
     iris::data::monitor::mode mode;
