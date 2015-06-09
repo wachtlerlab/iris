@@ -141,6 +141,9 @@ public:
         std::transform(circ_phi.cbegin(), circ_phi.cend(), circ_rgb.begin(), [&](const double p){
             iris::rgb crgb = colorspace.iso_lum(p, c);
             uint8_t creport;
+            double dl, dp;
+            std::tie(dl, dp) = colorspace.iso_slant();
+            std::cerr << "Updating colors... " << dl << " " << dp << std::endl;
             iris::rgb res = crgb.clamp(&creport);
             if (creport != 0) {
                 std::cerr << "[W] color clamped: " << crgb << " → " << res << " @ c: " << c << std::endl;
@@ -222,6 +225,8 @@ void colorcircle::key_event(int key, int scancode, int action, int mods) {
         } else {
             colorspace.iso_slant(0.0, M_PI);
         }
+
+        update_colors();
 
         std::cout << "iso slant correction: " << std::boolalpha << use_isoslant << std::endl;
     }
