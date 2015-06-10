@@ -79,7 +79,7 @@ private:
 
 class sin_fitter : public fitter {
 public:
-    sin_fitter(const std::vector<double> &x, const std::vector<double> &y, bool fit_freq = false)
+    sin_fitter(const std::vector<double> &x, const std::vector<double> &y, bool fit_freq = false, double offset = -1)
             : x(x), y(y), fit_frequency(fit_freq) {
 
         auto result = std::minmax_element(y.cbegin(), y.cend());
@@ -92,16 +92,27 @@ public:
         double v_amp = (v_max - v_min) * 0.5;
         double v_mid = v_min + (v_max - v_min) * 0.5;
 
-        p[0] = v_amp;
-        p[1] = x[p_max];
-        p[2] = v_mid;
-        p[3] = 1;
+        if ((fit_offset = offset < 0)) {
+            dc = v_mid;
+            freq_idx = 3;
+        } else {
+            dc = offset;
+            freq_idx = 2;
+        }
+
+        p[0] = v_amp;    // amplitude
+        p[1] = x[p_max]; // phase
+        p[2] = dc;       // offset
+        p[freq_idx] = 1; // frequency
     }
 
     virtual int eval(int m, int n, const double *p, double *fvec) const override;
 
     virtual int num_parameter() const override {
-        return fit_frequency ? 4 : 3;
+        int params = 4;
+        params -= fit_frequency ? 0 : 1;
+        params -= fit_offset ? 0 : 1;
+        return params;
     }
 
     virtual int num_variables() const override {
@@ -112,10 +123,18 @@ public:
         return p;
     }
 
+    double amplitude() const { return p[0]; }
+    double phase() const { return p[1]; }
+    double offset() const { return fit_offset ? p[2] : dc; }
+    double frequency() const { return fit_frequency ? p[freq_idx] : 1.0; }
+
     const std::vector<double> &x;
     const std::vector<double> &y;
     bool fit_frequency;
+    bool fit_offset;
+    double dc = 0.66;
     double p[4];
+    size_t freq_idx;
 };
 
 class rgb2sml_fitter : public fitter {

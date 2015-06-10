@@ -51,10 +51,12 @@ int gamma_fitter::eval(int m, int n, const double *p, double *fvec) const {
 
 int sin_fitter::eval(int m, int n, const double *p, double *fvec) const {
 
+    size_t freq_idx = fit_offset ? 3 : 2;
+
     double A = p[0];
     double phi = p[1];
-    double offset = p[2];
-    double f = fit_frequency ? p[3] : 1.0;
+    double offset = fit_offset ? p[2] : dc;
+    double f = fit_frequency ? p[freq_idx] : 1.0;
 
     for(int i = 0; i < x.size(); i++) {
         fvec[i] = y[i] - (offset + A * cos(f * x[i] - phi));
