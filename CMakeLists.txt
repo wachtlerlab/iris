@@ -130,8 +130,8 @@ target_link_libraries(iris-board iris)
 add_executable(iris-convert tools/conv.cc)
 target_link_libraries(iris-convert iris)
 
-add_executable(iris-cfg tools/cfg.cc)
-target_link_libraries(iris-cfg iris)
+add_executable(iris-store tools/store.cc)
+target_link_libraries(iris-store iris)
 
 add_executable(iris-isoslant tools/isoslant.cc)
 target_link_libraries(iris-isoslant iris)
