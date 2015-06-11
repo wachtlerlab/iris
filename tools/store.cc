@@ -3,69 +3,71 @@
 #include <boost/program_options.hpp>
 #include <data.h>
 
+#include <getopt.h>
+
 #include <iostream>
 
-void cmd_monitor(const std::vector<std::string> &args) {
-    namespace po = boost::program_options;
+void cmd_info(int argc, char **argv) {
+    iris::data::store store = iris::data::store::default_store();
 
-    po::options_description opts("monitor options");
-    opts.add_options()
-            ("list", "list installed monitors");
+    std::cout << "location: " << store.location().path() << std::endl;
 
-    po::variables_map vm;
-    try {
-        po::store(po::command_line_parser(args).options(opts).run(), vm);
-    } catch (const std::exception &e) {
-        std::cerr << "Error while parsing commad line options: " << std::endl;
-        std::cerr << "\t" << e.what() << std::endl;
-        return;
-    }
 }
 
 
 struct command {
     std::string name;
-    void (*command_fn)(const std::vector<std::string> &args);
+    std::string help;
+    void (*command_fn)(int argc, char **argv);
 
-    void operator()(const std::vector<std::string> &args) const {
-        (*command_fn)(args);
+    void operator()(int argc, char **argv) const {
+        (*command_fn)(argc, argv);
     }
 };
 
 command cmds[] = {
-        { "monitor", cmd_monitor },
-        {"",         nullptr}
+        { "info", "general data store information", cmd_info },
+        {"",         "", nullptr}
 };
+
+static void usage(const std::string &binname = "") {
+    std::cerr << "iris data store tool" << std::endl;
+    std::cerr << "usage: " << binname << " " << "<command> [<args>]" << std::endl << std::endl;
+    std::cerr << "valid commands:" << std::endl;
+
+    command *cmd = nullptr;
+    for (cmd = cmds; cmd->command_fn != nullptr; cmd++) {
+        std::cerr << "   " << cmd->name << " \t " << cmd->help << std::endl;
+    }
+}
 
 int main(int argc, char **argv)
 {
-    namespace po = boost::program_options;
+    static struct option longopts[] = {
+            { "help",       no_argument,            NULL,          'h' },
+            { NULL,         0,                      NULL,           0 }
+    };
 
-    po::options_description po_global("configration tool");
-    po_global.add_options()
-            ("command", po::value<std::string>(), "cmd")
-            ("args", po::value<std::vector<std::string> >(), "args for cmd");
+    std::string binname = argv[0];
 
-    po::positional_options_description pos;
-    pos.add("command", 1);
-    pos.add("args", -1);
+    int ch;
+    while ((ch = getopt_long(argc, argv, ":h", longopts, NULL)) != -1)
+        switch (ch) {
+            case 'h':
+                usage(binname);
+                return -1;
 
-    po::variables_map vm;
-    po::parsed_options parsed = po::command_line_parser(argc, argv)
-            .options(po_global)
-            .positional(pos)
-            .allow_unregistered()
-            .run();
+        }
 
-    po::store(parsed, vm);
-    po::notify(vm);
+    argc -= optind;
+    argv += optind;
 
-    if (vm.count("help") > 0) {
-        std::cout << po_global << std::endl;
-        return 0;
+    if (argc == 0) {
+        usage(binname);
+        return -1;
     }
 
-    std::string cmd_name = vm["command"].as<std::string>();
+    std::string cmd_name(argv[0]);
 
     bool valid_cmd = false;
     command *cmd = nullptr;
@@ -78,15 +80,11 @@ int main(int argc, char **argv)
 
     if (!valid_cmd) {
         std::cerr << "Invalid command: " << cmd_name << std::endl;
-        std::cerr << po_global << std::endl;
+        usage(binname);
         return -1;
     }
 
-    std::vector<std::string> opts = po::collect_unrecognized(parsed.options, po::include_positional);
-    opts.erase(opts.begin());
-
-    (*cmd)(opts);
-
+    (*cmd)(argc, argv);
 
     return 0;
 }
