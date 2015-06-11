@@ -19,7 +19,6 @@ static fs::file find_default_location() {
 
     //std::cerr << "[D] Looking for iris file in: " << std::endl;
     for (fs::file &f : known_files) {
-        std::cerr << f.path() << std::endl;
         fs::file fver = f.child("/version");
         if (f.exists() && fver.exists()) {
             return f;
@@ -33,30 +32,38 @@ static fs::file find_default_location() {
 iris::data::store iris::data::store::default_store() {
 
     fs::file base = find_default_location();
-    std::cerr << "[I] iris root: " << base.path() << std::endl;
-
     fs::file fver = base.child("/version");
 
     if (!base.exists() || !fver.exists()) {
         throw std::runtime_error("Could not initialize store");
     }
 
-    std::string sver = fver.read_all();
-    sver.erase(std::find_if(sver.begin(), sver.end(), [](const char c) {
-        return c == ' ' || c == '\n' || c == '\t';
-    }));
+    data::store store(base);
+    std::string sver = store.version_string();
 
     if (sver != CUR_VERSION) {
         std::cerr << "[W] different store version: " ;
         std::cerr << sver << " [" << CUR_VERSION << "]" << std::endl;
     }
 
-    return data::store(base);
+    return store;
 }
 
 
 iris::data::store::store(const fs::file &path) : base(path) {
 
+}
+
+
+std::string store::version_string() const {
+    fs::file fver = base.child("/version");
+
+    std::string sver = fver.read_all();
+    sver.erase(std::find_if(sver.begin(), sver.end(), [](const char c) {
+        return c == ' ' || c == '\n' || c == '\t';
+    }));
+
+    return sver;
 }
 
 std::string iris::data::store::default_monitor() const {

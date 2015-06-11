@@ -141,6 +141,7 @@ public:
     static store default_store();
 
     fs::file location() const { return base; }
+    std::string version_string() const;
 
     //monitor functions
     std::string default_monitor() const;
