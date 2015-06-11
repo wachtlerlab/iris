@@ -11,6 +11,9 @@ void cmd_info(int argc, char **argv) {
     iris::data::store store = iris::data::store::default_store();
 
     std::cout << "location: " << store.location().path() << std::endl;
+    std::cout << "version: " << store.version_string() << std::endl;
+
+
 
 }
 
