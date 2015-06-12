@@ -323,6 +323,7 @@ rgb2lms store::yaml2rgb2lms(const std::string &data) {
 
     std::string csv = root["dkl"].as<std::string>();
     calibration.dkl_params = dkl::parameter::from_csv_data(csv);
+    calibration.dataset = root["dataset"].as<std::string>();
 
     return calibration;
 }
