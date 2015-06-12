@@ -87,7 +87,12 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    (*cmd)(argc, argv);
-
-    return 0;
+    int res = 0;
+    try {
+        res = (*cmd)(argc, argv);
+    } catch (const std::exception &e) {
+        std::cerr << "[E] " << e.what() << std::endl;
+        res = -1;
+    }
+    return res;
 }
