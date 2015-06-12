@@ -152,7 +152,8 @@ public:
     std::vector<std::string> list_settings(const monitor &monitor) const;
 
     //calibration functions
-    rgb2lms load_rgb2lms(const display &display) const;
+    rgb2lms  load_rgb2lms(const display &display) const;
+    fs::file store_rgb2lms(const rgb2lms &rgb2lms);
 
     //subject functions
     subject load_subject(const std::string &uid);

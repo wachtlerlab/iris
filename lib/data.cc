@@ -170,6 +170,29 @@ rgb2lms store::load_rgb2lms(const display &display) const {
 }
 
 
+fs::file store::store_rgb2lms(const rgb2lms &rgb2lms) {
+    display display = rgb2lms.dsy;
+
+    monitor monitor;
+    try {
+        monitor = load_monitor(display.monitor_id);
+    } catch(const std::runtime_error &e) {
+        throw std::runtime_error("Could not import rgb2lms; monitor loading error");
+    }
+
+    fs::file mdir = base.child("monitors/" + display.monitor_id);
+    fs::file fd = mdir.child(rgb2lms.identifier() + ".rgb2lms");
+
+    if (fd.exists()) {
+        throw std::runtime_error("rgb2lms data already exists!");
+    }
+
+    std::string data = rgb2lms2yaml(rgb2lms);
+    fd.write_all(data);
+
+    return fd;
+}
+
 subject store::load_subject(const std::string &uid) {
     fs::file sfile = base.child("subjects/" + uid + "/" + uid + ".subject");
     return yaml2subject(sfile.read_all());
