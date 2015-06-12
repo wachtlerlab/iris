@@ -96,6 +96,10 @@ public:
     std::string read_all() const;
     void write_all(const std::string &data);
 
+    // fs functions
+
+    void copy(fs::file &dest, bool overwrite = false) const;
+
     // obtain files
 
     static file current_directory();

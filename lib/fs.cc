@@ -214,6 +214,19 @@ void file::write_all(const std::string &data) {
 
 }
 
+
+void file::copy(fs::file &dest, bool overwrite) const {
+
+    if (dest.exists() && !overwrite) {
+        throw std::runtime_error("destination exists");
+    }
+
+    //FIXME: ok, this is really, really lame
+
+    std::string data = read_all();
+    dest.write_all(data);
+}
+
 file file::current_directory() {
     char buf[PATH_MAX] = {0, };
 
