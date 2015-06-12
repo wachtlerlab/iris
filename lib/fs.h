@@ -85,7 +85,7 @@ public:
 
     bool access(int mode);
 
-    bool exists();
+    bool exists() const;
 
     bool is_directory() const;
 

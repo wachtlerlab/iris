@@ -117,7 +117,7 @@ bool file::access(int mode) {
     return ::access(loc.c_str(), mode) == 0;
 }
 
-bool file::exists() {
+bool file::exists() const {
     struct stat buf;
     int res = stat(loc.c_str(), &buf);
     return res == 0;
