@@ -225,10 +225,20 @@ void file::copy(fs::file &dest, bool overwrite) const {
         throw std::runtime_error("destination exists");
     }
 
-    //FIXME: ok, this is really, really lame
+    std::fstream input = stream(std::ios::in | std::ios::binary);
+    std::fstream output = dest.stream(std::ios::out | std::ios::binary);
 
-    std::string data = read_all();
-    dest.write_all(data);
+    char buffer[128];
+
+    while (output.good() && input.good()) {
+        input.read(buffer, sizeof(buffer));
+        std::streamsize nread = input.gcount();
+        output.write(buffer, nread);
+    }
+
+    if ((!input.good() && !input.eof()) || !output.good()) {
+        throw std::runtime_error("copy error: IO error");
+    }
 }
 
 file file::current_directory() {
