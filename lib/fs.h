@@ -70,6 +70,7 @@ public:
     file(const std::string &path);
     const std::string &path() const { return loc; }
     std::string name() const;
+    std::pair<std::string, std::string> splitext() const;
 
     file child(const std::string &name) const {
         if (name.empty() || loc.empty()) {

@@ -69,6 +69,20 @@ std::string file::name() const {
 }
 
 
+std::pair<std::string, std::string> file::splitext() const {
+    std::string nm = name();
+    std::string::size_type pos = nm.rfind(".");
+
+    std::string root = nm.substr(0, pos);
+    std::string ext;
+
+    if (pos != std::string::npos) {
+        ext = nm.substr(pos + 1);
+    }
+
+    return std::make_pair(root, ext);
+}
+
 file file::parent() const {
 
     if (loc.size() == 1 && loc[0] == '/') {
