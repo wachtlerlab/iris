@@ -161,6 +161,10 @@ file file::readlink() const {
 }
 
 
+std::fstream file::stream(std::ios_base::openmode mode) const {
+    return std::fstream(loc, mode);
+}
+
 std::string file::read_all() const {
     std::ifstream fd(loc, std::ios::in | std::ios::ate);
 

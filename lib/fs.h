@@ -93,6 +93,8 @@ public:
 
     // IO
 
+    std::fstream stream(std::ios::openmode mode = std::ios::in|std::ios::out) const;
+
     std::string read_all() const;
     void write_all(const std::string &data);
 
