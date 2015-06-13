@@ -11,34 +11,6 @@
 
 namespace glue {
 
-static const char vs_text[] = R"SHDR(
-#version 140
-
-in vec4 coord;
-out vec2 texpos;
-uniform sampler2D tex;
-uniform mat4 transform;
-
-void main(void) {
-  gl_Position = transform * vec4(coord.xy, 0, 1);
-  texpos = coord.zw / textureSize(tex, 0);
-}
-)SHDR";
-
-static const char fs_text[] = R"SHDR(
-#version 140
-
-in vec2 texpos;
-uniform sampler2D tex;
-uniform vec4 color;
-
-out vec4 finalColor;
-
-void main(void) {
-  finalColor = vec4(1, 1, 1, texture(tex, texpos).r) * color;
-}
-)SHDR";
-
 tf_atlas::tf_atlas(size_t font_size)
         : font_size(font_size), pos(), size(), rowh(0), index(), font_tex() {
   int w = 1024;
