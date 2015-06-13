@@ -228,7 +228,7 @@ void file::copy(fs::file &dest, bool overwrite) const {
     std::fstream input = stream(std::ios::in | std::ios::binary);
     std::fstream output = dest.stream(std::ios::out | std::ios::binary);
 
-    char buffer[128];
+    char buffer[4096];
 
     while (output.good() && input.good()) {
         input.read(buffer, sizeof(buffer));
