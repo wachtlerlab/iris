@@ -140,6 +140,30 @@ add_executable(iris-rndgen tools/rndgen.cc)
 target_link_libraries(iris-rndgen iris)
 
 ########################################
+# UI tools (depend on Qt5)
+
+find_package(Qt5Widgets QUIET)
+find_package(Qt5PrintSupport QUIET)
+
+message("Have Qt5 Widgets: ${Qt5Widgets_FOUND}, PrintSupport: ${Qt5PrintSupport_FOUND}")
+
+set(HAVE_UI NO)
+if (${Qt5Widgets_FOUND} AND ${Qt5PrintSupport_FOUND})
+
+  set(CMAKE_INCLUDE_CURRENT_DIR ON)
+  set(CMAKE_AUTOMOC ON)
+
+  include_directories(ui ${CMAKE_BINARY_DIR})
+
+  QT5_WRAP_UI(ISOSLANT_UI_HDRS
+              ui/isoslantwnd.ui)
+
+  add_executable(iris-ui-isoslant ui/qcustomplot.cpp ui/isoslant.cc ui/isoslantwnd.cc ${ISOSLANT_UI_HDRS})
+  target_link_libraries(iris-ui-isoslant Qt5::Widgets Qt5::PrintSupport iris)
+  set(HAVE_UI YES)
+endif()
+
+########################################
 # playground
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/play.cc")
@@ -167,6 +191,7 @@ install(DIRECTORY lib/ DESTINATION include/iris
 ########################################
 # Status
 MESSAGE("===============================")
+MESSAGE("Binary dir: ${CMAKE_BINARY_DIR}")
 MESSAGE("Configuration:")
 MESSAGE("Freetype:")
 MESSAGE("\tinc: ${FREETYPE_INCLUDE_DIRS}")
