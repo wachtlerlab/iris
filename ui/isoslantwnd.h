@@ -23,6 +23,7 @@ public:
   explicit IsoslantWnd(QWidget *parent = 0);
 
   static void load_isodata(const std::string &path,  QCustomPlot *plot);
+  static QCPGraph *plot_isodata(const iris::data::isodata &iso, QCustomPlot *plot);
   static QCPGraph *plot_isoslant(const iris::data::isoslant &iso, QCustomPlot *plot);
   void add_isoslant(const std::string &path);
 

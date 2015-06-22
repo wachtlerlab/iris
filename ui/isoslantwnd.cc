@@ -33,6 +33,11 @@ void IsoslantWnd::load_isodata(const std::string &path, QCustomPlot *plot) {
     std::string raw = fd.read_all();
     iris::data::isodata input = iris::data::store::yaml2isodata(raw);
 
+    plot_isodata(input, plot);
+}
+
+
+QCPGraph *IsoslantWnd::plot_isodata(const iris::data::isodata &input, QCustomPlot *plot) {
     QVector<double> x(input.samples.size());
     QVector<double> y(input.samples.size());
     std::transform(input.samples.cbegin(), input.samples.cend(), x.begin(),
@@ -52,7 +57,6 @@ void IsoslantWnd::load_isodata(const std::string &path, QCustomPlot *plot) {
     points->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
     points->setName("Measured data");
 }
-
 
 QCPGraph *IsoslantWnd::plot_isoslant(const iris::data::isoslant &iso, QCustomPlot *plot) {
 
