@@ -161,9 +161,9 @@ file file::readlink() const {
 }
 
 
-std::fstream file::stream(std::ios_base::openmode mode) const {
-    return std::fstream(loc, mode);
-}
+//std::fstream file::stream(std::ios_base::openmode mode) const {
+//    return std::fstream(loc, mode);
+//}
 
 std::string file::read_all() const {
     std::ifstream fd(loc, std::ios::in | std::ios::ate);
@@ -225,8 +225,8 @@ void file::copy(fs::file &dest, bool overwrite) const {
         throw std::runtime_error("destination exists");
     }
 
-    std::fstream input = stream(std::ios::in | std::ios::binary);
-    std::fstream output = dest.stream(std::ios::out | std::ios::binary);
+    std::fstream input(path(), std::ios::in | std::ios::binary);
+    std::fstream output(dest.path(), std::ios::out | std::ios::binary);
 
     char buffer[4096];
 
