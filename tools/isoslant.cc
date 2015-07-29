@@ -72,6 +72,7 @@ private:
     bool draw_stim;
     int refresh;
     int nframes;
+    int flips;
 
     gl::point cursor;
     float mouse_gain;
@@ -113,6 +114,8 @@ flicker_wnd::flicker_wnd(const iris::data::rgb2lms &rgb2lms, const std::vector<d
     contrast = 0.2;
     mouse_gain = 0.00001;
     completed = false;
+    flips = 0;
+    glfwSetTime(0.0);
 
     resp.resize(phi.size());
 
@@ -138,34 +141,41 @@ flicker_wnd::flicker_wnd(const iris::data::rgb2lms &rgb2lms, const std::vector<d
 void flicker_wnd::update_label() {
     std::stringstream sstr;
     sstr << stim_index + 1 << " of " << phi.size();
+
+    double now = glfwGetTime();
+    double fps = flips / now;
+
+    sstr << " [flicker @ " << fps << " Hz] ";
+
     progress.text(sstr.str());
 }
 
 void flicker_wnd::render() {
     nframes++;
 
-    if (nframes == 20*refresh) {
+    if (nframes == 1000*refresh) {
         nframes = 0;
     }
 
-    bool flip = false;
-
     if (nframes % refresh == 0) {
         draw_stim = !draw_stim;
-        flip = true;
+        flips++;
     }
 
-    if (flip) {
-        glClearColor(gray_level, gray_level, gray_level, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(gray_level, gray_level, gray_level, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-        if (draw_stim) {
-            fg.draw(vp);
-        }
-
-        progress.draw(px2gl);
-        swap_buffers();
+    if (draw_stim) {
+        fg.draw(vp);
     }
+
+    if (glfwGetTime() - clock > 1.0) {
+        update_label();
+        clock = glfwGetTime();
+    }
+
+    progress.draw(px2gl);
+    swap_buffers();
 
     glfwPollEvents();
 }
@@ -251,10 +261,14 @@ int main(int argc, char **argv) {
         iris::data::store store = iris::data::store::default_store();
         std::string mdev = store.default_monitor();
 
+        std::cerr << "[D] monitor: " << mdev << std::endl;
+
         iris::data::monitor moni = store.load_monitor(mdev);
         iris::data::monitor::mode mode = moni.default_mode;
         iris::data::display display = store.make_display(moni, mode, "gl");
         iris::data::rgb2lms rgb2lms = store.load_rgb2lms(display);
+
+        std::cerr << "[D] config: " << rgb2lms.qualified_id() << std::endl;
 
         //find the subject
         std::vector<iris::data::subject> hits = store.find_subjects(sid);
