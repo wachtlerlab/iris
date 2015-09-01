@@ -17,6 +17,12 @@ namespace device {
 class pr655 {
 public:
 
+    enum class SyncMode {
+        NoSync = 0,
+        Adaptive = 1,
+        Frequency = 3
+    };
+
     template<typename T>
     struct response {
 
@@ -122,6 +128,8 @@ public:
     spectral_data spectral();
 
     response<brightness> brightness_pm();
+
+    response<bool> sync_mode(SyncMode mode);
 
     bool measure();
 

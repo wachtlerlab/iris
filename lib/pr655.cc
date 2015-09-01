@@ -144,4 +144,14 @@ pr655::brightness pr655::parse_brightness(const std::string &line) {
 
     return br;
 }
+
+pr655::response<bool> pr655::sync_mode(pr655::SyncMode mode) {
+    int imode = static_cast<int>(mode);
+    char cmd[1024] = {'\0', };
+    snprintf(cmd, sizeof(cmd), "SS%d", imode);
+    std::cerr << cmd << std::endl;
+    response<std::string> res = io_cmd(cmd);
+    return response<bool>(res.code);
+}
+
 } //namespace device
