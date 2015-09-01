@@ -14,11 +14,13 @@ int main(int argc, char **argv) {
     std::string device;
     std::string mtype;
     bool auto_sync = false;
+    int exp_time = 0; // means adaptive
 
     po::options_description opts("pr655 commandline tool");
     opts.add_options()
             ("help", "produce help message")
             ("auto-sync", po::value<bool>(&auto_sync))
+            ("exposure", po::value<int>(&exp_time))
             ("device", po::value<std::string>(&device))
             ("measurement", po::value<std::string>(&mtype), "for now only 'spectrum' is valid");
 
@@ -62,6 +64,12 @@ int main(int argc, char **argv) {
             if (!bres) {
                 std::cout << "[W] could not set SyncMode to Adaptive" << std::endl;
             }
+        }
+
+        bres = meter.exposure_time(exp_time);
+
+        if (!bres) {
+            std::cout << "[W] could not set exposure time to" << exp_time  << std::endl;
         }
 
         std::cout << prefix << "status: " << meter.istatus().code << std::endl;
