@@ -53,6 +53,12 @@ int main(int argc, char **argv) {
 
         meter.units(true);
 
+        device::pr655::response<bool> bres = meter.sync_mode(device::pr655::SyncMode::Adaptive);
+
+        if (!bres) {
+            std::cout << "[W] could not set SyncMode to Adaptive" << std::endl;
+        }
+
         std::cout << prefix << "status: " << meter.istatus().code << std::endl;
 
         meter.measure();
