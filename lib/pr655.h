@@ -131,6 +131,8 @@ public:
 
     response<bool> sync_mode(SyncMode mode);
 
+    response<bool> exposure_time(int milliseconds);
+
     bool measure();
 
 private:
