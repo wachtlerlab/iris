@@ -13,10 +13,12 @@ int main(int argc, char **argv) {
 
     std::string device;
     std::string mtype;
+    bool auto_sync = false;
 
     po::options_description opts("pr655 commandline tool");
     opts.add_options()
             ("help", "produce help message")
+            ("auto-sync", po::value<bool>(&auto_sync))
             ("device", po::value<std::string>(&device))
             ("measurement", po::value<std::string>(&mtype), "for now only 'spectrum' is valid");
 
@@ -53,10 +55,13 @@ int main(int argc, char **argv) {
 
         meter.units(true);
 
-        device::pr655::response<bool> bres = meter.sync_mode(device::pr655::SyncMode::Adaptive);
+        device::pr655::response<bool> bres(0);
 
-        if (!bres) {
-            std::cout << "[W] could not set SyncMode to Adaptive" << std::endl;
+        if (auto_sync) {
+            bres = meter.sync_mode(device::pr655::SyncMode::Adaptive);
+            if (!bres) {
+                std::cout << "[W] could not set SyncMode to Adaptive" << std::endl;
+            }
         }
 
         std::cout << prefix << "status: " << meter.istatus().code << std::endl;
