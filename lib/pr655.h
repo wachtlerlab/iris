@@ -138,6 +138,24 @@ private:
     cfg         hw;
 };
 
+
+template<>
+struct pr655::response<bool> {
+    response(int code) : code(code) { }
+    explicit operator bool() const { return code == 0; }
+
+    template<typename U>
+    response<U> map(const std::function<U()> &f) const {
+        if (code == 0) {
+            return response<U>(code, f());
+        } else {
+            return response<U>(code, U());
+        }
+    }
+
+    int code;
+};
+
 }
 
 #endif
