@@ -35,7 +35,8 @@ include_directories(${GLM_INCLUDE_DIRS}
 
 link_directories(${GLFW_LIBRARY_DIRS}
                  ${OpenGL_LIBRARY_DIRS}
-                 ${OPENCL_LIBRARY_DIRS})
+                 ${OPENCL_LIBRARY_DIRS}
+                 ${FREETYPE_LIBRARY_DIRS})
 
 set(LINK_LIBS ${LINK_LIBS} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${FREETYPE_LIBRARIES})
 
