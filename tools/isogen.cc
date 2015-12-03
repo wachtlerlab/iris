@@ -24,12 +24,14 @@ int main(int argc, char **argv) {
     std::string mdev;
     double contrast = 0.16;
     size_t number = 360;
+    float bits = 0;
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
             ("contrast,c", po::value<double>(&contrast))
             ("number,N", po::value<size_t>(&number))
+            ("bits", po::value<float>(&bits))
             ("monitor", po::value<std::string>(&mdev));
 
     po::variables_map vm;
@@ -70,7 +72,18 @@ int main(int argc, char **argv) {
     for (const double angle : phi) {
         iris::rgb color = dkl.iso_lum(angle, contrast);
         double deg = angle / M_PI * 180.0;
-        std::cout << deg << ", " << color << std::endl;
+
+        std::cout << deg << ", ";
+        if (bits) {
+
+            int r, g, b;
+            std::tie(r, g, b) = color.as_int(std::pow(2.0f, bits));
+            std::cout << r << ", " << g << ", " << b;
+        } else {
+            std::cout << color;
+        }
+
+        std::cout << std::endl;
     }
 
 }
