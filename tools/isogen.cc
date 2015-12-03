@@ -22,11 +22,14 @@ int main(int argc, char **argv) {
     namespace po = boost::program_options;
 
     std::string mdev;
-    double contrast = 0.2;
+    double contrast = 0.16;
+    size_t number = 360;
 
     po::options_description opts("calibration tool");
     opts.add_options()
             ("help", "produce help message")
+            ("contrast,c", po::value<double>(&contrast))
+            ("number,N", po::value<size_t>(&number))
             ("monitor", po::value<std::string>(&mdev));
 
     po::variables_map vm;
@@ -58,8 +61,9 @@ int main(int argc, char **argv) {
 
     std::cerr << "[D] monitor: " << mdev << std::endl;
     std::cerr << "[D] config: " << rgb2lms.qualified_id() << std::endl;
+    std::cerr << "[D] contrast: " << contrast << std::endl;
 
-    std::vector<double> phi = iris::linspace(0.0, 2 * M_PI, 360);
+    std::vector<double> phi = iris::linspace(0.0, 2 * M_PI, number);
     iris::dkl dkl = iris::dkl(rgb2lms.dkl_params, iris::rgb::gray(rgb2lms.gray_level));
 
     std::cout << "angle, r, g, b" << std::endl;
