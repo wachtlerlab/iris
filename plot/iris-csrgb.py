@@ -1,9 +1,12 @@
 #!/usr/bin/env python
+from __future__ import print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import csv
 import argparse
+import pandas as pd
 
 
 def main():
@@ -11,28 +14,20 @@ def main():
     parser.add_argument('data', type=str)
 
     args = parser.parse_args()
-    x = []
-    c = []
-    filename = args.data if args.data != '-' else '/dev/stdin'
-    with open(filename, 'rb') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',', quotechar='#')
-        is_header = True
-        for row in reader:
-            if is_header:
-                is_header = False
-                continue
-            x.append(float(row[0]))
-            c.append([float(row[i]) for i in xrange(1, 4)])
 
-    y = np.array(c)
-    print(y.shape)
+    filename = args.data if args.data != '-' else '/dev/stdin'
+    df = pd.read_csv(filename, skipinitialspace=True)
+
+    x = df['angle']
     for i, c in enumerate(['r', 'g', 'b']):
-        print i
-        data = y[:, i]
-        data *= 255
-        data = data.astype('u8')
+        data = df[c]
         plt.plot(x, data,  color=c, label=c)
 
+    foo = df.diff()
+    print(foo)
+    foo['nd'] = foo[["r", "g", "b"]].apply(lambda x: len(set(x)) == 1, axis=1)
+    same_rgb = df[foo.nd == True]
+    print(same_rgb)
     plt.show()
 
 if __name__ == '__main__':
