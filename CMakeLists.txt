@@ -137,6 +137,10 @@ target_link_libraries(iris-store iris)
 add_executable(iris-isoslant tools/isoslant.cc)
 target_link_libraries(iris-isoslant iris)
 
+add_executable(iris-isogen tools/isogen.cc)
+target_link_libraries(iris-isogen iris)
+
+
 add_executable(iris-rndgen tools/rndgen.cc)
 target_link_libraries(iris-rndgen iris)
 
