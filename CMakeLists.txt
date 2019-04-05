@@ -71,8 +71,27 @@ if(NOT APPLE)
   set(LINK_LIBS ${LINK_LIBS} -llapacke)
 endif()
 
+find_path(LAPACK_INCLUDE_DIRS lapacke.h
+  /usr/include
+  /usr/include/lapacke
+  /usr/include/atlas
+  /usr/include/openblas
+  /usr/local/include
+  $ENV{LAPACK_HOME}/include)
+
+include_directories(${LAPACK_INCLUDE_DIRS})
+
 find_package(BLAS REQUIRED)
 set(LINK_LIBS ${LINK_LIBS} ${BLAS_LIBRARIES})
+
+find_path(BLAS_INCLUDE_DIRS cblas.h
+  /usr/include
+  /usr/include/atlas
+  /usr/include/openblas
+  /usr/local/include
+  $ENV{BLAS_HOME}/include)
+
+include_directories(${BLAS_INCLUDE_DIRS})
 
 #######################################
 # YAML CPP
