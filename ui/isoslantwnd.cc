@@ -56,6 +56,8 @@ QCPGraph *IsoslantWnd::plot_isodata(const iris::data::isodata &input, QCustomPlo
     points->setLineStyle(QCPGraph::lsNone);
     points->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
     points->setName("Measured data");
+
+    return points;
 }
 
 QCPGraph *IsoslantWnd::plot_isoslant(const iris::data::isoslant &iso, QCustomPlot *plot) {
