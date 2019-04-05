@@ -136,7 +136,7 @@ mat_inv(int m, int n, const double  *A, double *Ai) {
 
     std::vector<double> Sw(k*k, 0.0);
 
-    for(size_t i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
         Sw[i*(k+1)] = 1.0/s[i];
     }
 

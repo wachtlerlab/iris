@@ -34,7 +34,7 @@ bool fitter::operator()() {
 }
 
 int gamma_fitter::eval(int m, int n, const double *p, double *fvec) const {
-    if (n != 3 || m != x.size()) {
+    if (n != 3 || m != static_cast<int>(x.size())) {
         throw std::invalid_argument("Invalid data passed to GF");
     }
 
@@ -58,7 +58,7 @@ int sin_fitter::eval(int m, int n, const double *p, double *fvec) const {
     double offset = fit_offset ? p[2] : dc;
     double f = fit_frequency ? p[freq_idx] : 1.0;
 
-    for(int i = 0; i < x.size(); i++) {
+    for(int i = 0; i < static_cast<int>(x.size()); i++) {
         fvec[i] = y[i] - (offset + A * cos(f * x[i] - phi));
     }
 

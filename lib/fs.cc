@@ -139,7 +139,7 @@ file file::readlink() const {
     do {
         res = ::readlink(loc.c_str(), buffer.data(), buffer.size());
 
-        if (res > 0 && buffer.size() == res) {
+        if (res > 0 && static_cast<ssize_t>(buffer.size()) == res) {
             buffer.resize(buffer.size() * 2);
             std::fill(buffer.begin(), buffer.end(), 0);
             try_again = true;
