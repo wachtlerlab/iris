@@ -22,6 +22,7 @@ set(LINK_LIBS ${LINK_LIBS} ${Boost_LIBRARIES})
 
 ########################################
 # OpenGL + Co
+set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
