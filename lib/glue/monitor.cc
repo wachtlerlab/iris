@@ -20,7 +20,7 @@ std::vector <monitor> monitor::monitors() {
     });
 
     return result;
-};
+}
 
 static monitor::mode make(const GLFWvidmode *vm) {
     monitor::mode m;
