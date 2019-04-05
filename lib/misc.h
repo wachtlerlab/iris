@@ -5,6 +5,7 @@
 #include <numeric>
 #include <vector>
 #include <cmath>
+#include <string>
 
 namespace iris {
 

@@ -3,6 +3,8 @@
 
 #include <serial.h>
 
+#include <functional>
+
 struct spectral_data {
 
     bool is_valid;
