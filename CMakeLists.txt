@@ -84,6 +84,12 @@ link_directories(${YAMLCPP_LIBRARY_DIRS})
 set(LINK_LIBS ${LINK_LIBS} ${YAMLCPP_LIBRARIES})
 
 #######################################
+# Threads
+
+find_package(Threads)
+set(LINK_LIBS ${LINK_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+
+#######################################
 # lib
 
 if(NOT APPLE)
