@@ -17,8 +17,11 @@
 # elif HAVE_ACML
 #  include <acml.h>
 # else
+extern "C"
+{
 # include <cblas.h>
 # include <lapacke.h>
+}
 # endif
 #endif
 
