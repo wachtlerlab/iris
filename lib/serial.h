@@ -88,9 +88,6 @@ public:
     }
 
     serial(serial &&other) {
-        if (fd > -1) {
-            close(fd);
-        }
         fd = other.fd;
         other.fd = -1;
     }
