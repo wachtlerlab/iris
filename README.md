@@ -79,6 +79,23 @@ layout is the following:
 Most measured data (`*.cac`, `*.isodata`, `*.h5`) are stored in the HDF5
 format. The rest of the data is in YAML.
 
+Usage - Calibration
+-------------------
+
+We need to blacklist the `cdc-acm` kernel module that otherwise might be
+loaded and bind earlier. At least the PR655 needs the `usbserial`. This
+can be done by creatin a file called `/etc/modprobe.d/pr665.conf` with
+the following contents (see `modprobe.conf(5)`):
+
+	#PR655 should use usbserial
+	blacklist cdc-acm
+
+The following set of commands will use the PR655 connected to `/dev/ttyUSB0`
+to calibrate the screen of `395 mm` width by `295 mm` height.
+
+	iris-measure --device=/dev/ttyUSB0 calib.stim
+	iris-calibrate -W 395 -H 295 spectra-20150814T1522.h5
+
 
 [glm]: https://glm.g-truc.net/0.9.9/index.html
 [glew]: http://glew.sourceforge.net/
