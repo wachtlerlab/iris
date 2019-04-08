@@ -31,6 +31,23 @@ Configuring and building:
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr -G Ninja ..
 	ninja
 
+Usage - Tools
+-------------
+
+| Command            | Description                                                |
+| ----------------   | ---------------------------------------------------------- |
+| `pr655`            | interface with the PR655 spectrometer                      |
+| `iris-measure`     | use calibration stimuli to measure spectra                 |
+| `iris-calibrate`   | use measured spectra to generated calibration              |
+| `iris-cgen`        | generate color (`-r, -g, -b`) or white (`-w`) stimuli, in  |
+|                    | increments of N steps (`-N`) that repeat for (`-B`) blocks |
+| `iris-info`        | Show information about known monitors                      |
+| `iris-store`       | Show store information                                     |
+| `iris-colorcircle` | Display a (calibrated) colorcircle                         |
+| `iris-board`       | Display an animated (and color calibrated checkerboard     |
+| `iris-isoslant`    | Measure iso-slant data for a single test subject           |
+| `iris-fitiso`      | Use iso-slant data to generate per-subject calibration     |
+
 
 
 [glm]: https://glm.g-truc.net/0.9.9/index.html
