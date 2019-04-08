@@ -1,0 +1,31 @@
+rgb2lms:
+  id: 20150825T1555
+  size:
+    width: 395
+    height: 294
+  gray-level: 0.66
+  dataset: spectra-20150825T1554.h5
+  display:
+    monitor_id: eDP-1
+    settings_id: 20150602
+    link_id: eDP-1
+    gfx: gl
+    mode:
+      width: 1280
+      height: 1024
+      refresh: 85
+      color-depth: [8, 8, 8]
+  dkl: |
+    # A₀ [A₀S, A₀M, A₀L]
+    0.0437856059, 1.12776536, 2.10532006
+    
+    # A [ArS, AgS, AbS; 
+    #    ArM, AgM, AbM; 
+    #    ArL, AgL, AbL ]
+    9.57569783e-07, 6.23107612e-06, 9.66416579e-05
+    0.000218169081, 0.0015551971, 0.000489407411
+    0.0009676302, 0.00233508571, 0.000514881643
+    
+    # ɣ [rˠ, gˠ, bˠ]
+    1.85415433, 1.8150179, 1.75956656
+    

@@ -1,0 +1,22 @@
+settings:
+  contrast: 95
+  brightness: 50
+  left-right: 55
+  left-right-size: 67
+  up-down: 49
+  up-down-size: 49
+  geo-tilt: 51
+  geo-sym-curve: 35
+  geo-asym-curve: 49
+  geo-trapez: 50
+  gep-parallello: 53
+  kvg-left-right: 53
+  kvg-up-down: 53
+  kvg-up-down-up: 53
+  kvg-up-down-down: 56
+  color-purity-top-right: 50
+  color-purity-top-left: 50
+  color-purity-bottom-left: 50
+  color-purity-bottom-right: 50
+  color-type: simple
+  color-temperature: 7200K

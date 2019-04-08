@@ -1,0 +1,16 @@
+isoslant:
+  id: 20150609T1147
+  subject: twachtler
+  dl: 0.01784325730811845
+  phi: 5.86578264266967
+  display:
+    monitor_id: sony_gdmf520_77
+    settings_id: 20150602
+    link_id: DVI-0
+    gfx: gl
+    mode:
+      width: 1280
+      height: 1024
+      refresh: 85
+      color-depth: [8, 8, 8]
+  rgb2lms: 20150608T1549
