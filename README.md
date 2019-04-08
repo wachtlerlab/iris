@@ -48,6 +48,36 @@ Usage - Tools
 | `iris-isoslant`    | Measure iso-slant data for a single test subject           |
 | `iris-fitiso`      | Use iso-slant data to generate per-subject calibration     |
 
+Usage - Store
+-------------
+
+The calibration and configuration data can be stored globally,
+`/etc/iris`, or locally per user at `~/.config/iris`. The basic
+layout is the following:
+
+	[store root]
+	├── cones/                              # cone sensitivies data
+	│   └── sml_380@4.csv                   # SML data, starting 380nm, 4nm steps
+	├── default.font -> fonts/OpenSans.ttf  # link to default font
+	├── default.monitor -> monitors/eDP-1   # link to default monitor
+	├── fonts/                              # all fonts
+	├── links.cfg                           # output to monitor description
+	├── monitors/                           # all known montors
+	│   └── sony_gdmf520_77                 # example monitor
+	│       ├── 20150602.settings           # description of monitor settings (brightness, …)
+	│       ├── 20150602T1807.rgb2lms       # calibration data from spectra (`iris-calibrate`)
+	│       ├── 20150608T1549.cac           # calibration data like above, in hdf5 format
+	│       ├── sony_gdmf520_77.monitor     # description of the monitor (model, name, …)
+	│       └── spectra-20150617T1737.h5    # measured monitor spectra (`iris-measure`)
+	├── subjects/                           # registred subjects
+	│   └── tsubject                        # subject, "Test Subject" (tsubject)
+	│       ├── 20150827T1755.isodata       # measured isoslant data (`iris-isoslant`)
+	│       ├── 20150827T1755.isoslant      # isoslant calibration form isodata (`iris-fitiso`)
+	│       └── tsubject.subject            # subject description
+	└── version                             # store format version, currently "1.0\n"
+
+Most measured data (`*.cac`, `*.isodata`, `*.h5`) are stored in the HDF5
+format. The rest of the data is in YAML.
 
 
 [glm]: https://glm.g-truc.net/0.9.9/index.html
