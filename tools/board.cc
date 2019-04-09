@@ -236,7 +236,7 @@ int main(int argc, char **argv) {
 
     bool grab_mouse = false;
 
-    po::options_description opts("calibration tool");
+    po::options_description opts("screensaver tool");
     opts.add_options()
             ("help", "produce help message")
             ("grab-mouse,m", po::value<bool>(&grab_mouse));
