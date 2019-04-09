@@ -56,14 +56,18 @@ Usage - Introduction
 --------------------
 
 The fundamental idea of IRIS is to present stimuli on a display (`iris::data::display`)
-which is the virtual entity composed of the physical monitor (`iris::data::monitor`)
-connected to a computer via an output of the graphics card. The monitor has a specific
-set of concrete settings (brightness, contrast; represented by `iris::data::settings`).
-Scenes are drawn via a graphics subsystem (e.g. OpenGL). The link between graphics card,
-monitor and graphics subsystem is configured via `iris::data::link`. To be able
-to use color accurately (in DKL space) a display needs to have valid calibration
-(`iris::data::rgb2lms`). Individual subjects can have varying iso-slants, so for
-each subject an additional iso-slant correction can be applied when displaying stimuli.
+which is the virtual entity composed of the following concrete entities:
+ - physical monitor (`iris::data::monitor`)
+ - concrete settings of the monitor (brightness, contrast, …; represented by `iris::data::settings`)
+ - graphics card output (HMDI, DisplayPort)
+ - the mode of the monitor (resolution, color depth, …; represented by `iris::data::monitor::mode`)
+ - the graphics subsystem being used (currently only OpenGL)
+
+The link between graphics card, monitor and graphics subsystem is configured via `iris::data::link`.
+To be able to use color accurately (in DKL space) a display needs to have valid calibration, i.e.
+`iris::data::rgb2lms`. Individual subjects can have varying iso-slants (`iris::data::isoslant`),
+so for each subject and display an additional iso-slant correction can be applied when displaying 
+stimuli.
 
 
 Usage - Store
