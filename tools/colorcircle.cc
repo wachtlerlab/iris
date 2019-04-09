@@ -287,7 +287,7 @@ int main(int argc, char **argv) {
     std::string sid;
     bool grab_mouse = false;
 
-    po::options_description opts("calibration tool");
+    po::options_description opts("color-circle tool");
     opts.add_options()
             ("help", "produce help message")
             ("subject,S", po::value<std::string>(&sid))
