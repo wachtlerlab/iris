@@ -1,6 +1,10 @@
 IRIS
 ====
 
+Toolbox for creating (color) vision experiments. It provides a library and
+tools with the aim to create simple visual experiments on color-calibrated
+monitors.
+
 Building
 --------
 
